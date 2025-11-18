@@ -39,7 +39,7 @@ class Pantalla_Viaje extends StatefulWidget {
   Pantalla_Viaje(
       {super.key,
       required this.selectedIndex,
-        required this.inicionSesiada,
+      required this.inicionSesiada,
       required this.viajes,
       required this.num_viaje,
       required this.repo,
@@ -468,7 +468,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)),
                   margin: const EdgeInsets.symmetric(vertical: 8),
-
                   child: Column(
                     children: [
                       Stack(

@@ -21,7 +21,6 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
-
 // Dominio / aplicación
 import 'package:journi/application/shared/result.dart';
 
@@ -32,8 +31,6 @@ void main() {
   final TripRepository tripRepo = DriftTripRepository(db);
   final EntryRepository entryRepo = DriftEntryRepository(db);
   final UserRepository userRepo = DriftUserRepository(db);
-
-
 
   final tripService = makeTripService(tripRepo);
   final entryService = makeEntryService(entryRepo);
@@ -101,7 +98,8 @@ class MyHomePage extends StatefulWidget {
     required this.tripService,
     required this.entryRepo,
     required this.entryService,
-    required this.userRepo, required this.userService,
+    required this.userRepo,
+    required this.userService,
   });
 
   final String title;
@@ -327,45 +325,41 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             } else if (index == 4) {
               //mi perfil
-                if (widget.inicionSesiada){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MiPerfil(
-                        selectedIndex: index,
-                        inicionSesiada: widget.inicionSesiada,
-                        viajes: widget.viajes,
-                        tripRepo: widget.tripRepo,
-                        entryRepo: widget.entryRepo,
-                        tripService: widget.tripService,
-                        entryService: widget.entryService,
-                        userRepo: widget.userRepo,
-                        userService: widget.userService,
-
-                      ),
+              if (widget.inicionSesiada) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MiPerfil(
+                      selectedIndex: index,
+                      inicionSesiada: widget.inicionSesiada,
+                      viajes: widget.viajes,
+                      tripRepo: widget.tripRepo,
+                      entryRepo: widget.entryRepo,
+                      tripService: widget.tripService,
+                      entryService: widget.entryService,
+                      userRepo: widget.userRepo,
+                      userService: widget.userService,
                     ),
-                  );
-                }
-                else{
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginScreen(
-                        selectedIndex: index,
-                        inicionSesiada: widget.inicionSesiada,
-                        viajes: widget.viajes,
-                        tripRepo: widget.tripRepo,
-                        entryRepo: widget.entryRepo,
-                        tripService: widget.tripService,
-                        entryService: widget.entryService,
-                        userRepo: widget.userRepo,
-                        userService: widget.userService,
-
-                      ),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(
+                      selectedIndex: index,
+                      inicionSesiada: widget.inicionSesiada,
+                      viajes: widget.viajes,
+                      tripRepo: widget.tripRepo,
+                      entryRepo: widget.entryRepo,
+                      tripService: widget.tripService,
+                      entryService: widget.entryService,
+                      userRepo: widget.userRepo,
+                      userService: widget.userService,
                     ),
-                  );
-                }
-
+                  ),
+                );
+              }
             }
           });
         },

@@ -36,7 +36,6 @@ void main() {
       entryService = DefaultEntryService(repo: entryRepo);
       tRepo = DriftTripRepository(db);
       eRepo = DriftEntryRepository(db);
-
     });
 
     testWidgets('✅ Crear entrada correctamente', (WidgetTester tester) async {
