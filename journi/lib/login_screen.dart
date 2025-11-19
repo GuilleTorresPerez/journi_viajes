@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'application/entry_service.dart';
 import 'application/trip_service.dart';
 import 'application/user_service.dart';
+import 'package:journi/application/use_cases/user_use_cases.dart';
+import 'package:journi/application/shared/result.dart';
+import 'package:journi/domain/user.dart';
 import 'data/local/drift/app_database.dart';
 import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/entry_repository.dart';
@@ -14,7 +17,7 @@ import 'register_screen.dart';
 class LoginScreen extends StatefulWidget {
   int selectedIndex;
   List<Trip> viajes;
-  final bool inicionSesiada;
+  final bool sesionIniciada;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
@@ -24,7 +27,7 @@ class LoginScreen extends StatefulWidget {
 
   LoginScreen({
     super.key,
-    required this.inicionSesiada,
+    required this.sesionIniciada,
     required this.viajes,
     required this.selectedIndex,
     required this.tripRepo,
@@ -86,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
       MaterialPageRoute(
         builder: (_) => MiPerfil(
           selectedIndex: widget.selectedIndex,
-          inicionSesiada: true,
+          sesionIniciada: true,
           viajes: widget.viajes,
           tripRepo: widget.tripRepo,
           entryRepo: widget.entryRepo,
@@ -194,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(
                         builder: (_) => RegisterScreen(
                           selectedIndex: widget.selectedIndex,
-                          inicionSesiada: widget.inicionSesiada,
+                          sesionIniciada: widget.sesionIniciada,
                           viajes: widget.viajes,
                           tripRepo: widget.tripRepo,
                           entryRepo: widget.entryRepo,

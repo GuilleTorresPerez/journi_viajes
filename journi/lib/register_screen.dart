@@ -12,7 +12,7 @@ import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart'; // para poder ir al login
 
 class RegisterScreen extends StatefulWidget {
-  final bool inicionSesiada;
+  final bool sesionIniciada;
   int selectedIndex;
   List<Trip> viajes;
   final TripRepository tripRepo;
@@ -24,7 +24,7 @@ class RegisterScreen extends StatefulWidget {
 
   RegisterScreen(
       {super.key,
-      required this.inicionSesiada,
+      required this.sesionIniciada,
       required this.viajes,
       required this.selectedIndex,
       required this.tripRepo,
@@ -82,7 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       MaterialPageRoute(
         builder: (_) => LoginScreen(
           selectedIndex: widget.selectedIndex,
-          inicionSesiada: widget.inicionSesiada,
+          sesionIniciada: widget.sesionIniciada,
           viajes: widget.viajes,
           tripRepo: widget.tripRepo,
           entryRepo: widget.entryRepo,
@@ -101,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       MaterialPageRoute(
         builder: (_) => LoginScreen(
           selectedIndex: widget.selectedIndex,
-          inicionSesiada: widget.inicionSesiada,
+          sesionIniciada: widget.sesionIniciada,
           viajes: widget.viajes,
           tripRepo: widget.tripRepo,
           entryRepo: widget.entryRepo,

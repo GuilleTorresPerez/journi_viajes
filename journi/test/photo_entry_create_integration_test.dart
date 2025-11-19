@@ -58,7 +58,7 @@ void main() {
         home: Pantalla_Viaje(
           selectedIndex: 0,
           num_viaje: 0,
-          inicionSesiada: false,
+          sesionIniciada: false,
           viajes: [trip],
           tripService: tripService,
           entryService: entryService,
@@ -88,7 +88,7 @@ void main() {
             home: Pantalla_Viaje(
               selectedIndex: 0,
               num_viaje: 0,
-              inicionSesiada: false,
+              sesionIniciada: false,
               viajes: [trip],
               tripService: tripService,
               entryService: entryService,

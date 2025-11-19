@@ -42,7 +42,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         home: MyHomePage(
           title: 'JOURNI',
-          inicionSesiada: false,
+          sesionIniciada: false,
           viajes: [],
           tripService: tripService,
           entryService: entryService,
@@ -85,7 +85,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         home: Crear_Viaje(
           selectedIndex: 2,
-          inicionSesiada: false,
+          sesionIniciada: false,
           viajes: [],
           num_viaje: -1,
           repo: tRepo,
