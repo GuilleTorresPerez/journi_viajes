@@ -21,9 +21,6 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
-// Dominio / aplicación
-import 'package:journi/application/shared/result.dart';
-
 import 'package:journi/login_screen.dart';
 
 void main() {
