@@ -21,9 +21,9 @@ import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
 class Pantalla_Viaje extends StatefulWidget {
-  int selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
-  List<Trip> viajes;
-  int num_viaje;
+  final int selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
+  final List<Trip> viajes;
+  final int num_viaje;
   final ImagePicker? picker;
   final bool inicionSesiada;
   // 👉 Puerto (interfaz) en lugar del repo in-memory
@@ -56,6 +56,14 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
   final ImagePicker _picker = ImagePicker();
   final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
   final TextEditingController _textoController = TextEditingController();
+
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex; // snapshot inicial
+  }
 
   void _editarUbicacion(Entry entry) async {
     final nameController = TextEditingController(text: entry.text);
@@ -527,7 +535,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: widget.selectedIndex,
+        currentIndex: _selectedIndex,
         backgroundColor: const Color(0xFFEDE5D0),
         unselectedItemColor: Colors.black,
         selectedItemColor: Colors.teal[500],
@@ -543,11 +551,11 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
         ],
         onTap: (int inIndex) {
           setState(() {
-            widget.selectedIndex = inIndex;
-            if (widget.selectedIndex == 0) {
+            _selectedIndex = inIndex;
+            if (_selectedIndex == 0) {
               // ✅ Volver a la home existente
               Navigator.pop(context);
-            } else if (widget.selectedIndex == 1) {
+            } else if (_selectedIndex == 1) {
               // Ir al mapa
               Navigator.push(
                 context,
