@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'application/entry_service.dart';
 import 'application/trip_service.dart';
 import 'application/user_service.dart';
-import 'data/local/drift/app_database.dart';
-import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';

@@ -14,8 +14,6 @@ import 'package:journi/domain/trip.dart' hide Ok;
 import 'application/shared/result.dart';
 import 'application/user_service.dart';
 import 'crear_viaje.dart';
-import 'data/local/drift/app_database.dart';
-import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'editar_viaje.dart';
 import 'map_screen.dart';

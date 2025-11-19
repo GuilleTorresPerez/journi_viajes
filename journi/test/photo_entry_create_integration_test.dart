@@ -12,7 +12,6 @@ import 'package:journi/application/entry_service.dart';
 import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/trip.dart';
-import 'package:journi/main.dart';
 import 'package:journi/mockImagePicker.dart';
 import 'package:journi/pantalla_viaje.dart';
 

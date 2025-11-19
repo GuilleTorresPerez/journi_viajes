@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:journi/application/user_service.dart';
-import 'package:journi/crear_viaje.dart';
 import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_entry_repository.dart';
 import 'package:journi/data/local/drift/drift_trip_repository.dart';
