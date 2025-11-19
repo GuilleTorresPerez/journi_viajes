@@ -12,9 +12,9 @@ import 'main.dart';
 import 'map_screen.dart';
 
 class MiPerfil extends StatefulWidget {
-  int selectedIndex;
+  final int selectedIndex;
   final bool inicionSesiada;
-  List<Trip> viajes;
+  final List<Trip> viajes;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
