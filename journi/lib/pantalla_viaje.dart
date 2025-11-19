@@ -21,7 +21,8 @@ import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
 class Pantalla_Viaje extends StatefulWidget {
-  final int selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
+  final int
+      selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
   final List<Trip> viajes;
   final int num_viaje;
   final ImagePicker? picker;
