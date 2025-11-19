@@ -12,6 +12,7 @@ import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
 import 'login_screen.dart';
 import 'main.dart';
+import 'domain/user.dart';
 import 'map_screen.dart';
 
 class MiPerfil extends StatefulWidget {
@@ -25,6 +26,8 @@ class MiPerfil extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
+  final User currentUser;   // 👈 AÑADIR ESTO
+
   MiPerfil({
     super.key,
     required this.sesionIniciada,
@@ -36,6 +39,7 @@ class MiPerfil extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
+    required this.currentUser,   // 👈 AÑADIR EN EL CONSTRUCTOR
   });
 
   @override
@@ -51,8 +55,24 @@ class _MiPerfilState extends State<MiPerfil> {
         backgroundColor: Colors.teal[200],
         title: const Text('Mi perfil'),
       ),
-      body: const Center(
-        child: Text('Aquí irá la información de tu perfil'),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Aquí irá la información de tu perfil',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Correo: ${widget.currentUser.email}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.selectedIndex,
@@ -71,63 +91,50 @@ class _MiPerfilState extends State<MiPerfil> {
         ],
         onTap: (int index) {
           setState(() {
-            if (widget.selectedIndex == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
-                  builder: (context) => MyHomePage(
-                    title: 'JOURNI',
-                    sesionIniciada: widget.sesionIniciada,
-                    viajes: widget.viajes,
-                    tripRepo: widget.tripRepo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: widget.userService,
-                  ),
-                ),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Crear_Viaje(
-                    selectedIndex: index,
-                    sesionIniciada: widget.sesionIniciada,
-                    viajes: widget.viajes,
-                    num_viaje: -1,
-                    repo: widget.tripRepo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: widget.userService,
-                  ),
-                ),
-              );
-            } else if (index == 1) {
-              // Ir al mapa
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MapaPaisScreen(
-                    selectedIndex: index,
-                    sesionIniciada: widget.sesionIniciada,
-                    viajes: widget.viajes,
-                    tripRepo: widget.tripRepo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: widget.userService,
-                  ),
-                ),
-              );
-            }
+            widget.selectedIndex = index;
           });
-        },
+
+          if (index == 0) {
+            // Volver a la pantalla anterior (MyHomePage original con su estado)
+            Navigator.pop(context);
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Crear_Viaje(
+                  selectedIndex: index,
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  num_viaje: -1,
+                  repo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                ),
+              ),
+            );
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MapaPaisScreen(
+                  selectedIndex: index,
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                ),
+              ),
+            );
+          }
+        }
+        ,
       ),
     );
   }

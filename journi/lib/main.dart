@@ -102,11 +102,13 @@ class MyHomePage extends StatefulWidget {
     required this.tripService,
     required this.entryRepo,
     required this.entryService,
-    required this.userRepo, required this.userService,
+    required this.userRepo,
+    required this.userService,
   });
 
   final String title;
   final bool sesionIniciada;
+
   final TripRepository tripRepo;
   final TripService tripService;
 
@@ -117,12 +119,13 @@ class MyHomePage extends StatefulWidget {
 
   List<Trip> viajes = [];
 
-  UserRepository userRepo;
-  UserService userService;
+  final UserRepository userRepo;
+  final UserService userService;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
+
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
@@ -137,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _sesionIniciada = widget.sesionIniciada;  // 👈 IMPORTANTE
     _loadInitial();
   }
 
@@ -284,40 +288,82 @@ class _MyHomePageState extends State<MyHomePage> {
         iconSize: 35,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.folder), label: 'Mis viajes'),
+          BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Mis viajes'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],
-        onTap: (int index) {
+        onTap: (int index) async {
+          // Actualizamos índice básico
           setState(() {
             _selectedIndex = index;
-            if (_selectedIndex == 2) {
+          });
+
+          if (index == 2) {
+            // Nuevo viaje
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Crear_Viaje(
+                  selectedIndex: _selectedIndex,
+                  sesionIniciada: _sesionIniciada,
+                  viajes: widget.viajes,
+                  num_viaje: -1,
+                  repo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                ),
+              ),
+            );
+          } else if (index == 1) {
+            // Mapa
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MapaPaisScreen(
+                  selectedIndex: index,
+                  sesionIniciada: _sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                ),
+              ),
+            );
+          } else if (index == 4) {
+            // Perfil
+            if (_sesionIniciada && _currentUser != null) {
+              // Ya tenía sesión -> ir directo a MiPerfil
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Crear_Viaje(
-                    selectedIndex: _selectedIndex,
+                  builder: (context) => MiPerfil(
+                    selectedIndex: index,
                     sesionIniciada: _sesionIniciada,
                     viajes: widget.viajes,
-                    num_viaje: -1,
-                    repo: widget.tripRepo,
+                    tripRepo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: _currentUser!, //loggedUser
                   ),
                 ),
               );
-            } else if (index == 1) {
-              // Ir al mapa
-              Navigator.push(
+            } else {
+              // No hay sesión -> ir a Login y esperar resultado
+              final loggedUser = await Navigator.push<User?>(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MapaPaisScreen(
+                  builder: (context) => LoginScreen(
                     selectedIndex: index,
                     sesionIniciada: _sesionIniciada,
                     viajes: widget.viajes,
@@ -330,9 +376,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               );
-            }else if (index == 4)  {
-              if (_sesionIniciada && _currentUser != null) {
-                // Ya hay sesión -> ir a MiPerfil
+
+              if (loggedUser != null && mounted) {
+                setState(() {
+                  _sesionIniciada = true;
+                  _currentUser = loggedUser;
+                });
+
+                // Una vez logueado, lo llevamos al perfil
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -346,39 +397,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
+                      currentUser: loggedUser,
                     ),
                   ),
                 );
-              } else {
-                // No hay sesión -> ir a Login y esperar resultado
-                final loggedUser =  Navigator.push<User?>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      selectedIndex: index,
-                      sesionIniciada: _sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.tripRepo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
-                    ),
-                  ),
-                );
-
-                if (loggedUser != null && mounted) {
-                  setState(() async {
-                    _sesionIniciada = true;
-                    _currentUser = await loggedUser;
-                  });
-                }
               }
             }
-          });
+          }
         },
       ),
+
     );
   }
 }

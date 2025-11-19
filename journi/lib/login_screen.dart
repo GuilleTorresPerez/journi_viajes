@@ -25,6 +25,7 @@ class LoginScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
+
   LoginScreen({
     super.key,
     required this.sesionIniciada,
@@ -54,12 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onEntrar() {
+  Future<void> _onEntrar() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -71,35 +72,46 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!emailRegex.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-                'El correo introducido no sigue el formato correcto. Inténtelo de nuevo')),
+          content: Text(
+            'El correo introducido no sigue el formato correcto. Inténtelo de nuevo',
+          ),
+        ),
       );
       return;
     }
 
-    // 🔐 Simulamos login correcto
-    //sesionIniciada = true; // ✅ Ahora la reconoce correctamente
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sesión iniciada correctamente')),
+    // 🔐 Llamada real al caso de uso de login
+    final cmd = AuthenticateUserCommand(
+      email: email,
+      password: password,
     );
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MiPerfil(
-          selectedIndex: widget.selectedIndex,
-          sesionIniciada: true,
-          viajes: widget.viajes,
-          tripRepo: widget.tripRepo,
-          entryRepo: widget.entryRepo,
-          tripService: widget.tripService,
-          entryService: widget.entryService,
-          userRepo: widget.userRepo,
-          userService: widget.userService,
-        ),
-      ),
-    );
+    final result = await widget.userService.authenticate(cmd);
+
+    if (!mounted) return;
+
+    if (result is Ok<User>) {
+      final user = result.value;
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bienvenido, ${user.name}')),
+      );
+
+      // 👇 Devolvemos el usuario a la pantalla anterior (MyHomePage)
+      Navigator.pop<User>(context, user);
+    }
+    else {
+      // ❌ Error de autenticación
+      final msg = result.errorsOrEmpty.isNotEmpty
+          ? result.errorsOrEmpty.first.message
+          : 'Error al iniciar sesión';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg)),
+      );
+    }
   }
 
   @override
