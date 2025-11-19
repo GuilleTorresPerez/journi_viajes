@@ -11,8 +11,8 @@ import 'domain/trip.dart'; // para poder ir al login
 
 class RegisterScreen extends StatefulWidget {
   final bool inicionSesiada;
-  int selectedIndex;
-  List<Trip> viajes;
+  final int selectedIndex;
+  final List<Trip> viajes;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
