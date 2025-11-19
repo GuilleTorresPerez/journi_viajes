@@ -21,9 +21,6 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
-// Dominio / aplicación
-import 'package:journi/application/shared/result.dart';
-
 import 'package:journi/login_screen.dart';
 
 void main() {
@@ -76,7 +73,6 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(
         title: 'JOURNI',
         inicionSesiada: false,
-        viajes: const [],
         tripRepo: tripRepo,
         tripService: tripService,
         entryRepo: entryRepo,
@@ -93,7 +89,6 @@ class MyHomePage extends StatefulWidget {
     super.key,
     required this.title,
     required this.inicionSesiada,
-    required this.viajes,
     required this.tripRepo,
     required this.tripService,
     required this.entryRepo,
@@ -104,18 +99,17 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
   final bool inicionSesiada;
+
   final TripRepository tripRepo;
   final TripService tripService;
 
   final EntryRepository entryRepo;
-  final MockImagePicker picker = MockImagePicker();
-
   final EntryService entryService;
 
-  List<Trip> viajes = [];
+  final UserRepository userRepo;
+  final UserService userService;
 
-  UserRepository userRepo;
-  UserService userService;
+  final MockImagePicker picker = MockImagePicker();
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -126,6 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 🔽 snapshot inicial para cuando el stream aún no ha emitido
   List<Trip>? _initialTrips;
+  List<Trip> _viajes = [];
 
   @override
   void initState() {
@@ -194,7 +189,8 @@ class _MyHomePageState extends State<MyHomePage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          widget.viajes = items;
+          _viajes = items;
+
           if (items.isEmpty) {
             return const Center(
               child: Text(
@@ -294,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   builder: (context) => Crear_Viaje(
                     selectedIndex: _selectedIndex,
                     inicionSesiada: widget.inicionSesiada,
-                    viajes: widget.viajes,
+                    viajes: _viajes,
                     num_viaje: -1,
                     repo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
@@ -313,7 +309,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   builder: (context) => MapaPaisScreen(
                     selectedIndex: index,
                     inicionSesiada: widget.inicionSesiada,
-                    viajes: widget.viajes,
+                    viajes: _viajes,
                     tripRepo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
@@ -332,7 +328,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) => MiPerfil(
                       selectedIndex: index,
                       inicionSesiada: widget.inicionSesiada,
-                      viajes: widget.viajes,
+                      viajes: _viajes,
                       tripRepo: widget.tripRepo,
                       entryRepo: widget.entryRepo,
                       tripService: widget.tripService,
@@ -349,7 +345,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) => LoginScreen(
                       selectedIndex: index,
                       inicionSesiada: widget.inicionSesiada,
-                      viajes: widget.viajes,
+                      viajes: _viajes,
                       tripRepo: widget.tripRepo,
                       entryRepo: widget.entryRepo,
                       tripService: widget.tripService,

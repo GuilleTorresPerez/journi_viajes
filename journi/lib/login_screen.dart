@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'application/entry_service.dart';
 import 'application/trip_service.dart';
 import 'application/user_service.dart';
-import 'data/local/drift/app_database.dart';
-import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
@@ -12,8 +10,8 @@ import 'mi_perfil.dart'; // importa tu pantalla de perfil
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  int selectedIndex;
-  List<Trip> viajes;
+  final int selectedIndex;
+  final List<Trip> viajes;
   final bool inicionSesiada;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
@@ -22,7 +20,7 @@ class LoginScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  LoginScreen({
+  const LoginScreen({
     super.key,
     required this.inicionSesiada,
     required this.viajes,

@@ -23,8 +23,8 @@ import 'main.dart';
 //
 class MapaPaisScreen extends StatefulWidget {
   final bool inicionSesiada;
-  int selectedIndex;
-  List<Trip> viajes;
+  final int selectedIndex;
+  final List<Trip> viajes;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
@@ -54,6 +54,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
   final UserRepository userRepo = DriftUserRepository(AppDatabase());
   late final userService;
   List<Trip>? _viajes;
+  late int _selectedIndex;
 
   @override
   void initState() {
@@ -86,7 +87,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
         ),
         body: Center(child: CircularProgressIndicator()),
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: widget.selectedIndex,
+          currentIndex: _selectedIndex,
           backgroundColor: const Color(0xFFEDE5D0),
           unselectedItemColor: Colors.black,
           selectedItemColor: Colors.teal[500],
@@ -105,8 +106,8 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
           ],
           onTap: (int index) {
             setState(() {
-              widget.selectedIndex = index;
-              if (widget.selectedIndex == 0) {
+              _selectedIndex = index;
+              if (_selectedIndex == 0) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -114,7 +115,6 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     builder: (context) => MyHomePage(
                       title: 'JOURNI',
                       inicionSesiada: widget.inicionSesiada,
-                      viajes: widget.viajes,
                       tripRepo: widget.tripRepo,
                       entryRepo: widget.entryRepo,
                       tripService: widget.tripService,
@@ -124,12 +124,12 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     ),
                   ),
                 );
-              } else if (widget.selectedIndex == 2) {
+              } else if (_selectedIndex == 2) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => Crear_Viaje(
-                      selectedIndex: widget.selectedIndex,
+                      selectedIndex: _selectedIndex,
                       viajes: _viajes!,
                       inicionSesiada: widget.inicionSesiada,
                       num_viaje: -1,
@@ -233,7 +233,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
               },
             ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: widget.selectedIndex,
+        currentIndex: _selectedIndex,
         backgroundColor: const Color(0xFFEDE5D0),
         unselectedItemColor: Colors.black,
         selectedItemColor: Colors.teal[500],
@@ -249,8 +249,8 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
         ],
         onTap: (int index) {
           setState(() {
-            widget.selectedIndex = index;
-            if (widget.selectedIndex == 0) {
+            _selectedIndex = index;
+            if (_selectedIndex == 0) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -265,12 +265,12 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                   ),
                 ),
               );
-            } else if (widget.selectedIndex == 2) {
+            } else if (_selectedIndex == 2) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => Crear_Viaje(
-                    selectedIndex: widget.selectedIndex,
+                    selectedIndex: _selectedIndex,
                     viajes: _viajes!,
                     inicionSesiada: widget.inicionSesiada,
                     num_viaje: -1,

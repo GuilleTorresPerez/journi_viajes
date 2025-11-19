@@ -28,7 +28,6 @@ void main() {
       home: MyHomePage(
         title: 'JOURNI',
         inicionSesiada: false,
-        viajes: const [],
         tripRepo: repo,
         tripService: tripService,
         entryRepo: entryRepo,
@@ -54,7 +53,6 @@ void main() {
       home: MyHomePage(
         title: 'JOURNI',
         inicionSesiada: false,
-        viajes: const [],
         tripRepo: repo,
         tripService: tripService,
         entryRepo: entryRepo,
@@ -101,7 +99,6 @@ void main() {
       home: MyHomePage(
         title: 'JOURNI',
         inicionSesiada: false,
-        viajes: const [],
         tripRepo: repo,
         tripService: tripService,
         entryRepo: entryRepo,
@@ -139,7 +136,6 @@ void main() {
       home: MyHomePage(
         title: 'JOURNI',
         inicionSesiada: false,
-        viajes: const [],
         tripRepo: repo,
         tripService: tripService,
         entryRepo: entryRepo,

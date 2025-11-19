@@ -4,20 +4,17 @@ import 'application/entry_service.dart';
 import 'application/trip_service.dart';
 import 'application/user_service.dart';
 import 'crear_viaje.dart';
-import 'data/local/drift/app_database.dart';
-import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
-import 'login_screen.dart';
 import 'main.dart';
 import 'map_screen.dart';
 
 class MiPerfil extends StatefulWidget {
-  int selectedIndex;
+  final int selectedIndex;
   final bool inicionSesiada;
-  List<Trip> viajes;
+  final List<Trip> viajes;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
@@ -79,7 +76,6 @@ class _MiPerfilState extends State<MiPerfil> {
                   builder: (context) => MyHomePage(
                     title: 'JOURNI',
                     inicionSesiada: widget.inicionSesiada,
-                    viajes: widget.viajes,
                     tripRepo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
