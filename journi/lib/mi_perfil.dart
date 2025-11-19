@@ -76,7 +76,6 @@ class _MiPerfilState extends State<MiPerfil> {
                   builder: (context) => MyHomePage(
                     title: 'JOURNI',
                     inicionSesiada: widget.inicionSesiada,
-                    viajes: widget.viajes,
                     tripRepo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,

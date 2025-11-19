@@ -43,7 +43,6 @@ void main() {
         home: MyHomePage(
           title: 'JOURNI',
           inicionSesiada: false,
-          viajes: [],
           tripService: tripService,
           entryService: entryService,
           tripRepo: tripRepo,
