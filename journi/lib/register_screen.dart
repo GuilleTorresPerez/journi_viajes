@@ -60,39 +60,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _onGuardar() async {
+    //final id = _idController.text.trim();
     final nombre = _nombreController.text.trim();
     final apellidos = _apellidosController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // DEBUG: imprime lo que está leyendo
-    debugPrint('nombre: "$nombre" (len=${nombre.length})');
-    debugPrint('apellidos: "$apellidos" (len=${apellidos.length})');
-    debugPrint('email: "$email" (len=${email.length})');
-    debugPrint('password: "$password" (len=${password.length})');
-
-    // Comprobación campo a campo para saber cuál falla
-    if (nombre.isEmpty) {
+    if (nombre.isEmpty ||
+        apellidos.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rellena el nombre')),
-      );
-      return;
-    }
-    if (apellidos.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rellena los apellidos')),
-      );
-      return;
-    }
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rellena el correo electrónico')),
-      );
-      return;
-    }
-    if (password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rellena la contraseña')),
+        const SnackBar(content: Text('Falta algún campo')),
       );
       return;
     }
