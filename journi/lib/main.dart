@@ -103,7 +103,7 @@ class MyHomePage extends StatefulWidget {
     required this.entryRepo,
     required this.entryService,
     required this.userRepo,
-    required this.userService,
+    required this.userService, //required bool inicionSesiada,
   });
 
   final String title;
@@ -173,6 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
           entryService: widget.entryService,
           userRepo: widget.userRepo,
           userService: widget.userService,
+          currentUser: _currentUser,
         ),
       ),
     );
@@ -265,6 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           picker: widget.picker,
                           userRepo: widget.userRepo,
                           userService: widget.userService,
+                          currentUser: _currentUser,        // 👈 NUEVO
                         ),
                       ),
                     );

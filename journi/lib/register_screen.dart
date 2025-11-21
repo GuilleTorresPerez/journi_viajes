@@ -66,6 +66,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
+    print('DEBUG REGISTRO: "$nombre" "$apellidos" "$email" "$password"');
+
     if (nombre.isEmpty ||
         apellidos.isEmpty ||
         email.isEmpty ||

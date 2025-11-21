@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'mi_perfil.dart';
+import 'domain/user.dart';
 
 import 'package:journi/application/entry_service.dart';
 import 'package:journi/application/shared/result.dart';
@@ -14,6 +16,7 @@ import 'domain/ports/user_repository.dart';
 import 'login_screen.dart';
 import 'main.dart';
 import 'map_screen.dart';
+import 'mi_perfil.dart';
 
 class Crear_Viaje extends StatefulWidget {
   // 🔒 Los campos del Widget deben ser inmutables (final)
@@ -29,6 +32,9 @@ class Crear_Viaje extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
+  final User? currentUser;  // 👈 AÑADIR ESTO
+
+
 
   const Crear_Viaje({
     super.key,
@@ -41,7 +47,8 @@ class Crear_Viaje extends StatefulWidget {
     required this.tripService,
     required this.entryService,
     required this.userRepo,
-    required this.userService
+    required this.userService,
+    this.currentUser,      // 👈 AÑADIR ESTO
   });
 
   @override
@@ -226,20 +233,7 @@ class _CrearViajeState extends State<Crear_Viaje> {
             _selectedIndex = inIndex; // muta el estado, no el widget
           });
           if (_selectedIndex == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
-                builder: (context) => MyApp(
-                  tripRepo: widget.repo,
-                  entryRepo: widget.entryRepo,
-                  tripService: widget.tripService,
-                  entryService: widget.entryService,
-                  userRepo: widget.userRepo,
-                  userService: widget.userService,
-                ),
-              ),
-            );
+            Navigator.pop(context);  // vuelve a Mis viajes sin perder el estado
           } else if (_selectedIndex == 1) {
             // Ir al mapa
             Navigator.push(
@@ -259,24 +253,42 @@ class _CrearViajeState extends State<Crear_Viaje> {
               ),
             );
           } else if (_selectedIndex == 4) {
-            //mi perfil
-            inIndex = 2;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LoginScreen(
-                  selectedIndex: 2,
-                  sesionIniciada: widget.sesionIniciada,
-                  viajes: widget.viajes,
-                  tripRepo: widget.repo,
-                  entryRepo: widget.entryRepo,
-                  tripService: widget.tripService,
-                  entryService: widget.entryService,
-                  userRepo: widget.userRepo,
-                  userService: widget.userService,
+            if (widget.sesionIniciada && widget.currentUser != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MiPerfil(
+                    selectedIndex: 4,
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                    currentUser: widget.currentUser!,   // 👈 IMPORTANTE
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginScreen(
+                    selectedIndex: 2,
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                  ),
+                ),
+              );
+            }
           }
         },
       ),

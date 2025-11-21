@@ -11,6 +11,8 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/trip.dart' hide Ok;
+import 'mi_perfil.dart';
+import 'domain/user.dart';
 
 import 'application/shared/result.dart';
 import 'application/user_service.dart';
@@ -20,6 +22,7 @@ import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'editar_viaje.dart';
 import 'map_screen.dart';
+import 'mi_perfil.dart';
 import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
@@ -37,6 +40,8 @@ class Pantalla_Viaje extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
+  final User? currentUser;
+
   Pantalla_Viaje(
       {super.key,
       required this.selectedIndex,
@@ -49,7 +54,8 @@ class Pantalla_Viaje extends StatefulWidget {
       required this.entryService,
       this.picker,
       required this.userRepo,
-      required this.userService});
+      required this.userService,
+      this.currentUser,  });
 
   @override
   _PantallaViajeState createState() => _PantallaViajeState();
@@ -746,24 +752,44 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 ),
               );
             } else if (widget.selectedIndex == 4) {
-              inIndex = 0;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
-                  builder: (context) => LoginScreen(
-                    selectedIndex: 0,
-                    sesionIniciada: widget.sesionIniciada,
-                    viajes: widget.viajes,
-                    tripRepo: widget.repo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: widget.userService,
+              if (widget.sesionIniciada && widget.currentUser != null) {
+                // Ya hay sesión -> ir al perfil
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MiPerfil(
+                      selectedIndex: 4,
+                      sesionIniciada: widget.sesionIniciada,
+                      viajes: widget.viajes,
+                      tripRepo: widget.repo,
+                      entryRepo: widget.entryRepo,
+                      tripService: widget.tripService,
+                      entryService: widget.entryService,
+                      userRepo: widget.userRepo,
+                      userService: widget.userService,
+                      currentUser: widget.currentUser!,   // 👈 AQUÍ TAMBIÉN
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                // No hay sesión -> login
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(
+                      selectedIndex: 0,
+                      sesionIniciada: widget.sesionIniciada,
+                      viajes: widget.viajes,
+                      tripRepo: widget.repo,
+                      entryRepo: widget.entryRepo,
+                      tripService: widget.tripService,
+                      entryService: widget.entryService,
+                      userRepo: widget.userRepo,
+                      userService: widget.userService,
+                    ),
+                  ),
+                );
+              }
             }
           });
         },
