@@ -25,7 +25,6 @@ class LoginScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-
   LoginScreen({
     super.key,
     required this.sesionIniciada,
@@ -60,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     final emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -101,8 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // 👇 Devolvemos el usuario a la pantalla anterior (MyHomePage)
       Navigator.pop<User>(context, user);
-    }
-    else {
+    } else {
       // ❌ Error de autenticación
       final msg = result.errorsOrEmpty.isNotEmpty
           ? result.errorsOrEmpty.first.message

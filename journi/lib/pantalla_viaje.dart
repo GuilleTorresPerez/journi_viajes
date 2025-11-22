@@ -42,20 +42,21 @@ class Pantalla_Viaje extends StatefulWidget {
 
   final User? currentUser;
 
-  Pantalla_Viaje(
-      {super.key,
-      required this.selectedIndex,
-        required this.sesionIniciada,
-      required this.viajes,
-      required this.num_viaje,
-      required this.repo,
-      required this.entryRepo,
-      required this.tripService,
-      required this.entryService,
-      this.picker,
-      required this.userRepo,
-      required this.userService,
-      this.currentUser,  });
+  Pantalla_Viaje({
+    super.key,
+    required this.selectedIndex,
+    required this.sesionIniciada,
+    required this.viajes,
+    required this.num_viaje,
+    required this.repo,
+    required this.entryRepo,
+    required this.tripService,
+    required this.entryService,
+    this.picker,
+    required this.userRepo,
+    required this.userService,
+    this.currentUser,
+  });
 
   @override
   _PantallaViajeState createState() => _PantallaViajeState();
@@ -125,7 +126,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
     );
   }
 
-  Future<void> _editarTexto(Entry e, String textoSinUbicacion, String? ubicacionActual) async {
+  Future<void> _editarTexto(
+      Entry e, String textoSinUbicacion, String? ubicacionActual) async {
     final controller = TextEditingController(text: textoSinUbicacion);
 
     await showDialog(
@@ -140,7 +142,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar')),
           TextButton(
             onPressed: () async {
               final nuevoTexto = controller.text.trim();
@@ -152,7 +156,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 id: UniqueKey().toString(),
                 tripId: widget.viajes[widget.num_viaje].id,
                 type: EntryType.note,
-                text: ubicacionActual != null ? '$nuevoTexto\n$ubicacionActual' : nuevoTexto,
+                text: ubicacionActual != null
+                    ? '$nuevoTexto\n$ubicacionActual'
+                    : nuevoTexto,
               );
               await widget.entryService.create(cmd);
 
@@ -169,7 +175,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
     // Separa texto y ubicación si existe
     final partes = (e.text ?? '').split('📍');
     final textoSinUbicacion = partes.first.trim();
-    final ubicacionActual = partes.length > 1 ? '📍${partes.last.trim()}' : null;
+    final ubicacionActual =
+        partes.length > 1 ? '📍${partes.last.trim()}' : null;
 
     await showDialog(
       context: context,
@@ -186,7 +193,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           ),
           ListTile(
             leading: const Icon(Icons.location_on),
-            title: Text(ubicacionActual == null ? 'Añadir ubicación' : 'Editar ubicación'),
+            title: Text(ubicacionActual == null
+                ? 'Añadir ubicación'
+                : 'Editar ubicación'),
             onTap: () async {
               Navigator.pop(context);
               await _asignarUbicacionAEntrada(e); // reusa tu flujo de ubicación
@@ -200,7 +209,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
   Future<void> _mostrarAccionesImagen(Entry e) async {
     // Si el texto contiene una ubicación tipo "📍 ..."
     final partes = (e.text ?? '').split('📍');
-    final ubicacionActual = partes.length > 1 ? '📍${partes.last.trim()}' : null;
+    final ubicacionActual =
+        partes.length > 1 ? '📍${partes.last.trim()}' : null;
 
     await showDialog(
       context: context,
@@ -225,7 +235,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           ),
           ListTile(
             leading: const Icon(Icons.location_on),
-            title: Text(ubicacionActual == null ? 'Añadir ubicación' : 'Editar ubicación'),
+            title: Text(ubicacionActual == null
+                ? 'Añadir ubicación'
+                : 'Editar ubicación'),
             onTap: () async {
               Navigator.pop(context);
               await _asignarUbicacionAEntrada(e); // reusa tu método existente
@@ -270,7 +282,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
         id: UniqueKey().toString(),
         tripId: widget.viajes[widget.num_viaje].id,
         type: entry.type,
-        text: '${entry.text ?? ''}\n📍 $ubicacionTexto', // añadimos ubicación al texto existente
+        text:
+            '${entry.text ?? ''}\n📍 $ubicacionTexto', // añadimos ubicación al texto existente
         mediaUri: entry.mediaUri,
       );
 
@@ -284,6 +297,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
       }
     }
   }
+
   void _abrirUbicacionDesdeTexto(String ubicacionTexto) {
     // Intenta extraer latitud y longitud del texto (formato: 📍 Nombre (lat, lng))
     final regex = RegExp(r'\(([0-9\.\-]+),\s*([0-9\.\-]+)\)');
@@ -560,11 +574,13 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 // Detectamos si hay ubicación en el texto
                 final partes = e.text!.split('📍');
                 final textoSinUbicacion = partes.first.trim();
-                final ubicacionActual = partes.length > 1 ? '📍${partes.last.trim()}' : null;
+                final ubicacionActual =
+                    partes.length > 1 ? '📍${partes.last.trim()}' : null;
 
                 return Card(
                   color: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   child: ListTile(
                     key: ValueKey('eid$index'),
@@ -584,7 +600,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         // Ubicación clicable (abre mapa centrado)
                         if (ubicacionActual != null)
                           GestureDetector(
-                            onTap: () => _abrirUbicacionDesdeTexto(ubicacionActual),
+                            onTap: () =>
+                                _abrirUbicacionDesdeTexto(ubicacionActual),
                             child: Padding(
                               padding: const EdgeInsets.only(top: 6.0),
                               child: Text(
@@ -605,12 +622,16 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.location_on, color: Colors.teal),
-                          tooltip: ubicacionActual == null ? 'Añadir ubicación' : 'Editar ubicación',
+                          icon:
+                              const Icon(Icons.location_on, color: Colors.teal),
+                          tooltip: ubicacionActual == null
+                              ? 'Añadir ubicación'
+                              : 'Editar ubicación',
                           onPressed: () => _asignarUbicacionAEntrada(e),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.red),
+                          icon: const Icon(Icons.delete_outline,
+                              color: Colors.red),
                           onPressed: () async {
                             await widget.entryService.deleteById(e.id);
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -623,8 +644,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 );
               }
-
-
 
               // Imagen
               if (e.type == EntryType.photo && e.mediaUri != null) {
@@ -640,16 +659,17 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)),
                   margin: const EdgeInsets.symmetric(vertical: 8),
-
                   child: Column(
                     children: [
                       Stack(
                         alignment: Alignment.topRight,
                         children: [
                           GestureDetector(
-                            onTap: () => _mostrarAccionesImagen(e), // 👈 NUEVO: muestra el menú contextual
+                            onTap: () => _mostrarAccionesImagen(
+                                e), // 👈 NUEVO: muestra el menú contextual
                             child: ClipRRect(
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(15)),
                               child: Image.file(
                                 file,
                                 height: 200,
@@ -659,7 +679,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.location_on, color: Colors.teal),
+                            icon: const Icon(Icons.location_on,
+                                color: Colors.teal),
                             tooltip: 'Añadir ubicación',
                             onPressed: () => _asignarUbicacionAEntrada(e),
                           ),
@@ -673,9 +694,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                           ),
                         ],
-
                       ),
-
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Text(
@@ -767,7 +786,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
-                      currentUser: widget.currentUser!,   // 👈 AQUÍ TAMBIÉN
+                      currentUser: widget.currentUser!, // 👈 AQUÍ TAMBIÉN
                     ),
                   ),
                 );

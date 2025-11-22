@@ -14,7 +14,6 @@ import 'package:journi/application/use_cases/user_use_cases.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/domain/user.dart';
 
-
 class RegisterScreen extends StatefulWidget {
   final bool sesionIniciada;
   int selectedIndex;
@@ -28,15 +27,15 @@ class RegisterScreen extends StatefulWidget {
 
   RegisterScreen(
       {super.key,
-        required this.sesionIniciada,
-        required this.viajes,
-        required this.selectedIndex,
-        required this.tripRepo,
-        required this.entryRepo,
-        required this.tripService,
-        required this.entryService,
-        required this.userRepo,
-        required this.userService});
+      required this.sesionIniciada,
+      required this.viajes,
+      required this.selectedIndex,
+      required this.tripRepo,
+      required this.entryRepo,
+      required this.tripService,
+      required this.entryService,
+      required this.userRepo,
+      required this.userService});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -124,8 +123,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     }
   }
-
-
 
   void _onYaTengoCuenta() {
     Navigator.pushReplacement(
@@ -253,11 +250,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildInput(
-      TextEditingController controller,
-      String hintText, {
-        bool obscureText = false,
-        TextInputType keyboardType = TextInputType.text,
-      }) {
+    TextEditingController controller,
+    String hintText, {
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFEDE5D0),

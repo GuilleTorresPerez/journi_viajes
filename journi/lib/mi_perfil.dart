@@ -26,7 +26,7 @@ class MiPerfil extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  final User currentUser;   // 👈 AÑADIR ESTO
+  final User currentUser; // 👈 AÑADIR ESTO
 
   MiPerfil({
     super.key,
@@ -39,7 +39,7 @@ class MiPerfil extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
-    required this.currentUser,   // 👈 AÑADIR EN EL CONSTRUCTOR
+    required this.currentUser, // 👈 AÑADIR EN EL CONSTRUCTOR
   });
 
   @override
@@ -133,8 +133,7 @@ class _MiPerfilState extends State<MiPerfil> {
               ),
             );
           }
-        }
-        ,
+        },
       ),
     );
   }

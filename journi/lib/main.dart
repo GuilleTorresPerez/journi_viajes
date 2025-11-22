@@ -22,7 +22,6 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
-
 // Dominio / aplicación
 import 'package:journi/application/shared/result.dart';
 
@@ -33,8 +32,6 @@ void main() {
   final TripRepository tripRepo = DriftTripRepository(db);
   final EntryRepository entryRepo = DriftEntryRepository(db);
   final UserRepository userRepo = DriftUserRepository(db);
-
-
 
   final tripService = makeTripService(tripRepo);
   final entryService = makeEntryService(entryRepo);
@@ -126,21 +123,19 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   // 🔽 snapshot inicial para cuando el stream aún no ha emitido
   List<Trip>? _initialTrips;
 
-  bool _sesionIniciada = false;      // 👈 NUEVO
-  User? _currentUser;                // 👈 NUEVO
-
+  bool _sesionIniciada = false; // 👈 NUEVO
+  User? _currentUser; // 👈 NUEVO
 
   @override
   void initState() {
     super.initState();
-    _sesionIniciada = widget.sesionIniciada;  // 👈 IMPORTANTE
+    _sesionIniciada = widget.sesionIniciada; // 👈 IMPORTANTE
     _loadInitial();
   }
 
@@ -266,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           picker: widget.picker,
                           userRepo: widget.userRepo,
                           userService: widget.userService,
-                          currentUser: _currentUser,        // 👈 NUEVO
+                          currentUser: _currentUser, // 👈 NUEVO
                         ),
                       ),
                     );
@@ -290,7 +285,8 @@ class _MyHomePageState extends State<MyHomePage> {
         iconSize: 35,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Mis viajes'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.folder), label: 'Mis viajes'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
@@ -408,7 +404,6 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         },
       ),
-
     );
   }
 }

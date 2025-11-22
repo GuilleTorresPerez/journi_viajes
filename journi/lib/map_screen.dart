@@ -32,7 +32,6 @@ class MapaPaisScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-
   MapaPaisScreen({
     super.key,
     required this.viajes,
@@ -44,7 +43,6 @@ class MapaPaisScreen extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
-
   });
 
   @override
@@ -98,9 +96,12 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.folder), label: 'Mis viajes'),
             BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
-            BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
-            BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.add), label: 'Nuevo viaje'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.equalizer), label: 'Datos'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person), label: 'Mi perfil'),
           ],
           onTap: (int index) {
             setState(() {
@@ -159,7 +160,8 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                 ),
               );
             }
-            */ else if (index == 4) {
+            */
+              else if (index == 4) {
                 //mi perfil
                 index = 1;
                 Navigator.push(
@@ -299,7 +301,8 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                 ),
               );
             }
-            */ else if (index == 4) {
+            */
+            else if (index == 4) {
               //mi perfil
               index = 1;
               Navigator.push(
@@ -388,7 +391,6 @@ class OpcionesViajeScreen extends StatelessWidget {
           ],
         ),
       ),
-
     );
   }
 }
@@ -470,7 +472,6 @@ class _MapaDetalleScreenState extends State<MapaDetalleScreen> {
                 ),
               ],
             ),
-
     );
   }
 }
