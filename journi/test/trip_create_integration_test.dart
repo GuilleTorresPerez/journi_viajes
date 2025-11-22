@@ -44,7 +44,6 @@ void main() {
           title: 'JOURNI',
           sesionIniciada: false,
           viajes: [],
-          inicionSesiada: false,
           tripService: tripService,
           entryService: entryService,
           tripRepo: tripRepo,
