@@ -1,8 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:journi/application/entry_service.dart';
 import 'package:journi/application/shared/result.dart';
-import 'package:journi/application/use_cases/entry_use_cases.dart';
-import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/domain/entry.dart';
 
 void main() {

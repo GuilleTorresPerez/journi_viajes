@@ -20,7 +20,8 @@ import 'mi_perfil.dart';
 
 class Crear_Viaje extends StatefulWidget {
   // 🔒 Los campos del Widget deben ser inmutables (final)
-  final int selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
+  final int
+      selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
   final int num_viaje;
   final List<Trip> viajes;
   final bool sesionIniciada;
@@ -109,7 +110,8 @@ class _CrearViajeState extends State<Crear_Viaje> {
         title: const Text('Error'),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
         ],
       ),
     );
@@ -161,8 +163,7 @@ class _CrearViajeState extends State<Crear_Viaje> {
               const SizedBox(height: 10),
             ]),
             Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              RoundedButton
-              (
+              RoundedButton(
                 key: const Key('guardarButton'),
                 text: 'Guardar',
                 backgroundColor: Colors.white,
@@ -173,19 +174,23 @@ class _CrearViajeState extends State<Crear_Viaje> {
                   final fin = _parseDdMmYyyy(_fecha_fin.text.trim());
 
                   if (titulo.isEmpty || ini == null || fin == null) {
-                    _showError('Rellena todos los campos con formato válido (DD-MM-YYYY).');
+                    _showError(
+                        'Rellena todos los campos con formato válido (DD-MM-YYYY).');
                     return;
                   }
                   if (ini.isAfter(fin)) {
-                    _showError('La fecha de inicio no puede ser posterior a la final');
+                    _showError(
+                        'La fecha de inicio no puede ser posterior a la final');
                     return;
                   }
                   if (titulo.length > Trip.titleMax) {
-                    _showError('El título debe contener entre 1 y ${Trip.titleMax} caracteres');
+                    _showError(
+                        'El título debe contener entre 1 y ${Trip.titleMax} caracteres');
                     return;
                   }
 
-                  final nuevoId = DateTime.now().millisecondsSinceEpoch.toString();
+                  final nuevoId =
+                      DateTime.now().millisecondsSinceEpoch.toString();
                   final cmd = CreateTripCommand(
                     id: nuevoId,
                     title: titulo,
@@ -201,11 +206,13 @@ class _CrearViajeState extends State<Crear_Viaje> {
 
                   if (result is Ok<Trip>) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Viaje creado correctamente')),
+                      const SnackBar(
+                          content: Text('Viaje creado correctamente')),
                     );
                     Navigator.pop(context); // vuelve a la lista
                   } else if (result is Err<Trip>) {
-                    final errors = result.errors.map((e) => e.message).join('\n');
+                    final errors =
+                        result.errors.map((e) => e.message).join('\n');
                     _showError('Error al crear viaje:\n$errors');
                   }
                 },
@@ -222,7 +229,8 @@ class _CrearViajeState extends State<Crear_Viaje> {
         iconSize: 35,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Mis viajes'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.folder), label: 'Mis viajes'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
@@ -326,7 +334,8 @@ class InputField extends StatelessWidget {
               style: const TextStyle(color: Colors.white),
               controller: controller,
               decoration: const InputDecoration(
-                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 hintText: '',
                 filled: true,
                 fillColor: Colors.transparent,
@@ -365,7 +374,8 @@ class RoundedButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         ),
         child: Text(text, style: TextStyle(color: textColor)),
       ),

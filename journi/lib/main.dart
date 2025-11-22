@@ -22,10 +22,6 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
-
-// Dominio / aplicación
-import 'package:journi/application/shared/result.dart';
-
 import 'package:journi/login_screen.dart';
 
 void main() {
@@ -33,8 +29,6 @@ void main() {
   final TripRepository tripRepo = DriftTripRepository(db);
   final EntryRepository entryRepo = DriftEntryRepository(db);
   final UserRepository userRepo = DriftUserRepository(db);
-
-
 
   final tripService = makeTripService(tripRepo);
   final entryService = makeEntryService(entryRepo);
@@ -113,11 +107,10 @@ class MyHomePage extends StatefulWidget {
   final TripService tripService;
 
   final EntryRepository entryRepo;
-  final MockImagePicker picker = MockImagePicker();
-
   final EntryService entryService;
 
-  List<Trip> viajes = [];
+  final UserRepository userRepo;
+  final UserService userService;
 
   final UserRepository userRepo;
   final UserService userService;
@@ -132,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 🔽 snapshot inicial para cuando el stream aún no ha emitido
   List<Trip>? _initialTrips;
+  List<Trip> _viajes = [];
 
   bool _sesionIniciada = false;      // 👈 NUEVO
   User? _currentUser;                // 👈 NUEVO
@@ -206,7 +200,8 @@ class _MyHomePageState extends State<MyHomePage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          widget.viajes = items;
+          _viajes = items;
+
           if (items.isEmpty) {
             return const Center(
               child: Text(
