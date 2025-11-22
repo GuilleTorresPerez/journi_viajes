@@ -14,8 +14,9 @@ import 'package:journi/pantalla_viaje.dart';
 
 void main() {
   final db = AppDatabase();
-  testWidgets('Muestra CircularProgressIndicator mientras se cargan las entradas', (tester) async {
-
+  testWidgets(
+      'Muestra CircularProgressIndicator mientras se cargan las entradas',
+      (tester) async {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final UserRepository userRepo = DriftUserRepository(db);
@@ -152,7 +153,8 @@ void main() {
     expect(find.textContaining('Madrid'), findsOneWidget);
   });
 
-  testWidgets('Elimina una entrada al pulsar el icono de borrar', (tester) async {
+  testWidgets('Elimina una entrada al pulsar el icono de borrar',
+      (tester) async {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final tripService = makeTripService(tripRepo);
