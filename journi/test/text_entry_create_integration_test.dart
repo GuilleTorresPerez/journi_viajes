@@ -28,21 +28,6 @@ void main() {
 //       tripService = DefaultTripService(repo: tripRepo);
 //       entryService = DefaultEntryService(repo: entryRepo);
 //     });
-
-    testWidgets('✅ Crear entrada correctamente', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: MyHomePage(
-          title: 'JOURNI',
-          sesionIniciada: false,
-          viajes: [],
-          tripService: tripService,
-          entryService: entryService,
-          tripRepo: tripRepo,
-          entryRepo: entryRepo,
-          userRepo: userRepo,
-          userService: userService,
-        ),
-      ));
 //     testWidgets('✅ Crear entrada correctamente', (WidgetTester tester) async {
 //       await tester.pumpWidget(MaterialApp(
 //         home: MyHomePage(
@@ -92,21 +77,6 @@ void main() {
 //       // ✅ Verificar éxito
 //       // Verifica que la pantalla principal está visible
 //     });
-
-    testWidgets('❌ Error: Entrada vacía', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: MyHomePage(
-          title: 'JOURNI',
-          sesionIniciada: false,
-          viajes: [],
-          tripService: tripService,
-          entryService: entryService,
-          tripRepo: tripRepo,
-          entryRepo: entryRepo,
-          userRepo: userRepo,
-          userService: userService,
-        ),
-      ));
 //     testWidgets('❌ Error: Entrada vacía', (WidgetTester tester) async {
 //       await tester.pumpWidget(MaterialApp(
 //         home: MyHomePage(

@@ -44,21 +44,6 @@ void main() {
 //         ),
 //       ));
 
-    testWidgets('✅ Crear entrada correctamente', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: MyHomePage(
-          title: 'JOURNI',
-          sesionIniciada: false,
-          viajes: [],
-          tripService: tripService,
-          entryService: entryService,
-          tripRepo: tripRepo,
-          entryRepo: entryRepo,
-          userRepo: userRepo,
-          userService: userService,
-        ),
-      ));
-
 //       // 🧩 Rellenar los campos
 //       await tester.enterText(
 //         find.byKey(const Key('tituloField')),
@@ -111,20 +96,6 @@ void main() {
 //         ),
 //       ));
 
-    testWidgets('❌ Error: Entrada vacía', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: MyHomePage(
-          title: 'JOURNI',
-          sesionIniciada: false,
-          viajes: [],
-          tripService: tripService,
-          entryService: entryService,
-          tripRepo: tripRepo,
-          entryRepo: entryRepo,
-          userRepo: userRepo,
-          userService: userService,
-        ),
-      ));
 //       await tester.tap(find.byKey(const Key('anadirButton')));
 //       await tester.pumpAndSettle();
 

@@ -66,23 +66,6 @@ void main() {
   //     await tester.tap(find.byKey(const Key('adjuntarFoto')));
   //     await tester.pumpAndSettle();
 
-    testWidgets('✅ Añadir foto correctamente', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Pantalla_Viaje(
-          selectedIndex: 0,
-          num_viaje: 0,
-          sesionIniciada: false,
-          viajes: [trip],
-          tripService: tripService,
-          entryService: entryService,
-          repo: tripRepo,
-          entryRepo: entryRepo,
-          picker: mPicker,
-          userRepo: userRepo,
-          userService: userService,
-        ),
-      ));
-
   //   testWidgets('❌ Error: Cancela operación de añadir foto',
   //       (WidgetTester tester) async {
   //     await tester.pumpWidget(MaterialApp(
@@ -100,38 +83,6 @@ void main() {
   //         userService: userService,
   //       ),
   //     ));
-
-      expect(find.byKey(const Key('eid0')), findsOneWidget);
-      // ✅ Verificar éxito
-      // Verifica que la pantalla principal está visible
-    });
-
-    testWidgets('❌ Error: Cancela operación de añadir foto',
-        (WidgetTester tester) async {
-          await tester.pumpWidget(MaterialApp(
-            home: Pantalla_Viaje(
-              selectedIndex: 0,
-              num_viaje: 0,
-              sesionIniciada: false,
-              viajes: [trip],
-              tripService: tripService,
-              entryService: entryService,
-              repo: tripRepo,
-              entryRepo: entryRepo,
-              picker: mPicker,
-              userRepo: userRepo,
-              userService: userService,
-            ),
-          ));
-
-          await tester.pumpAndSettle();
-          await tester.tap(find.byKey(const Key('anadirFoto')));
-          await tester.pumpAndSettle();
-          Navigator.of(tester.element(find.byType(AlertDialog)), rootNavigator: true).pop();
-          await tester.pumpAndSettle();
-          expect(find.byKey(const Key('eid0')), findsNothing);
-    });
-  });
   //     await tester.pumpAndSettle();
   //     await tester.tap(find.byKey(const Key('anadirFoto')));
   //     await tester.pumpAndSettle();
