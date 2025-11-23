@@ -66,65 +66,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
     _selectedIndex = widget.selectedIndex; // snapshot inicial
   }
 
-  void _editarUbicacion(Entry entry) async {
-    final nameController = TextEditingController(text: entry.text);
-
-    // Abre un cuadro de diálogo simple para cambiar el nombre
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Editar ubicación'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(
-              hintText: 'Nuevo nombre de la ubicación',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final nuevoNombre = nameController.text.trim();
-                if (nuevoNombre.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('El nombre no puede estar vacío')),
-                  );
-                  return;
-                }
-
-                // Simula "actualizar" la ubicación eliminando y recreando
-                await widget.entryService.deleteById(entry.id);
-
-                final cmd = CreateEntryCommand(
-                  id: UniqueKey().toString(),
-                  tripId: widget.viajes[widget.num_viaje].id,
-                  type: EntryType.location,
-                  text: nuevoNombre,
-                );
-                await widget.entryService.create(cmd);
-
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ubicación actualizada')),
-                  );
-                  setState(() {});
-                }
-              },
-              child: const Text('Guardar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final currentTrip = widget.viajes[widget.num_viaje];
@@ -369,17 +310,31 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         const Text('¿Seguro que quieres eliminar este viaje?'),
                     actions: [
                       TextButton(
+                          key: const Key('cancelarButton'),
                           onPressed: () => Navigator.pop(context),
                           child: const Text('Cancelar')),
                       TextButton(
+                        key: const Key('aceptarButton'),
                         onPressed: () async {
                           final tripToDelete = currentTrip;
-                          await widget.tripService.deleteById(tripToDelete.id);
+                          final result = await widget.tripService.deleteById(tripToDelete.id);
+                          if (result is Ok<Unit>) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                Text('Viaje eliminado correctamente.')),
+                          );
+                            widget.viajes.removeAt(widget.num_viaje);
 
-                          widget.viajes.removeAt(widget.num_viaje);
-
-                          Navigator.pop(context);
-                          Navigator.pop(context);
+                            Navigator.pop(context); // cierra diálogo
+                            Navigator.pop(context); // vuelve a lista
+                            setState(() {});
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Error al eliminar el viaje')),
+                            );
+                          }
                         },
                         child: const Text('Eliminar'),
                       ),
