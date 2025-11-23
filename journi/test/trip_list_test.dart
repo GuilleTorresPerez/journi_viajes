@@ -13,34 +13,38 @@ import 'package:journi/pantalla_viaje.dart';
 
 void main() {
   final db = AppDatabase();
-  testWidgets('Muestra CircularProgressIndicator mientras se cargan los viajes',
-      (tester) async {
-    // Simulamos un stream que todavía no ha emitido nada
-    final repo = InMemoryTripRepository();
-    final entryRepo = InMemoryEntryRepository();
-    final tripService = makeTripService(repo);
-    final entryService = makeEntryService(entryRepo);
+  testWidgets(
+    'Muestra CircularProgressIndicator mientras se cargan los viajes',
+    (tester) async {
+      // Simulamos un stream que todavía no ha emitido nada
+      final repo = InMemoryTripRepository();
+      final entryRepo = InMemoryEntryRepository();
+      final tripService = makeTripService(repo);
+      final entryService = makeEntryService(entryRepo);
 
-    final userRepo = DriftUserRepository(db);
-    final userService = makeUserService(userRepo);
+      final userRepo = DriftUserRepository(db);
+      final userService = makeUserService(userRepo);
 
-    await tester.pumpWidget(MaterialApp(
-      home: MyHomePage(
-        title: 'JOURNI',
-        sesionIniciada: false,
-        viajes: const [],
-        tripRepo: repo,
-        tripService: tripService,
-        entryRepo: entryRepo,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
-      ),
-    ));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MyHomePage(
+            title: 'JOURNI',
+            sesionIniciada: false,
+            viajes: const [],
+            tripRepo: repo,
+            tripService: tripService,
+            entryRepo: entryRepo,
+            entryService: entryService,
+            userRepo: userRepo,
+            userService: userService,
+          ),
+        ),
+      );
 
-    // Como aún no hay datos, debería mostrar el indicador
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-  });
+      // Como aún no hay datos, debería mostrar el indicador
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    },
+  );
 
   testWidgets('Muestra mensaje si no hay viajes registrados', (tester) async {
     final repo = InMemoryTripRepository();
@@ -50,19 +54,21 @@ void main() {
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
 
-    await tester.pumpWidget(MaterialApp(
-      home: MyHomePage(
-        title: 'JOURNI',
-        sesionIniciada: false,
-        viajes: const [],
-        tripRepo: repo,
-        tripService: tripService,
-        entryRepo: entryRepo,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MyHomePage(
+          title: 'JOURNI',
+          sesionIniciada: false,
+          viajes: const [],
+          tripRepo: repo,
+          tripService: tripService,
+          entryRepo: entryRepo,
+          entryService: entryService,
+          userRepo: userRepo,
+          userService: userService,
+        ),
       ),
-    ));
+    );
 
     await tester.pump(); // dejar que StreamBuilder se actualice
 
@@ -97,19 +103,21 @@ void main() {
     repo.upsert(trip1);
     repo.upsert(trip2);
 
-    await tester.pumpWidget(MaterialApp(
-      home: MyHomePage(
-        title: 'JOURNI',
-        sesionIniciada: false,
-        viajes: const [],
-        tripRepo: repo,
-        tripService: tripService,
-        entryRepo: entryRepo,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MyHomePage(
+          title: 'JOURNI',
+          sesionIniciada: false,
+          viajes: const [],
+          tripRepo: repo,
+          tripService: tripService,
+          entryRepo: entryRepo,
+          entryService: entryService,
+          userRepo: userRepo,
+          userService: userService,
+        ),
       ),
-    ));
+    );
 
     await tester.pumpAndSettle();
 
@@ -135,19 +143,21 @@ void main() {
     );
     repo.upsert(trip);
 
-    await tester.pumpWidget(MaterialApp(
-      home: MyHomePage(
-        title: 'JOURNI',
-        sesionIniciada: false,
-        viajes: const [],
-        tripRepo: repo,
-        tripService: tripService,
-        entryRepo: entryRepo,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MyHomePage(
+          title: 'JOURNI',
+          sesionIniciada: false,
+          viajes: const [],
+          tripRepo: repo,
+          tripService: tripService,
+          entryRepo: entryRepo,
+          entryService: entryService,
+          userRepo: userRepo,
+          userService: userService,
+        ),
       ),
-    ));
+    );
 
     await tester.pumpAndSettle();
 

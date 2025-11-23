@@ -6,17 +6,17 @@ import 'app_database.dart' as db;
 
 // ---------- mappers -----------
 db.EntriesCompanion _toCompanion(Entry e) => db.EntriesCompanion(
-      id: d.Value(e.id),
-      tripId: d.Value(e.tripId),
-      type: d.Value(e.type), // requiere converter en la tabla
-      textContent: d.Value(e.text),
-      mediaUri: d.Value(e.mediaUri),
-      lat: d.Value(e.location?.lat),
-      lon: d.Value(e.location?.lon),
-      tagsJson: d.Value(e.tags),
-      createdAt: d.Value(e.createdAt.toUtc()),
-      updatedAt: d.Value(e.updatedAt.toUtc()),
-    );
+  id: d.Value(e.id),
+  tripId: d.Value(e.tripId),
+  type: d.Value(e.type), // requiere converter en la tabla
+  textContent: d.Value(e.text),
+  mediaUri: d.Value(e.mediaUri),
+  lat: d.Value(e.location?.lat),
+  lon: d.Value(e.location?.lon),
+  tagsJson: d.Value(e.tags),
+  createdAt: d.Value(e.createdAt.toUtc()),
+  updatedAt: d.Value(e.updatedAt.toUtc()),
+);
 
 // 👇 DbEntry (no EntriesData)
 Entry _toDomain(db.DbEntry row) {
@@ -38,7 +38,8 @@ Entry _toDomain(db.DbEntry row) {
 
   if (res.isErr) {
     throw StateError(
-        'Fila entries inválida (id=${row.id}): ${res.asErr().errors}');
+      'Fila entries inválida (id=${row.id}): ${res.asErr().errors}',
+    );
   }
   return res.asOk().value;
 }
@@ -50,9 +51,9 @@ class DriftEntryRepository implements EntryRepository {
   @override
   Future<Result<Entry>> upsert(Entry entry) async {
     await _db.into(_db.entries).insertOnConflictUpdate(_toCompanion(entry));
-    final row = await (_db.select(_db.entries)
-          ..where((e) => e.id.equals(entry.id)))
-        .getSingle();
+    final row = await (_db.select(
+      _db.entries,
+    )..where((e) => e.id.equals(entry.id))).getSingle();
     return Ok(_toDomain(row));
   }
 
@@ -64,8 +65,9 @@ class DriftEntryRepository implements EntryRepository {
 
   @override
   Future<Result<Entry?>> findById(String id) async {
-    final row = await (_db.select(_db.entries)..where((e) => e.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.entries,
+    )..where((e) => e.id.equals(id))).getSingleOrNull();
     return Ok(row == null ? null : _toDomain(row));
   }
 

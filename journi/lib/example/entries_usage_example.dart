@@ -9,21 +9,25 @@ void main() async {
 
   // Crear una nota
   // ignore: unused_local_variable
-  final r1 = await entries.create(CreateEntryCommand(
-    id: 'e1',
-    tripId: 't1',
-    type: EntryType.note,
-    text: 'Llegamos a Lisboa y comimos pasteis',
-  ));
+  final r1 = await entries.create(
+    CreateEntryCommand(
+      id: 'e1',
+      tripId: 't1',
+      type: EntryType.note,
+      text: 'Llegamos a Lisboa y comimos pasteis',
+    ),
+  );
 
   // Crear una foto
   // ignore: unused_local_variable
-  final r2 = await entries.create(CreateEntryCommand(
-    id: 'e2',
-    tripId: 't1',
-    type: EntryType.photo,
-    mediaUri: '/storage/emulated/0/Pictures/lisboa_1.jpg',
-  ));
+  final r2 = await entries.create(
+    CreateEntryCommand(
+      id: 'e2',
+      tripId: 't1',
+      type: EntryType.photo,
+      mediaUri: '/storage/emulated/0/Pictures/lisboa_1.jpg',
+    ),
+  );
 
   // Listar
   final listRes = await entries.listByTrip('t1');

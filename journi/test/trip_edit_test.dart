@@ -55,7 +55,9 @@ void main() {
       expect(res, isA<Err<Trip>>());
       final msgs = (res as Err<Trip>).errors.map((e) => e.message).join(' | ');
       expect(
-          msgs.contains('description supera ${Trip.descriptionMax}'), isTrue);
+        msgs.contains('description supera ${Trip.descriptionMax}'),
+        isTrue,
+      );
     });
 
     test('startDate > endDate -> Err', () {

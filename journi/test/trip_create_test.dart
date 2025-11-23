@@ -13,8 +13,10 @@ void main() {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      expect(res,
-          isA<Ok<Trip>>()); // group/test/expect son prácticas estándar. :contentReference[oaicite:2]{index=2}
+      expect(
+        res,
+        isA<Ok<Trip>>(),
+      ); // group/test/expect son prácticas estándar. :contentReference[oaicite:2]{index=2}
       final trip = (res as Ok<Trip>).value;
       expect(trip.title, 'Mi viaje');
     });
@@ -56,7 +58,9 @@ void main() {
       expect(res, isA<Err<Trip>>());
       final msgs = (res as Err<Trip>).errors.map((e) => e.message).join(' | ');
       expect(
-          msgs.contains('description supera ${Trip.descriptionMax}'), isTrue);
+        msgs.contains('description supera ${Trip.descriptionMax}'),
+        isTrue,
+      );
     });
 
     test('startDate > endDate -> Err', () {

@@ -50,15 +50,17 @@ class User {
     }
     if (errs.isNotEmpty) return Err<User>(errs);
 
-    return Ok(User(
-      id: id.trim(),
-      name: name.trim(),
-      lastName: lastName.trim(),
-      email: e,
-      passwordHash: passwordHash,
-      passwordSalt: passwordSalt,
-      createdAt: createdAt.toUtc(),
-      updatedAt: updatedAt.toUtc(),
-    ));
+    return Ok(
+      User(
+        id: id.trim(),
+        name: name.trim(),
+        lastName: lastName.trim(),
+        email: e,
+        passwordHash: passwordHash,
+        passwordSalt: passwordSalt,
+        createdAt: createdAt.toUtc(),
+        updatedAt: updatedAt.toUtc(),
+      ),
+    );
   }
 }

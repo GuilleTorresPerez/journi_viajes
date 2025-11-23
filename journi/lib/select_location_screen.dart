@@ -9,10 +9,7 @@ class SelectedLocation {
   final String name;
   final LatLng position;
 
-  SelectedLocation({
-    required this.name,
-    required this.position,
-  });
+  SelectedLocation({required this.name, required this.position});
 }
 
 class SelectLocationScreen extends StatefulWidget {
@@ -57,10 +54,13 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
     );
 
     try {
-      final response = await http.get(url, headers: {
-        'User-Agent':
-            'journi/1.0 (developer@jorni.local)', // requerido por Nominatim
-      });
+      final response = await http.get(
+        url,
+        headers: {
+          'User-Agent':
+              'journi/1.0 (developer@jorni.local)', // requerido por Nominatim
+        },
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as List;
@@ -83,9 +83,9 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error buscando ubicación: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error buscando ubicación: $e')));
     }
   }
 
@@ -131,8 +131,9 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                       ),
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                      ),
                     ),
                   ),
                 ),
@@ -183,8 +184,11 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                         point: _selected!,
                         width: 40,
                         height: 40,
-                        child: const Icon(Icons.location_on,
-                            color: Colors.red, size: 40),
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                          size: 40,
+                        ),
                       ),
                     ],
                   ),
@@ -201,8 +205,10 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                 FloatingActionButton(
                   heroTag: 'zoom_in',
                   onPressed: () {
-                    _mapController.move(_mapController.camera.center,
-                        _mapController.camera.zoom + 1);
+                    _mapController.move(
+                      _mapController.camera.center,
+                      _mapController.camera.zoom + 1,
+                    );
                   },
                   child: const Icon(Icons.add),
                 ),
@@ -216,8 +222,10 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                 FloatingActionButton(
                   heroTag: 'zoom_out',
                   onPressed: () {
-                    _mapController.move(_mapController.camera.center,
-                        _mapController.camera.zoom - 1);
+                    _mapController.move(
+                      _mapController.camera.center,
+                      _mapController.camera.zoom - 1,
+                    );
                   },
                   child: const Icon(Icons.remove),
                 ),

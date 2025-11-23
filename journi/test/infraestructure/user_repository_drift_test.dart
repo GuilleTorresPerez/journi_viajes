@@ -69,13 +69,17 @@ void main() {
     await repo.upsert(u);
 
     // tras insertar, al menos una emisión con 1 elemento
-    await expectLater(stream,
-        emits(predicate<List<User>>((l) => l.any((x) => x.id == 'u1'))));
+    await expectLater(
+      stream,
+      emits(predicate<List<User>>((l) => l.any((x) => x.id == 'u1'))),
+    );
 
     await repo.deleteById('u1');
 
     // después de borrar, debería emitir una lista donde no esté 'u1'
-    await expectLater(stream,
-        emits(predicate<List<User>>((l) => l.every((x) => x.id != 'u1'))));
+    await expectLater(
+      stream,
+      emits(predicate<List<User>>((l) => l.every((x) => x.id != 'u1'))),
+    );
   });
 }

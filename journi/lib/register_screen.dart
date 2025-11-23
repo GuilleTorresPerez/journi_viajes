@@ -24,17 +24,18 @@ class RegisterScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  RegisterScreen(
-      {super.key,
-      required this.sesionIniciada,
-      required this.viajes,
-      required this.selectedIndex,
-      required this.tripRepo,
-      required this.entryRepo,
-      required this.tripService,
-      required this.entryService,
-      required this.userRepo,
-      required this.userService});
+  RegisterScreen({
+    super.key,
+    required this.sesionIniciada,
+    required this.viajes,
+    required this.selectedIndex,
+    required this.tripRepo,
+    required this.entryRepo,
+    required this.tripService,
+    required this.entryService,
+    required this.userRepo,
+    required this.userService,
+  });
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -70,9 +71,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         apellidos.isEmpty ||
         email.isEmpty ||
         password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Falta algún campo')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Falta algún campo')));
       return;
     }
 
@@ -117,9 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ? result.errorsOrEmpty.first.message
           : 'Error al registrar usuario';
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 
@@ -191,8 +190,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 16),
 
               // Correo electrónico
-              _buildInput(_emailController, 'Correo electronico',
-                  keyboardType: TextInputType.emailAddress),
+              _buildInput(
+                _emailController,
+                'Correo electronico',
+                keyboardType: TextInputType.emailAddress,
+              ),
               const SizedBox(height: 16),
 
               // Contraseña

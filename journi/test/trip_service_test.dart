@@ -135,7 +135,9 @@ void main() {
       final res = await service.create(makeCmd(id: 'bad', title: '   '));
       final errs = expectErrList(res);
       expect(
-          errs.map((e) => e.message), contains('title no puede estar vacío'));
+        errs.map((e) => e.message),
+        contains('title no puede estar vacío'),
+      );
     });
 
     test('getById: Ok(null) si no existe', () async {
@@ -146,18 +148,21 @@ void main() {
 
     test('patch: actualización parcial y nulabilidad controlada', () async {
       // Arrange: crear
-      final created = expectOk(await service.create(makeCmd(
-        id: 't2',
-        title: 'Origen',
-        description: 'desc',
-        cover: 'img.png',
-      )));
+      final created = expectOk(
+        await service.create(
+          makeCmd(
+            id: 't2',
+            title: 'Origen',
+            description: 'desc',
+            cover: 'img.png',
+          ),
+        ),
+      );
 
       // Act: Patch ausente en coverImage (no cambia), description -> null, title ausente
-      final patched = await service.patch(UpdateTripCommand(
-        id: created.id,
-        description: const Patch.value(null),
-      ));
+      final patched = await service.patch(
+        UpdateTripCommand(id: created.id, description: const Patch.value(null)),
+      );
       final after = expectOk(patched);
 
       // Assert
@@ -167,15 +172,13 @@ void main() {
     });
 
     test('patch: title = null -> Err de validación', () async {
-      final created = expectOk(await service.create(makeCmd(
-        id: 't3',
-        title: 'Titulo',
-      )));
+      final created = expectOk(
+        await service.create(makeCmd(id: 't3', title: 'Titulo')),
+      );
 
-      final res = await service.patch(UpdateTripCommand(
-        id: created.id,
-        title: const Patch.value(null),
-      ));
+      final res = await service.patch(
+        UpdateTripCommand(id: created.id, title: const Patch.value(null)),
+      );
 
       final errs = expectErrList(res);
       expect(
@@ -208,10 +211,9 @@ void main() {
     });
 
     test('updateTitleById: Ok actualiza título', () async {
-      final created = expectOk(await service.create(makeCmd(
-        id: 't5',
-        title: 'Antes',
-      )));
+      final created = expectOk(
+        await service.create(makeCmd(id: 't5', title: 'Antes')),
+      );
       final res = await service.updateTitleById(created.id, 'Después');
       final updated = expectOk(res);
       expect(updated.title, 'Después');
@@ -225,46 +227,48 @@ void main() {
 
     test('list: filtra por phase (planned/finished/ongoing/undated)', () async {
       // finished (pasado)
-      await service.create(makeCmd(
-        id: 'f',
-        title: 'Pasado',
-        start: DateTime.utc(2000, 1, 1),
-        end: DateTime.utc(2000, 1, 10),
-      ));
+      await service.create(
+        makeCmd(
+          id: 'f',
+          title: 'Pasado',
+          start: DateTime.utc(2000, 1, 1),
+          end: DateTime.utc(2000, 1, 10),
+        ),
+      );
       // planned (futuro)
-      await service.create(makeCmd(
-        id: 'p',
-        title: 'Futuro',
-        start: DateTime.utc(3000, 1, 1),
-        end: DateTime.utc(3000, 1, 10),
-      ));
+      await service.create(
+        makeCmd(
+          id: 'p',
+          title: 'Futuro',
+          start: DateTime.utc(3000, 1, 1),
+          end: DateTime.utc(3000, 1, 10),
+        ),
+      );
       // ongoing (cruza hoy)
       final now = DateTime.now().toUtc();
-      await service.create(makeCmd(
-        id: 'o',
-        title: 'Ahora',
-        start: now.subtract(const Duration(days: 1)),
-        end: now.add(const Duration(days: 1)),
-      ));
+      await service.create(
+        makeCmd(
+          id: 'o',
+          title: 'Ahora',
+          start: now.subtract(const Duration(days: 1)),
+          end: now.add(const Duration(days: 1)),
+        ),
+      );
       // undated
       await service.create(makeCmd(id: 'u', title: 'Sin fechas'));
 
-      final finishedIds =
-          (expectOk(await service.list(phase: TripPhase.finished)))
-              .map((t) => t.id)
-              .toList();
-      final plannedIds =
-          (expectOk(await service.list(phase: TripPhase.planned)))
-              .map((t) => t.id)
-              .toList();
-      final ongoingIds =
-          (expectOk(await service.list(phase: TripPhase.ongoing)))
-              .map((t) => t.id)
-              .toList();
-      final undatedIds =
-          (expectOk(await service.list(phase: TripPhase.undated)))
-              .map((t) => t.id)
-              .toList();
+      final finishedIds = (expectOk(
+        await service.list(phase: TripPhase.finished),
+      )).map((t) => t.id).toList();
+      final plannedIds = (expectOk(
+        await service.list(phase: TripPhase.planned),
+      )).map((t) => t.id).toList();
+      final ongoingIds = (expectOk(
+        await service.list(phase: TripPhase.ongoing),
+      )).map((t) => t.id).toList();
+      final undatedIds = (expectOk(
+        await service.list(phase: TripPhase.undated),
+      )).map((t) => t.id).toList();
 
       expect(finishedIds, containsAll(['f']));
       expect(plannedIds, containsAll(['p']));
@@ -272,25 +276,31 @@ void main() {
       expect(undatedIds, containsAll(['u']));
     });
 
-    test('listForDayUtc: devuelve solo los que ocurren en ese día (UTC)',
-        () async {
-      await service.create(makeCmd(
-        id: 'd1',
-        title: 'Día exacto',
-        start: DateTime.utc(2024, 1, 10),
-        end: DateTime.utc(2024, 1, 10, 23, 59, 59),
-      ));
-      await service.create(makeCmd(
-        id: 'd2',
-        title: 'Fuera de día',
-        start: DateTime.utc(2024, 1, 11),
-        end: DateTime.utc(2024, 1, 12),
-      ));
+    test(
+      'listForDayUtc: devuelve solo los que ocurren en ese día (UTC)',
+      () async {
+        await service.create(
+          makeCmd(
+            id: 'd1',
+            title: 'Día exacto',
+            start: DateTime.utc(2024, 1, 10),
+            end: DateTime.utc(2024, 1, 10, 23, 59, 59),
+          ),
+        );
+        await service.create(
+          makeCmd(
+            id: 'd2',
+            title: 'Fuera de día',
+            start: DateTime.utc(2024, 1, 11),
+            end: DateTime.utc(2024, 1, 12),
+          ),
+        );
 
-      final res = await service.listForDayUtc(DateTime.utc(2024, 1, 10));
-      final items = expectOk(res);
-      expect(items.map((t) => t.id), ['d1']);
-    });
+        final res = await service.listForDayUtc(DateTime.utc(2024, 1, 10));
+        final items = expectOk(res);
+        expect(items.map((t) => t.id), ['d1']);
+      },
+    );
 
     test('watch con phase: solo emite cambios de la fase solicitada', () async {
       final streamIds = service
@@ -311,12 +321,14 @@ void main() {
 
       await service.create(makeCmd(id: 'x', title: 'Undated'));
       // Cambios en otras fases ya no reemiten 'x' por .distinct
-      await service.create(makeCmd(
-        id: 'y',
-        title: 'Planned',
-        start: DateTime.utc(3000, 1, 1),
-        end: DateTime.utc(3000, 1, 2),
-      ));
+      await service.create(
+        makeCmd(
+          id: 'y',
+          title: 'Planned',
+          start: DateTime.utc(3000, 1, 1),
+          end: DateTime.utc(3000, 1, 2),
+        ),
+      );
       await service.deleteById('x');
 
       await expectation;

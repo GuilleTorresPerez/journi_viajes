@@ -64,10 +64,7 @@ class _MiPerfilState extends State<MiPerfil> {
             const SizedBox(height: 16),
             Text(
               'Correo: ${widget.currentUser.email}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -81,7 +78,9 @@ class _MiPerfilState extends State<MiPerfil> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.folder), label: 'Mis viajes'),
+            icon: Icon(Icons.folder),
+            label: 'Mis viajes',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),

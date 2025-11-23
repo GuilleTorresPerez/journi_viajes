@@ -9,12 +9,14 @@ void main() {
     final repo = InMemoryEntryRepository();
     final svc = makeEntryService(repo);
 
-    final r = await svc.create(const CreateEntryCommand(
-      id: 'e1',
-      tripId: 't1',
-      type: EntryType.note,
-      text: 'hola',
-    ));
+    final r = await svc.create(
+      const CreateEntryCommand(
+        id: 'e1',
+        tripId: 't1',
+        type: EntryType.note,
+        text: 'hola',
+      ),
+    );
     expect(r.isOk, isTrue);
 
     final listed = await svc.listByTrip('t1');
@@ -34,12 +36,14 @@ void main() {
       ]),
     );
 
-    await svc.create(const CreateEntryCommand(
-      id: 'e1',
-      tripId: 't1',
-      type: EntryType.note,
-      text: 'hola',
-    ));
+    await svc.create(
+      const CreateEntryCommand(
+        id: 'e1',
+        tripId: 't1',
+        type: EntryType.note,
+        text: 'hola',
+      ),
+    );
 
     await expectation;
   });

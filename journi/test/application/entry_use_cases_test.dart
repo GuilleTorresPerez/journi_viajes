@@ -3,11 +3,12 @@ import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/application/use_cases/entry_use_cases.dart';
 
-Entry _mk(
-    {required String id,
-    required String trip,
-    required DateTime ts,
-    EntryType type = EntryType.note}) {
+Entry _mk({
+  required String id,
+  required String trip,
+  required DateTime ts,
+  EntryType type = EntryType.note,
+}) {
   return Entry.create(
     id: id,
     tripId: trip,
@@ -24,12 +25,14 @@ void main() {
     test('crea y persiste una NOTE válida', () async {
       final repo = InMemoryEntryRepository();
       final uc = CreateEntryUseCase(repo);
-      final res = await uc(CreateEntryCommand(
-        id: 'e1',
-        tripId: 't1',
-        type: EntryType.note,
-        text: 'hola',
-      ));
+      final res = await uc(
+        CreateEntryCommand(
+          id: 'e1',
+          tripId: 't1',
+          type: EntryType.note,
+          text: 'hola',
+        ),
+      );
       expect(res.isOk, isTrue);
       final stored = await repo.findById('e1');
       expect(stored.asOk().value?.tripId, 't1');
@@ -39,7 +42,8 @@ void main() {
       final repo = InMemoryEntryRepository();
       final uc = CreateEntryUseCase(repo);
       final res = await uc(
-          CreateEntryCommand(id: 'e1', tripId: 't1', type: EntryType.note));
+        CreateEntryCommand(id: 'e1', tripId: 't1', type: EntryType.note),
+      );
       expect(res.isErr, isTrue);
       final stored = await repo.findById('e1');
       expect(stored.asOk().value, isNull);
@@ -51,10 +55,12 @@ void main() {
       final repo = InMemoryEntryRepository();
       final listUC = ListEntriesUseCase(repo);
       final t0 = DateTime.utc(2025, 1, 1, 12);
-      await repo.upsert(_mk(
-          id: 'e1', trip: 't1', ts: t0.subtract(const Duration(seconds: 1))));
-      await repo
-          .upsert(_mk(id: 'e2', trip: 't1', ts: t0, type: EntryType.photo));
+      await repo.upsert(
+        _mk(id: 'e1', trip: 't1', ts: t0.subtract(const Duration(seconds: 1))),
+      );
+      await repo.upsert(
+        _mk(id: 'e2', trip: 't1', ts: t0, type: EntryType.photo),
+      );
       await repo.upsert(_mk(id: 'e3', trip: 't2', ts: t0));
 
       final res = await listUC(tripId: 't1');

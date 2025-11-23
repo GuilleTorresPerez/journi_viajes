@@ -13,8 +13,10 @@ void main() {
         text: 'Mi entrada',
         type: EntryType.note,
       );
-      expect(res,
-          isA<Ok<Entry>>()); // group/test/expect son prácticas estándar. :contentReference[oaicite:2]{index=2}
+      expect(
+        res,
+        isA<Ok<Entry>>(),
+      ); // group/test/expect son prácticas estándar. :contentReference[oaicite:2]{index=2}
       final entry = (res as Ok<Entry>).value;
       expect(entry.text, 'Mi entrada');
     });

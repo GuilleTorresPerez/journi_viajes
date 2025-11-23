@@ -58,8 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,10 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     // 🔐 Llamada real al caso de uso de login
-    final cmd = AuthenticateUserCommand(
-      email: email,
-      password: password,
-    );
+    final cmd = AuthenticateUserCommand(email: email, password: password);
 
     final result = await widget.userService.authenticate(cmd);
 
@@ -94,9 +92,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bienvenido, ${user.name}')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Bienvenido, ${user.name}')));
 
       // 👇 Devolvemos el usuario a la pantalla anterior (MyHomePage)
       Navigator.pop<User>(context, user);
@@ -106,9 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ? result.errorsOrEmpty.first.message
           : 'Error al iniciar sesión';
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 

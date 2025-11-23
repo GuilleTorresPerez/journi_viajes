@@ -17,21 +17,22 @@ User _toDomain(db.DbUser row) {
   );
   if (res.isErr) {
     throw StateError(
-        'Fila users inválida (id=${row.id}): ${res.asErr().errors}');
+      'Fila users inválida (id=${row.id}): ${res.asErr().errors}',
+    );
   }
   return res.asOk().value;
 }
 
 db.UsersCompanion _toCompanion(User u) => db.UsersCompanion(
-      id: d.Value(u.id),
-      name: d.Value(u.name),
-      lastName: d.Value(u.lastName),
-      email: d.Value(u.email),
-      passwordHash: d.Value(u.passwordHash),
-      passwordSalt: d.Value(u.passwordSalt),
-      createdAt: d.Value(u.createdAt.toUtc()),
-      updatedAt: d.Value(u.updatedAt.toUtc()),
-    );
+  id: d.Value(u.id),
+  name: d.Value(u.name),
+  lastName: d.Value(u.lastName),
+  email: d.Value(u.email),
+  passwordHash: d.Value(u.passwordHash),
+  passwordSalt: d.Value(u.passwordSalt),
+  createdAt: d.Value(u.createdAt.toUtc()),
+  updatedAt: d.Value(u.updatedAt.toUtc()),
+);
 
 class DriftUserRepository implements UserRepository {
   final db.AppDatabase _db;
@@ -42,29 +43,31 @@ class DriftUserRepository implements UserRepository {
     try {
       // upsert por PK (id). Si choca UNIQUE(email) con otro id, SQLite lanza error.
       await _db.into(_db.users).insertOnConflictUpdate(_toCompanion(user));
-      final row = await (_db.select(_db.users)
-            ..where((t) => t.id.equals(user.id)))
-          .getSingle();
+      final row = await (_db.select(
+        _db.users,
+      )..where((t) => t.id.equals(user.id))).getSingle();
       return Ok(_toDomain(row));
     } catch (e, st) {
       // mapea violación de UNIQUE(email)
-      return Err<User>(
-          [RepoError('Email ya existe', cause: e, stackTrace: st)]);
+      return Err<User>([
+        RepoError('Email ya existe', cause: e, stackTrace: st),
+      ]);
     }
   }
 
   @override
   Future<Result<User?>> findById(String id) async {
-    final row = await (_db.select(_db.users)..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.users,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     return Ok(row == null ? null : _toDomain(row));
   }
 
   @override
   Future<Result<User?>> findByEmail(String email) async {
-    final row = await (_db.select(_db.users)
-          ..where((t) => t.email.equals(email.toLowerCase())))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.users,
+    )..where((t) => t.email.equals(email.toLowerCase()))).getSingleOrNull();
     return Ok(row == null ? null : _toDomain(row));
   }
 

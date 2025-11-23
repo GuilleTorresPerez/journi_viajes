@@ -37,14 +37,16 @@ void main() {
   final entryService = makeEntryService(entryRepo);
   final userService = makeUserService(userRepo);
 
-  runApp(MyApp(
-    tripRepo: tripRepo,
-    tripService: tripService,
-    entryRepo: entryRepo,
-    entryService: entryService,
-    userRepo: userRepo,
-    userService: userService,
-  ));
+  runApp(
+    MyApp(
+      tripRepo: tripRepo,
+      tripService: tripService,
+      entryRepo: entryRepo,
+      entryService: entryService,
+      userRepo: userRepo,
+      userService: userService,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -238,10 +240,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       if (viaje.startDate != null)
                         Text(
-                            'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}'),
+                          'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}',
+                        ),
                       if (viaje.endDate != null)
                         Text(
-                            'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}'),
+                          'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}',
+                        ),
                       const SizedBox(height: 4),
                     ],
                   ),
@@ -287,7 +291,9 @@ class _MyHomePageState extends State<MyHomePage> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.folder), label: 'Mis viajes'),
+            icon: Icon(Icons.folder),
+            label: 'Mis viajes',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),

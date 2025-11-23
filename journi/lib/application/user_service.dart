@@ -19,11 +19,11 @@ class DefaultUserService implements UserService {
   final ListUsersUseCase _watch;
 
   DefaultUserService(UserRepository repo)
-      : _register = RegisterUserUseCase(repo),
-        _auth = AuthenticateUserUseCase(repo),
-        _get = GetUserByIdUseCase(repo),
-        _del = DeleteUserUseCase(repo),
-        _watch = ListUsersUseCase(repo);
+    : _register = RegisterUserUseCase(repo),
+      _auth = AuthenticateUserUseCase(repo),
+      _get = GetUserByIdUseCase(repo),
+      _del = DeleteUserUseCase(repo),
+      _watch = ListUsersUseCase(repo);
 
   @override
   Future<Result<User>> register(RegisterUserCommand cmd) => _register(cmd);

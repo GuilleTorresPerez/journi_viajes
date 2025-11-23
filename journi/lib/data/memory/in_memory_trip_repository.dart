@@ -10,7 +10,7 @@ class InMemoryTripRepository implements TripRepository {
   final _controller = StreamController<List<Trip>>.broadcast();
 
   InMemoryTripRepository({Iterable<Trip>? seed})
-      : _store = {for (final t in (seed ?? const <Trip>[])) t.id: t} {
+    : _store = {for (final t in (seed ?? const <Trip>[])) t.id: t} {
     _emit();
   }
 

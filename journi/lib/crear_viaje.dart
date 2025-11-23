@@ -20,7 +20,7 @@ import 'map_screen.dart';
 class Crear_Viaje extends StatefulWidget {
   // 🔒 Los campos del Widget deben ser inmutables (final)
   final int
-      selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
+  selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
   final int num_viaje;
   final List<Trip> viajes;
   final bool sesionIniciada;
@@ -74,10 +74,12 @@ class _CrearViajeState extends State<Crear_Viaje> {
     // Rellena campos si venimos en modo edición
     if (widget.num_viaje >= 0) {
       final trip = widget.viajes[widget.num_viaje];
-      final fechaInicial =
-          DateFormat('dd-MM-yyyy').format(trip.startDate ?? DateTime.now());
-      final fechaFinal =
-          DateFormat('dd-MM-yyyy').format(trip.endDate ?? DateTime.now());
+      final fechaInicial = DateFormat(
+        'dd-MM-yyyy',
+      ).format(trip.startDate ?? DateTime.now());
+      final fechaFinal = DateFormat(
+        'dd-MM-yyyy',
+      ).format(trip.endDate ?? DateTime.now());
       _titulo.text = trip.title;
       _fecha_ini.text = fechaInicial;
       _fecha_fin.text = fechaFinal;
@@ -108,7 +110,9 @@ class _CrearViajeState extends State<Crear_Viaje> {
         content: Text(message),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
         ],
       ),
     );
@@ -133,88 +137,105 @@ class _CrearViajeState extends State<Crear_Viaje> {
       body: Center(
         child: Column(
           children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              InputField(
-                key: const Key('tituloField'),
-                controller: _titulo,
-                hintText: 'Titulo del viaje',
-              ),
-              const SizedBox(height: 10),
-            ]),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(height: 10),
-              InputField(
-                key: const Key('fechaIniField'),
-                controller: _fecha_ini,
-                hintText: 'Fecha de inicio de viaje (DD-MM-YYYY)',
-              ),
-              const SizedBox(height: 10),
-            ]),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(height: 10),
-              InputField(
-                key: const Key('fechaFinField'),
-                controller: _fecha_fin,
-                hintText: 'Fecha de fin de viaje (DD-MM-YYYY)',
-              ),
-              const SizedBox(height: 10),
-            ]),
-            Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              RoundedButton(
-                key: const Key('guardarButton'),
-                text: 'Guardar',
-                backgroundColor: Colors.white,
-                textColor: Colors.black,
-                onPressed: () async {
-                  final titulo = _titulo.text.trim();
-                  final ini = _parseDdMmYyyy(_fecha_ini.text.trim());
-                  final fin = _parseDdMmYyyy(_fecha_fin.text.trim());
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputField(
+                  key: const Key('tituloField'),
+                  controller: _titulo,
+                  hintText: 'Titulo del viaje',
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                InputField(
+                  key: const Key('fechaIniField'),
+                  controller: _fecha_ini,
+                  hintText: 'Fecha de inicio de viaje (DD-MM-YYYY)',
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                InputField(
+                  key: const Key('fechaFinField'),
+                  controller: _fecha_fin,
+                  hintText: 'Fecha de fin de viaje (DD-MM-YYYY)',
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                RoundedButton(
+                  key: const Key('guardarButton'),
+                  text: 'Guardar',
+                  backgroundColor: Colors.white,
+                  textColor: Colors.black,
+                  onPressed: () async {
+                    final titulo = _titulo.text.trim();
+                    final ini = _parseDdMmYyyy(_fecha_ini.text.trim());
+                    final fin = _parseDdMmYyyy(_fecha_fin.text.trim());
 
-                  if (titulo.isEmpty || ini == null || fin == null) {
-                    _showError(
-                        'Rellena todos los campos con formato válido (DD-MM-YYYY).');
-                    return;
-                  }
-                  if (ini.isAfter(fin)) {
-                    _showError(
-                        'La fecha de inicio no puede ser posterior a la final');
-                    return;
-                  }
-                  if (titulo.length > Trip.titleMax) {
-                    _showError(
-                        'El título debe contener entre 1 y ${Trip.titleMax} caracteres');
-                    return;
-                  }
+                    if (titulo.isEmpty || ini == null || fin == null) {
+                      _showError(
+                        'Rellena todos los campos con formato válido (DD-MM-YYYY).',
+                      );
+                      return;
+                    }
+                    if (ini.isAfter(fin)) {
+                      _showError(
+                        'La fecha de inicio no puede ser posterior a la final',
+                      );
+                      return;
+                    }
+                    if (titulo.length > Trip.titleMax) {
+                      _showError(
+                        'El título debe contener entre 1 y ${Trip.titleMax} caracteres',
+                      );
+                      return;
+                    }
 
-                  final nuevoId =
-                      DateTime.now().millisecondsSinceEpoch.toString();
-                  final cmd = CreateTripCommand(
-                    id: nuevoId,
-                    title: titulo,
-                    description: 'Description',
-                    startDate: ini,
-                    endDate: fin,
-                  );
-
-                  // Servicio de aplicación
-                  final result = await widget.tripService.create(cmd);
-
-                  if (!mounted) return; // evita usar context tras async gap
-
-                  if (result is Ok<Trip>) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Viaje creado correctamente')),
+                    final nuevoId = DateTime.now().millisecondsSinceEpoch
+                        .toString();
+                    final cmd = CreateTripCommand(
+                      id: nuevoId,
+                      title: titulo,
+                      description: 'Description',
+                      startDate: ini,
+                      endDate: fin,
                     );
-                    Navigator.pop(context); // vuelve a la lista
-                  } else if (result is Err<Trip>) {
-                    final errors =
-                        result.errors.map((e) => e.message).join('\n');
-                    _showError('Error al crear viaje:\n$errors');
-                  }
-                },
-              ),
-            ]),
+
+                    // Servicio de aplicación
+                    final result = await widget.tripService.create(cmd);
+
+                    if (!mounted) return; // evita usar context tras async gap
+
+                    if (result is Ok<Trip>) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Viaje creado correctamente'),
+                        ),
+                      );
+                      Navigator.pop(context); // vuelve a la lista
+                    } else if (result is Err<Trip>) {
+                      final errors = result.errors
+                          .map((e) => e.message)
+                          .join('\n');
+                      _showError('Error al crear viaje:\n$errors');
+                    }
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -227,7 +248,9 @@ class _CrearViajeState extends State<Crear_Viaje> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.folder), label: 'Mis viajes'),
+            icon: Icon(Icons.folder),
+            label: 'Mis viajes',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
@@ -331,8 +354,10 @@ class InputField extends StatelessWidget {
               style: const TextStyle(color: Colors.white),
               controller: controller,
               decoration: const InputDecoration(
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 10,
+                ),
                 hintText: '',
                 filled: true,
                 fillColor: Colors.transparent,
@@ -371,8 +396,9 @@ class RoundedButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
         ),
         child: Text(text, style: TextStyle(color: textColor)),
       ),
