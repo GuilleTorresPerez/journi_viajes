@@ -317,13 +317,14 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         key: const Key('aceptarButton'),
                         onPressed: () async {
                           final tripToDelete = currentTrip;
-                          final result = await widget.tripService.deleteById(tripToDelete.id);
+                          final result = await widget.tripService
+                              .deleteById(tripToDelete.id);
                           if (result is Ok<Unit>) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content:
-                                Text('Viaje eliminado correctamente.')),
-                          );
+                                  content:
+                                      Text('Viaje eliminado correctamente.')),
+                            );
                             widget.viajes.removeAt(widget.num_viaje);
 
                             Navigator.pop(context); // cierra diálogo
