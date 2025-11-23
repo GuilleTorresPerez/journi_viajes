@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:latlong2/latlong.dart';
 
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/entry_service.dart';
@@ -11,8 +10,7 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/trip.dart' hide Ok;
-import 'mi_perfil.dart';
-import 'domain/user.dart';
+import 'package:journi/domain/user.dart';
 
 import 'application/shared/result.dart';
 import 'application/user_service.dart';
@@ -20,8 +18,7 @@ import 'crear_viaje.dart';
 import 'domain/ports/user_repository.dart';
 import 'editar_viaje.dart';
 import 'map_screen.dart';
-//import 'mi_perfil.dart';
-import 'select_location_screen.dart';
+//import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
 class Pantalla_Viaje extends StatefulWidget {
@@ -30,7 +27,7 @@ class Pantalla_Viaje extends StatefulWidget {
   final List<Trip> viajes;
   final int num_viaje;
   final ImagePicker? picker;
-  final bool sesionIniciada;
+  final bool inicionSesiada;
   // 👉 Puerto (interfaz) en lugar del repo in-memory
   final TripRepository repo;
   final EntryRepository entryRepo;
@@ -39,23 +36,19 @@ class Pantalla_Viaje extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  final User? currentUser;
-
-  Pantalla_Viaje({
-    super.key,
-    required this.selectedIndex,
-    required this.sesionIniciada,
-    required this.viajes,
-    required this.num_viaje,
-    required this.repo,
-    required this.entryRepo,
-    required this.tripService,
-    required this.entryService,
-    this.picker,
-    required this.userRepo,
-    required this.userService,
-    this.currentUser,
-  });
+  Pantalla_Viaje(
+      {super.key,
+      required this.selectedIndex,
+      required this.inicionSesiada,
+      required this.viajes,
+      required this.num_viaje,
+      required this.repo,
+      required this.entryRepo,
+      required this.tripService,
+      required this.entryService,
+      this.picker,
+      required this.userRepo,
+      required this.userService, User? currentUser});
 
   @override
   _PantallaViajeState createState() => _PantallaViajeState();
@@ -63,7 +56,7 @@ class Pantalla_Viaje extends StatefulWidget {
 
 class _PantallaViajeState extends State<Pantalla_Viaje> {
   final ImagePicker _picker = ImagePicker();
-  final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
+  //final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
   final TextEditingController _textoController = TextEditingController();
 
   late int _selectedIndex;
@@ -290,7 +283,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => Editar_viaje(
                     selectedIndex: 2,
                     viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
+                    sesionIniciada: widget.inicionSesiada,
                     num_viaje: widget.num_viaje,
                     repo: widget.repo,
                     entryRepo: widget.entryRepo,
@@ -421,8 +414,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     return Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+                          borderRadius: BorderRadius.circular(15)),
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
                         children: [
@@ -437,10 +429,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                       return Dialog(
                                         child: InteractiveViewer(
                                           panEnabled: true,
-                                          child: Image.file(
-                                            file,
-                                            fit: BoxFit.contain,
-                                          ),
+                                          child: Image.file(file,
+                                              fit: BoxFit.contain),
                                         ),
                                       );
                                     },
@@ -448,8 +438,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 },
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(15),
-                                  ),
+                                      top: Radius.circular(15)),
                                   child: Image.file(
                                     file,
                                     height: 200,
@@ -459,38 +448,32 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () async {
                                   await widget.entryService.deleteById(e.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Foto eliminada'),
-                                    ),
+                                        content: Text('Foto eliminada')),
                                   );
                                 },
                               ),
                             ],
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: 8.0,
-                              top: 4.0,
-                            ),
+                            padding: const EdgeInsets.only(bottom: 8.0),
                             child: Text(
                               'Añadida el $fechaFormateada',
                               style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
+                                  fontSize: 14, color: Colors.black54),
                             ),
                           ),
                         ],
                       ),
                     );
                   }
+
+                  return const SizedBox.shrink();
                 },
               );
             },
@@ -657,7 +640,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => MapaPaisScreen(
                     selectedIndex: widget.selectedIndex,
                     viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
+                    sesionIniciada: widget.inicionSesiada,
                     tripRepo: widget.repo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
@@ -674,7 +657,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => Crear_Viaje(
                     selectedIndex: widget.selectedIndex,
                     viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
+                    sesionIniciada: widget.inicionSesiada,
                     num_viaje: -1,
                     repo: widget.repo,
                     entryRepo: widget.entryRepo,
@@ -686,44 +669,24 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 ),
               );
             } else if (widget.selectedIndex == 4) {
-              if (widget.sesionIniciada && widget.currentUser != null) {
-                // Ya hay sesión -> ir al perfil
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MiPerfil(
-                      selectedIndex: 4,
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.repo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
-                      currentUser: widget.currentUser!, // 👈 AQUÍ TAMBIÉN
-                    ),
+              inIndex = 0;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
+                  builder: (context) => LoginScreen(
+                    selectedIndex: 0,
+                    sesionIniciada: widget.inicionSesiada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
                   ),
-                );
-              } else {
-                // No hay sesión -> login
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      selectedIndex: 0,
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.repo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
-                    ),
-                  ),
-                );
-              }
+                ),
+              );
             }
           });
         },

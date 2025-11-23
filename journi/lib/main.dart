@@ -252,7 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialPageRoute(
                         builder: (context) => Pantalla_Viaje(
                           selectedIndex: _selectedIndex,
-                          sesionIniciada: _sesionIniciada,
+                          inicionSesiada: _sesionIniciada,
                           viajes: items,
                           num_viaje: index,
                           repo: widget.tripRepo,
