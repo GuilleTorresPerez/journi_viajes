@@ -1,18 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:journi/application/user_service.dart';
-import 'package:journi/crear_viaje.dart';
+//import 'package:journi/crear_viaje.dart';
 import 'package:journi/data/local/drift/app_database.dart';
-import 'package:journi/data/local/drift/drift_entry_repository.dart';
-import 'package:journi/data/local/drift/drift_trip_repository.dart';
+//import 'package:journi/data/local/drift/drift_entry_repository.dart';
+//import 'package:journi/data/local/drift/drift_trip_repository.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
 import 'package:journi/pantalla_viaje.dart';
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/entry_service.dart';
-import 'package:journi/domain/ports/entry_repository.dart';
-import 'package:journi/domain/ports/trip_repository.dart';
+//import 'package:journi/domain/ports/entry_repository.dart';
+//import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/main.dart';
 
 extension WidgetTesterExtension on WidgetTester {
@@ -37,8 +37,8 @@ void main() {
     late InMemoryEntryRepository entryRepo;
     late DefaultTripService tripService;
     late DefaultEntryService entryService;
-    late TripRepository tRepo;
-    late EntryRepository eRepo;
+    //late TripRepository tRepo;
+    //late EntryRepository eRepo;
     final db = AppDatabase();
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
@@ -48,8 +48,8 @@ void main() {
       entryRepo = InMemoryEntryRepository();
       tripService = DefaultTripService(repo: tripRepo);
       entryService = DefaultEntryService(repo: entryRepo);
-      tRepo = DriftTripRepository(db);
-      eRepo = DriftEntryRepository(db);
+      //tRepo = DriftTripRepository(db);
+      //eRepo = DriftEntryRepository(db);
     });
 
     testWidgets('✅ Editar viaje correctamente', (WidgetTester tester) async {

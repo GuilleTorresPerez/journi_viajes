@@ -5,18 +5,18 @@ import 'application/user_service.dart';
 import 'package:journi/application/use_cases/user_use_cases.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/domain/user.dart';
-import 'data/local/drift/app_database.dart';
-import 'data/local/drift/drift_user_repository.dart';
+//import 'data/local/drift/app_database.dart';
+//import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
-import 'mi_perfil.dart'; // importa tu pantalla de perfil
+//import 'mi_perfil.dart'; // importa tu pantalla de perfil
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  int selectedIndex;
-  List<Trip> viajes;
+  final int selectedIndex;
+  final List<Trip> viajes;
   final bool sesionIniciada;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;

@@ -20,7 +20,7 @@ import 'crear_viaje.dart';
 import 'domain/ports/user_repository.dart';
 import 'editar_viaje.dart';
 import 'map_screen.dart';
-import 'mi_perfil.dart';
+//import 'mi_perfil.dart';
 import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
@@ -73,7 +73,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
     super.initState();
     _selectedIndex = widget.selectedIndex; // snapshot inicial
   }
-
+/*
   void _editarUbicacion(Entry entry) async {
     final nameController = TextEditingController(text: entry.text);
 
@@ -132,6 +132,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
       },
     );
   }
+
+ */
 
   Future<void> _editarTexto(
       Entry e, String textoSinUbicacion, String? ubicacionActual) async {

@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
+// ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
   MyHomePage({
     super.key,

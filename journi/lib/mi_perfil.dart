@@ -8,10 +8,10 @@ import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
-import 'main.dart';
+//import 'main.dart';
 import 'domain/user.dart';
 import 'map_screen.dart';
-
+// ignore: must_be_immutable
 class MiPerfil extends StatefulWidget {
   int selectedIndex;
   final bool sesionIniciada;

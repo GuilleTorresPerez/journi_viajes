@@ -14,9 +14,8 @@ import 'package:journi/domain/trip.dart';
 import 'application/user_service.dart';
 import 'domain/ports/user_repository.dart';
 import 'login_screen.dart';
-import 'main.dart';
 import 'map_screen.dart';
-import 'mi_perfil.dart';
+//import 'mi_perfil.dart';
 
 class Crear_Viaje extends StatefulWidget {
   // 🔒 Los campos del Widget deben ser inmutables (final)

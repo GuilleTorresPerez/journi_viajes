@@ -21,6 +21,7 @@ import 'main.dart';
 //
 // 🔹 Pantalla principal: lista de viajes
 //
+// ignore: must_be_immutable
 class MapaPaisScreen extends StatefulWidget {
   final bool sesionIniciada;
   int selectedIndex;
