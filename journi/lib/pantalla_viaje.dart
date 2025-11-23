@@ -421,21 +421,11 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     return Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
                         children: [
-                          GestureDetector(
-                            onTap: () => _mostrarAccionesImagen(
-                                e), // 👈 NUEVO: muestra el menú contextual
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(15)),
-                              child: Image.file(
-                                file,
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
                           Stack(
                             alignment: Alignment.topRight,
                             children: [
@@ -447,8 +437,10 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                       return Dialog(
                                         child: InteractiveViewer(
                                           panEnabled: true,
-                                          child: Image.file(file,
-                                              fit: BoxFit.contain),
+                                          child: Image.file(
+                                            file,
+                                            fit: BoxFit.contain,
+                                          ),
                                         ),
                                       );
                                     },
@@ -456,7 +448,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 },
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(15)),
+                                    top: Radius.circular(15),
+                                  ),
                                   child: Image.file(
                                     file,
                                     height: 200,
@@ -466,40 +459,38 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 ),
                               ),
                               IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
                                 onPressed: () async {
                                   await widget.entryService.deleteById(e.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text('Foto eliminada')),
+                                      content: Text('Foto eliminada'),
+                                    ),
                                   );
                                 },
                               ),
                             ],
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
+                            padding: const EdgeInsets.only(
+                              bottom: 8.0,
+                              top: 4.0,
+                            ),
                             child: Text(
                               'Añadida el $fechaFormateada',
                               style: const TextStyle(
-                                  fontSize: 14, color: Colors.black54),
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.location_on,
-                                color: Colors.teal),
-                            tooltip: 'Añadir ubicación',
-                            onPressed: () => _asignarUbicacionAEntrada(e),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
                         ],
                       ),
                     );
                   }
-
-                  return const SizedBox.shrink();
                 },
               );
             },
