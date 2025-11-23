@@ -173,7 +173,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                               // Fecha inicio
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     fechaInicio == null
@@ -201,7 +202,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                               // Fecha fin
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     fechaFin == null
@@ -295,10 +297,10 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       children: [
                         const Text(
                           "Compartir viaje",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 20),
-
                         TextField(
                           controller: emailCtrl,
                           decoration: const InputDecoration(
@@ -307,7 +309,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           ),
                         ),
                         const SizedBox(height: 15),
-
                         ElevatedButton.icon(
                           icon: const Icon(Icons.send),
                           label: const Text("Enviar invitación"),
@@ -365,7 +366,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   return AlertDialog(
                     title: const Text('Confirmar eliminación'),
                     content:
-                    const Text('¿Seguro que quieres eliminar este viaje?'),
+                        const Text('¿Seguro que quieres eliminar este viaje?'),
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(context),
@@ -390,9 +391,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           ),
         ],
       ),
-
-
-
       body: Stack(
         children: [
           // --- CONTENIDO PRINCIPAL ---
@@ -435,7 +433,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         title: Text(e.text!),
                         subtitle: Text('Añadido el $fechaFormateada'),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.red),
+                          icon: const Icon(Icons.delete_outline,
+                              color: Colors.red),
                           onPressed: () async {
                             await widget.entryService.deleteById(e.id);
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -473,8 +472,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                       return Dialog(
                                         child: InteractiveViewer(
                                           panEnabled: true,
-                                          child:
-                                          Image.file(file, fit: BoxFit.contain),
+                                          child: Image.file(file,
+                                              fit: BoxFit.contain),
                                         ),
                                       );
                                     },
@@ -492,11 +491,13 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () async {
                                   await widget.entryService.deleteById(e.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Foto eliminada')),
+                                    const SnackBar(
+                                        content: Text('Foto eliminada')),
                                   );
                                 },
                               ),
@@ -564,7 +565,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Texto añadido')));
+                                  const SnackBar(
+                                      content: Text('Texto añadido')));
                             },
                             child: const Text('Aceptar'),
                           ),
@@ -585,7 +587,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('¿Qué tipo de archivo multimedia quieres añadir?'),
+                        title: const Text(
+                            '¿Qué tipo de archivo multimedia quieres añadir?'),
                         actions: [
                           TextButton(
                             onPressed: () async {
@@ -607,8 +610,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
-                              final XFile? imagen =
-                              await _picker.pickImage(source: ImageSource.camera);
+                              final XFile? imagen = await _picker.pickImage(
+                                  source: ImageSource.camera);
                               if (imagen != null) {
                                 final file = File(imagen.path);
                                 final cmd = CreateEntryCommand(
@@ -625,8 +628,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
-                              final XFile? video =
-                              await _picker.pickVideo(source: ImageSource.gallery);
+                              final XFile? video = await _picker.pickVideo(
+                                  source: ImageSource.gallery);
                               if (video != null) {
                                 final cmd = CreateEntryCommand(
                                   id: UniqueKey().toString(),
@@ -646,7 +649,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   child: const Icon(Icons.camera_alt),
                 ),
                 const SizedBox(height: 12),
-
               ],
             ),
           ),
