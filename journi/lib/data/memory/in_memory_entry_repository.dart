@@ -15,7 +15,8 @@ class InMemoryEntryRepository implements EntryRepository {
       final okTrip = tripId == null || e.tripId == tripId;
       final okType = type == null || e.type == type;
       return okTrip && okType;
-    }).toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return List.unmodifiable(items);
   }
 

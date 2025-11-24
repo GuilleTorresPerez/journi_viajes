@@ -229,18 +229,16 @@ void main() {
       repo = InMemoryTripRepo();
       useCase = UpdateTripUseCase(repo);
 
-      final created =
-          Trip.create(
-                id: 'u1',
-                title: 'Vacaciones en Italia',
-                description: 'Roma, Florencia y Venecia',
-                coverImage: 'italia.jpg',
-                startDate: DateTime.utc(2025, 7, 1),
-                endDate: DateTime.utc(2025, 7, 10),
-                createdAt: DateTime.utc(2025, 1, 1, 10, 0),
-                updatedAt: DateTime.utc(2025, 1, 1, 10, 0),
-              )
-              as Ok<Trip>;
+      final created = Trip.create(
+        id: 'u1',
+        title: 'Vacaciones en Italia',
+        description: 'Roma, Florencia y Venecia',
+        coverImage: 'italia.jpg',
+        startDate: DateTime.utc(2025, 7, 1),
+        endDate: DateTime.utc(2025, 7, 10),
+        createdAt: DateTime.utc(2025, 1, 1, 10, 0),
+        updatedAt: DateTime.utc(2025, 1, 1, 10, 0),
+      ) as Ok<Trip>;
       baseTrip = created.value;
       repo.seed(baseTrip);
       repo.resetCounters();
@@ -360,15 +358,13 @@ void main() {
     setUp(() {
       repo = InMemoryTripRepo();
       useCase = DeleteTripUseCase(repo);
-      t =
-          (Trip.create(
-                    id: 'd1',
-                    title: 'Borrar-me',
-                    createdAt: DateTime.utc(2025, 1, 1),
-                    updatedAt: DateTime.utc(2025, 1, 1),
-                  )
-                  as Ok<Trip>)
-              .value;
+      t = (Trip.create(
+        id: 'd1',
+        title: 'Borrar-me',
+        createdAt: DateTime.utc(2025, 1, 1),
+        updatedAt: DateTime.utc(2025, 1, 1),
+      ) as Ok<Trip>)
+          .value;
       repo.seed(t);
     });
 
@@ -396,40 +392,34 @@ void main() {
       repo = InMemoryTripRepo();
       useCase = ListTripsForDayUseCase(repo);
 
-      final a =
-          (Trip.create(
-                    id: 'a',
-                    title: 'A',
-                    startDate: DateTime.utc(2025, 6, 1),
-                    endDate: DateTime.utc(2025, 6, 3),
-                    createdAt: DateTime.utc(2025, 1, 1),
-                    updatedAt: DateTime.utc(2025, 1, 1),
-                  )
-                  as Ok<Trip>)
-              .value;
+      final a = (Trip.create(
+        id: 'a',
+        title: 'A',
+        startDate: DateTime.utc(2025, 6, 1),
+        endDate: DateTime.utc(2025, 6, 3),
+        createdAt: DateTime.utc(2025, 1, 1),
+        updatedAt: DateTime.utc(2025, 1, 1),
+      ) as Ok<Trip>)
+          .value;
 
-      final b =
-          (Trip.create(
-                    id: 'b',
-                    title: 'B',
-                    startDate: DateTime.utc(2025, 6, 3), // toca el día 3
-                    endDate: DateTime.utc(2025, 6, 5),
-                    createdAt: DateTime.utc(2025, 1, 2),
-                    updatedAt: DateTime.utc(2025, 1, 2),
-                  )
-                  as Ok<Trip>)
-              .value;
+      final b = (Trip.create(
+        id: 'b',
+        title: 'B',
+        startDate: DateTime.utc(2025, 6, 3), // toca el día 3
+        endDate: DateTime.utc(2025, 6, 5),
+        createdAt: DateTime.utc(2025, 1, 2),
+        updatedAt: DateTime.utc(2025, 1, 2),
+      ) as Ok<Trip>)
+          .value;
 
-      final c =
-          (Trip.create(
-                    id: 'c',
-                    title: 'C',
-                    // sin fechas → no debería aparecer
-                    createdAt: DateTime.utc(2025, 1, 3),
-                    updatedAt: DateTime.utc(2025, 1, 3),
-                  )
-                  as Ok<Trip>)
-              .value;
+      final c = (Trip.create(
+        id: 'c',
+        title: 'C',
+        // sin fechas → no debería aparecer
+        createdAt: DateTime.utc(2025, 1, 3),
+        updatedAt: DateTime.utc(2025, 1, 3),
+      ) as Ok<Trip>)
+          .value;
 
       repo.seed(a);
       repo.seed(b);

@@ -108,7 +108,8 @@ void main() {
       },
     );
 
-    test('upsert() persiste y normaliza (trim + UTC) y watchAll emite', () async {
+    test('upsert() persiste y normaliza (trim + UTC) y watchAll emite',
+        () async {
       repo = InMemoryTripRepository();
       final nowLocal =
           DateTime.now(); // no-UTC a propósito para comprobar normalización

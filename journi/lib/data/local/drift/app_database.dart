@@ -23,18 +23,18 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (m) async => m.createAll(),
-    onUpgrade: (m, from, to) async {
-      if (from < 2) {
-        await m.createTable(users);
-      }
-      if (from < 3) {
-        // añadimos columnas de password
-        await m.addColumn(users, users.passwordHash);
-        await m.addColumn(users, users.passwordSalt);
-      }
-    },
-  );
+        onCreate: (m) async => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(users);
+          }
+          if (from < 3) {
+            // añadimos columnas de password
+            await m.addColumn(users, users.passwordHash);
+            await m.addColumn(users, users.passwordSalt);
+          }
+        },
+      );
 }
 
 LazyDatabase _openLazy() {

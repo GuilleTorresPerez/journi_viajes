@@ -24,15 +24,15 @@ User _toDomain(db.DbUser row) {
 }
 
 db.UsersCompanion _toCompanion(User u) => db.UsersCompanion(
-  id: d.Value(u.id),
-  name: d.Value(u.name),
-  lastName: d.Value(u.lastName),
-  email: d.Value(u.email),
-  passwordHash: d.Value(u.passwordHash),
-  passwordSalt: d.Value(u.passwordSalt),
-  createdAt: d.Value(u.createdAt.toUtc()),
-  updatedAt: d.Value(u.updatedAt.toUtc()),
-);
+      id: d.Value(u.id),
+      name: d.Value(u.name),
+      lastName: d.Value(u.lastName),
+      email: d.Value(u.email),
+      passwordHash: d.Value(u.passwordHash),
+      passwordSalt: d.Value(u.passwordSalt),
+      createdAt: d.Value(u.createdAt.toUtc()),
+      updatedAt: d.Value(u.updatedAt.toUtc()),
+    );
 
 class DriftUserRepository implements UserRepository {
   final db.AppDatabase _db;
@@ -45,7 +45,8 @@ class DriftUserRepository implements UserRepository {
       await _db.into(_db.users).insertOnConflictUpdate(_toCompanion(user));
       final row = await (_db.select(
         _db.users,
-      )..where((t) => t.id.equals(user.id))).getSingle();
+      )..where((t) => t.id.equals(user.id)))
+          .getSingle();
       return Ok(_toDomain(row));
     } catch (e, st) {
       // mapea violación de UNIQUE(email)
@@ -59,7 +60,8 @@ class DriftUserRepository implements UserRepository {
   Future<Result<User?>> findById(String id) async {
     final row = await (_db.select(
       _db.users,
-    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    )..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
     return Ok(row == null ? null : _toDomain(row));
   }
 
@@ -67,7 +69,8 @@ class DriftUserRepository implements UserRepository {
   Future<Result<User?>> findByEmail(String email) async {
     final row = await (_db.select(
       _db.users,
-    )..where((t) => t.email.equals(email.toLowerCase()))).getSingleOrNull();
+    )..where((t) => t.email.equals(email.toLowerCase())))
+        .getSingleOrNull();
     return Ok(row == null ? null : _toDomain(row));
   }
 

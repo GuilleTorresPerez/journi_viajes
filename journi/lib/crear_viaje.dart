@@ -20,7 +20,7 @@ import 'map_screen.dart';
 class Crear_Viaje extends StatefulWidget {
   // 🔒 Los campos del Widget deben ser inmutables (final)
   final int
-  selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
+      selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
   final int num_viaje;
   final List<Trip> viajes;
   final bool sesionIniciada;
@@ -204,8 +204,8 @@ class _CrearViajeState extends State<Crear_Viaje> {
                       return;
                     }
 
-                    final nuevoId = DateTime.now().millisecondsSinceEpoch
-                        .toString();
+                    final nuevoId =
+                        DateTime.now().millisecondsSinceEpoch.toString();
                     final cmd = CreateTripCommand(
                       id: nuevoId,
                       title: titulo,
@@ -227,9 +227,8 @@ class _CrearViajeState extends State<Crear_Viaje> {
                       );
                       Navigator.pop(context); // vuelve a la lista
                     } else if (result is Err<Trip>) {
-                      final errors = result.errors
-                          .map((e) => e.message)
-                          .join('\n');
+                      final errors =
+                          result.errors.map((e) => e.message).join('\n');
                       _showError('Error al crear viaje:\n$errors');
                     }
                   },

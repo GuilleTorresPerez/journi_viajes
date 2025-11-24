@@ -94,18 +94,14 @@ class UpdateTripUseCase {
     }
 
     // Calcula nuevos valores (permitiendo null si el patch lo fija a null)
-    final newTitle = cmd.title.isSet
-        ? (cmd.title.value ?? current.title)
-        : current.title;
-    final newDescription = cmd.description.isSet
-        ? cmd.description.value
-        : current.description;
-    final newCoverImage = cmd.coverImage.isSet
-        ? cmd.coverImage.value
-        : current.coverImage;
-    final newStart = cmd.startDate.isSet
-        ? cmd.startDate.value
-        : current.startDate;
+    final newTitle =
+        cmd.title.isSet ? (cmd.title.value ?? current.title) : current.title;
+    final newDescription =
+        cmd.description.isSet ? cmd.description.value : current.description;
+    final newCoverImage =
+        cmd.coverImage.isSet ? cmd.coverImage.value : current.coverImage;
+    final newStart =
+        cmd.startDate.isSet ? cmd.startDate.value : current.startDate;
     final newEnd = cmd.endDate.isSet ? cmd.endDate.value : current.endDate;
 
     final nowUtc = DateTime.now().toUtc();
@@ -183,7 +179,8 @@ class ListTripsForDayUseCase {
   Future<Result<List<Trip>>> call(DateTime dayUtc) async {
     final res = await repo.list();
     if (res is Err<List<Trip>>) return res;
-    final items = (res as Ok<List<Trip>>).value
+    final items = (res as Ok<List<Trip>>)
+        .value
         .where((t) => t.occursOn(dayUtc.toUtc()))
         .toList();
     return Ok(items);

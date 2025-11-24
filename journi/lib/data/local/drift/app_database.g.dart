@@ -94,15 +94,15 @@ class $TripsTable extends Trips with TableInfo<$TripsTable, DbTrip> {
   );
   @override
   List<GeneratedColumn> get $columns => [
-    id,
-    title,
-    description,
-    coverImage,
-    startDate,
-    endDate,
-    createdAt,
-    updatedAt,
-  ];
+        id,
+        title,
+        description,
+        coverImage,
+        startDate,
+        endDate,
+        createdAt,
+        updatedAt,
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -323,26 +323,25 @@ class DbTrip extends DataClass implements Insertable<DbTrip> {
     Value<DateTime?> endDate = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => DbTrip(
-    id: id ?? this.id,
-    title: title ?? this.title,
-    description: description.present ? description.value : this.description,
-    coverImage: coverImage.present ? coverImage.value : this.coverImage,
-    startDate: startDate.present ? startDate.value : this.startDate,
-    endDate: endDate.present ? endDate.value : this.endDate,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
+  }) =>
+      DbTrip(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        description: description.present ? description.value : this.description,
+        coverImage: coverImage.present ? coverImage.value : this.coverImage,
+        startDate: startDate.present ? startDate.value : this.startDate,
+        endDate: endDate.present ? endDate.value : this.endDate,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
   DbTrip copyWithCompanion(TripsCompanion data) {
     return DbTrip(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
-      description: data.description.present
-          ? data.description.value
-          : this.description,
-      coverImage: data.coverImage.present
-          ? data.coverImage.value
-          : this.coverImage,
+      description:
+          data.description.present ? data.description.value : this.description,
+      coverImage:
+          data.coverImage.present ? data.coverImage.value : this.coverImage,
       startDate: data.startDate.present ? data.startDate.value : this.startDate,
       endDate: data.endDate.present ? data.endDate.value : this.endDate,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -367,15 +366,15 @@ class DbTrip extends DataClass implements Insertable<DbTrip> {
 
   @override
   int get hashCode => Object.hash(
-    id,
-    title,
-    description,
-    coverImage,
-    startDate,
-    endDate,
-    createdAt,
-    updatedAt,
-  );
+        id,
+        title,
+        description,
+        coverImage,
+        startDate,
+        endDate,
+        createdAt,
+        updatedAt,
+      );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -421,10 +420,10 @@ class TripsCompanion extends UpdateCompanion<DbTrip> {
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       title = Value(title),
-       createdAt = Value(createdAt),
-       updatedAt = Value(updatedAt);
+  })  : id = Value(id),
+        title = Value(title),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
   static Insertable<DbTrip> custom({
     Expression<String>? id,
     Expression<String>? title,
@@ -552,12 +551,12 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, DbEntry> {
   @override
   late final GeneratedColumnWithTypeConverter<EntryType, String> type =
       GeneratedColumn<String>(
-        'type',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      ).withConverter<EntryType>($EntriesTable.$convertertype);
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<EntryType>($EntriesTable.$convertertype);
   static const VerificationMeta _textContentMeta = const VerificationMeta(
     'textContent',
   );
@@ -601,12 +600,12 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, DbEntry> {
   @override
   late final GeneratedColumnWithTypeConverter<List<String>, String> tagsJson =
       GeneratedColumn<String>(
-        'tags_json',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      ).withConverter<List<String>>($EntriesTable.$convertertagsJson);
+    'tags_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<List<String>>($EntriesTable.$convertertagsJson);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -631,17 +630,17 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, DbEntry> {
   );
   @override
   List<GeneratedColumn> get $columns => [
-    id,
-    tripId,
-    type,
-    textContent,
-    mediaUri,
-    lat,
-    lon,
-    tagsJson,
-    createdAt,
-    updatedAt,
-  ];
+        id,
+        tripId,
+        type,
+        textContent,
+        mediaUri,
+        lat,
+        lon,
+        tagsJson,
+        createdAt,
+        updatedAt,
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -895,26 +894,26 @@ class DbEntry extends DataClass implements Insertable<DbEntry> {
     List<String>? tagsJson,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => DbEntry(
-    id: id ?? this.id,
-    tripId: tripId ?? this.tripId,
-    type: type ?? this.type,
-    textContent: textContent.present ? textContent.value : this.textContent,
-    mediaUri: mediaUri.present ? mediaUri.value : this.mediaUri,
-    lat: lat.present ? lat.value : this.lat,
-    lon: lon.present ? lon.value : this.lon,
-    tagsJson: tagsJson ?? this.tagsJson,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
+  }) =>
+      DbEntry(
+        id: id ?? this.id,
+        tripId: tripId ?? this.tripId,
+        type: type ?? this.type,
+        textContent: textContent.present ? textContent.value : this.textContent,
+        mediaUri: mediaUri.present ? mediaUri.value : this.mediaUri,
+        lat: lat.present ? lat.value : this.lat,
+        lon: lon.present ? lon.value : this.lon,
+        tagsJson: tagsJson ?? this.tagsJson,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
   DbEntry copyWithCompanion(EntriesCompanion data) {
     return DbEntry(
       id: data.id.present ? data.id.value : this.id,
       tripId: data.tripId.present ? data.tripId.value : this.tripId,
       type: data.type.present ? data.type.value : this.type,
-      textContent: data.textContent.present
-          ? data.textContent.value
-          : this.textContent,
+      textContent:
+          data.textContent.present ? data.textContent.value : this.textContent,
       mediaUri: data.mediaUri.present ? data.mediaUri.value : this.mediaUri,
       lat: data.lat.present ? data.lat.value : this.lat,
       lon: data.lon.present ? data.lon.value : this.lon,
@@ -943,17 +942,17 @@ class DbEntry extends DataClass implements Insertable<DbEntry> {
 
   @override
   int get hashCode => Object.hash(
-    id,
-    tripId,
-    type,
-    textContent,
-    mediaUri,
-    lat,
-    lon,
-    tagsJson,
-    createdAt,
-    updatedAt,
-  );
+        id,
+        tripId,
+        type,
+        textContent,
+        mediaUri,
+        lat,
+        lon,
+        tagsJson,
+        createdAt,
+        updatedAt,
+      );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1007,12 +1006,12 @@ class EntriesCompanion extends UpdateCompanion<DbEntry> {
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       tripId = Value(tripId),
-       type = Value(type),
-       tagsJson = Value(tagsJson),
-       createdAt = Value(createdAt),
-       updatedAt = Value(updatedAt);
+  })  : id = Value(id),
+        tripId = Value(tripId),
+        type = Value(type),
+        tagsJson = Value(tagsJson),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
   static Insertable<DbEntry> custom({
     Expression<String>? id,
     Expression<String>? tripId,
@@ -1220,15 +1219,15 @@ class $UsersTable extends Users with TableInfo<$UsersTable, DbUser> {
   );
   @override
   List<GeneratedColumn> get $columns => [
-    id,
-    name,
-    lastName,
-    email,
-    passwordHash,
-    passwordSalt,
-    createdAt,
-    updatedAt,
-  ];
+        id,
+        name,
+        lastName,
+        email,
+        passwordHash,
+        passwordSalt,
+        createdAt,
+        updatedAt,
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1444,16 +1443,17 @@ class DbUser extends DataClass implements Insertable<DbUser> {
     String? passwordSalt,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => DbUser(
-    id: id ?? this.id,
-    name: name ?? this.name,
-    lastName: lastName ?? this.lastName,
-    email: email ?? this.email,
-    passwordHash: passwordHash ?? this.passwordHash,
-    passwordSalt: passwordSalt ?? this.passwordSalt,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
+  }) =>
+      DbUser(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        lastName: lastName ?? this.lastName,
+        email: email ?? this.email,
+        passwordHash: passwordHash ?? this.passwordHash,
+        passwordSalt: passwordSalt ?? this.passwordSalt,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
   DbUser copyWithCompanion(UsersCompanion data) {
     return DbUser(
       id: data.id.present ? data.id.value : this.id,
@@ -1488,15 +1488,15 @@ class DbUser extends DataClass implements Insertable<DbUser> {
 
   @override
   int get hashCode => Object.hash(
-    id,
-    name,
-    lastName,
-    email,
-    passwordHash,
-    passwordSalt,
-    createdAt,
-    updatedAt,
-  );
+        id,
+        name,
+        lastName,
+        email,
+        passwordHash,
+        passwordSalt,
+        createdAt,
+        updatedAt,
+      );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1542,14 +1542,14 @@ class UsersCompanion extends UpdateCompanion<DbUser> {
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       name = Value(name),
-       lastName = Value(lastName),
-       email = Value(email),
-       passwordHash = Value(passwordHash),
-       passwordSalt = Value(passwordSalt),
-       createdAt = Value(createdAt),
-       updatedAt = Value(updatedAt);
+  })  : id = Value(id),
+        name = Value(name),
+        lastName = Value(lastName),
+        email = Value(email),
+        passwordHash = Value(passwordHash),
+        passwordSalt = Value(passwordSalt),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
   static Insertable<DbUser> custom({
     Expression<String>? id,
     Expression<String>? name,
@@ -1661,40 +1661,38 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [trips, entries, users];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'trips',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('entries', kind: UpdateKind.delete)],
-    ),
-  ]);
+        WritePropagation(
+          on: TableUpdateQuery.onTableName(
+            'trips',
+            limitUpdateKind: UpdateKind.delete,
+          ),
+          result: [TableUpdate('entries', kind: UpdateKind.delete)],
+        ),
+      ]);
 }
 
-typedef $$TripsTableCreateCompanionBuilder =
-    TripsCompanion Function({
-      required String id,
-      required String title,
-      Value<String?> description,
-      Value<String?> coverImage,
-      Value<DateTime?> startDate,
-      Value<DateTime?> endDate,
-      required DateTime createdAt,
-      required DateTime updatedAt,
-      Value<int> rowid,
-    });
-typedef $$TripsTableUpdateCompanionBuilder =
-    TripsCompanion Function({
-      Value<String> id,
-      Value<String> title,
-      Value<String?> description,
-      Value<String?> coverImage,
-      Value<DateTime?> startDate,
-      Value<DateTime?> endDate,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
-    });
+typedef $$TripsTableCreateCompanionBuilder = TripsCompanion Function({
+  required String id,
+  required String title,
+  Value<String?> description,
+  Value<String?> coverImage,
+  Value<DateTime?> startDate,
+  Value<DateTime?> endDate,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$TripsTableUpdateCompanionBuilder = TripsCompanion Function({
+  Value<String> id,
+  Value<String> title,
+  Value<String?> description,
+  Value<String?> coverImage,
+  Value<DateTime?> startDate,
+  Value<DateTime?> endDate,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
 
 final class $$TripsTableReferences
     extends BaseReferences<_$AppDatabase, $TripsTable, DbTrip> {
@@ -1702,10 +1700,11 @@ final class $$TripsTableReferences
 
   static MultiTypedResultKey<$EntriesTable, List<DbEntry>> _entriesRefsTable(
     _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.entries,
-    aliasName: $_aliasNameGenerator(db.trips.id, db.entries.tripId),
-  );
+  ) =>
+      MultiTypedResultKey.fromTable(
+        db.entries,
+        aliasName: $_aliasNameGenerator(db.trips.id, db.entries.tripId),
+      );
 
   $$EntriesTableProcessedTableManager get entriesRefs {
     final manager = $$EntriesTableTableManager(
@@ -1729,44 +1728,44 @@ class $$TripsTableFilterComposer extends Composer<_$AppDatabase, $TripsTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.id,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.title,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.description,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get coverImage => $composableBuilder(
-    column: $table.coverImage,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.coverImage,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.startDate,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.endDate,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.createdAt,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.updatedAt,
+        builder: (column) => ColumnFilters(column),
+      );
 
   Expression<bool> entriesRefs(
     Expression<bool> Function($$EntriesTableFilterComposer f) f,
@@ -1776,19 +1775,18 @@ class $$TripsTableFilterComposer extends Composer<_$AppDatabase, $TripsTable> {
       getCurrentColumn: (t) => t.id,
       referencedTable: $db.entries,
       getReferencedColumn: (t) => t.tripId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EntriesTableFilterComposer(
-            $db: $db,
-            $table: $db.entries,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
+      builder: (
+        joinBuilder, {
+        $addJoinBuilderToRootComposer,
+        $removeJoinBuilderFromRootComposer,
+      }) =>
+          $$EntriesTableFilterComposer(
+        $db: $db,
+        $table: $db.entries,
+        $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+        joinBuilder: joinBuilder,
+        $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+      ),
     );
     return f(composer);
   }
@@ -1804,44 +1802,44 @@ class $$TripsTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.id,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.title,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.description,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get coverImage => $composableBuilder(
-    column: $table.coverImage,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.coverImage,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.startDate,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.endDate,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.createdAt,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.updatedAt,
+        builder: (column) => ColumnOrderings(column),
+      );
 }
 
 class $$TripsTableAnnotationComposer
@@ -1860,14 +1858,14 @@ class $$TripsTableAnnotationComposer
       $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => column,
-  );
+        column: $table.description,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get coverImage => $composableBuilder(
-    column: $table.coverImage,
-    builder: (column) => column,
-  );
+        column: $table.coverImage,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<DateTime> get startDate =>
       $composableBuilder(column: $table.startDate, builder: (column) => column);
@@ -1889,177 +1887,173 @@ class $$TripsTableAnnotationComposer
       getCurrentColumn: (t) => t.id,
       referencedTable: $db.entries,
       getReferencedColumn: (t) => t.tripId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EntriesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.entries,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
+      builder: (
+        joinBuilder, {
+        $addJoinBuilderToRootComposer,
+        $removeJoinBuilderFromRootComposer,
+      }) =>
+          $$EntriesTableAnnotationComposer(
+        $db: $db,
+        $table: $db.entries,
+        $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+        joinBuilder: joinBuilder,
+        $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+      ),
     );
     return f(composer);
   }
 }
 
-class $$TripsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $TripsTable,
-          DbTrip,
-          $$TripsTableFilterComposer,
-          $$TripsTableOrderingComposer,
-          $$TripsTableAnnotationComposer,
-          $$TripsTableCreateCompanionBuilder,
-          $$TripsTableUpdateCompanionBuilder,
-          (DbTrip, $$TripsTableReferences),
-          DbTrip,
-          PrefetchHooks Function({bool entriesRefs})
-        > {
+class $$TripsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $TripsTable,
+    DbTrip,
+    $$TripsTableFilterComposer,
+    $$TripsTableOrderingComposer,
+    $$TripsTableAnnotationComposer,
+    $$TripsTableCreateCompanionBuilder,
+    $$TripsTableUpdateCompanionBuilder,
+    (DbTrip, $$TripsTableReferences),
+    DbTrip,
+    PrefetchHooks Function({bool entriesRefs})> {
   $$TripsTableTableManager(_$AppDatabase db, $TripsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$TripsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$TripsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$TripsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> title = const Value.absent(),
-                Value<String?> description = const Value.absent(),
-                Value<String?> coverImage = const Value.absent(),
-                Value<DateTime?> startDate = const Value.absent(),
-                Value<DateTime?> endDate = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => TripsCompanion(
-                id: id,
-                title: title,
-                description: description,
-                coverImage: coverImage,
-                startDate: startDate,
-                endDate: endDate,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String title,
-                Value<String?> description = const Value.absent(),
-                Value<String?> coverImage = const Value.absent(),
-                Value<DateTime?> startDate = const Value.absent(),
-                Value<DateTime?> endDate = const Value.absent(),
-                required DateTime createdAt,
-                required DateTime updatedAt,
-                Value<int> rowid = const Value.absent(),
-              }) => TripsCompanion.insert(
-                id: id,
-                title: title,
-                description: description,
-                coverImage: coverImage,
-                startDate: startDate,
-                endDate: endDate,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) =>
-                    (e.readTable(table), $$TripsTableReferences(db, table, e)),
-              )
-              .toList(),
-          prefetchHooksCallback: ({entriesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (entriesRefs) db.entries],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (entriesRefs)
-                    await $_getPrefetchedData<DbTrip, $TripsTable, DbEntry>(
-                      currentTable: table,
-                      referencedTable: $$TripsTableReferences._entriesRefsTable(
-                        db,
+      : super(
+          TableManagerState(
+            db: db,
+            table: table,
+            createFilteringComposer: () =>
+                $$TripsTableFilterComposer($db: db, $table: table),
+            createOrderingComposer: () =>
+                $$TripsTableOrderingComposer($db: db, $table: table),
+            createComputedFieldComposer: () =>
+                $$TripsTableAnnotationComposer($db: db, $table: table),
+            updateCompanionCallback: ({
+              Value<String> id = const Value.absent(),
+              Value<String> title = const Value.absent(),
+              Value<String?> description = const Value.absent(),
+              Value<String?> coverImage = const Value.absent(),
+              Value<DateTime?> startDate = const Value.absent(),
+              Value<DateTime?> endDate = const Value.absent(),
+              Value<DateTime> createdAt = const Value.absent(),
+              Value<DateTime> updatedAt = const Value.absent(),
+              Value<int> rowid = const Value.absent(),
+            }) =>
+                TripsCompanion(
+              id: id,
+              title: title,
+              description: description,
+              coverImage: coverImage,
+              startDate: startDate,
+              endDate: endDate,
+              createdAt: createdAt,
+              updatedAt: updatedAt,
+              rowid: rowid,
+            ),
+            createCompanionCallback: ({
+              required String id,
+              required String title,
+              Value<String?> description = const Value.absent(),
+              Value<String?> coverImage = const Value.absent(),
+              Value<DateTime?> startDate = const Value.absent(),
+              Value<DateTime?> endDate = const Value.absent(),
+              required DateTime createdAt,
+              required DateTime updatedAt,
+              Value<int> rowid = const Value.absent(),
+            }) =>
+                TripsCompanion.insert(
+              id: id,
+              title: title,
+              description: description,
+              coverImage: coverImage,
+              startDate: startDate,
+              endDate: endDate,
+              createdAt: createdAt,
+              updatedAt: updatedAt,
+              rowid: rowid,
+            ),
+            withReferenceMapper: (p0) => p0
+                .map(
+                  (e) => (
+                    e.readTable(table),
+                    $$TripsTableReferences(db, table, e)
+                  ),
+                )
+                .toList(),
+            prefetchHooksCallback: ({entriesRefs = false}) {
+              return PrefetchHooks(
+                db: db,
+                explicitlyWatchedTables: [if (entriesRefs) db.entries],
+                addJoins: null,
+                getPrefetchedDataCallback: (items) async {
+                  return [
+                    if (entriesRefs)
+                      await $_getPrefetchedData<DbTrip, $TripsTable, DbEntry>(
+                        currentTable: table,
+                        referencedTable:
+                            $$TripsTableReferences._entriesRefsTable(
+                          db,
+                        ),
+                        managerFromTypedResult: (p0) =>
+                            $$TripsTableReferences(db, table, p0).entriesRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.tripId == item.id),
+                        typedResults: items,
                       ),
-                      managerFromTypedResult: (p0) =>
-                          $$TripsTableReferences(db, table, p0).entriesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.tripId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
-        ),
-      );
+                  ];
+                },
+              );
+            },
+          ),
+        );
 }
 
-typedef $$TripsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $TripsTable,
-      DbTrip,
-      $$TripsTableFilterComposer,
-      $$TripsTableOrderingComposer,
-      $$TripsTableAnnotationComposer,
-      $$TripsTableCreateCompanionBuilder,
-      $$TripsTableUpdateCompanionBuilder,
-      (DbTrip, $$TripsTableReferences),
-      DbTrip,
-      PrefetchHooks Function({bool entriesRefs})
-    >;
-typedef $$EntriesTableCreateCompanionBuilder =
-    EntriesCompanion Function({
-      required String id,
-      required String tripId,
-      required EntryType type,
-      Value<String?> textContent,
-      Value<String?> mediaUri,
-      Value<double?> lat,
-      Value<double?> lon,
-      required List<String> tagsJson,
-      required DateTime createdAt,
-      required DateTime updatedAt,
-      Value<int> rowid,
-    });
-typedef $$EntriesTableUpdateCompanionBuilder =
-    EntriesCompanion Function({
-      Value<String> id,
-      Value<String> tripId,
-      Value<EntryType> type,
-      Value<String?> textContent,
-      Value<String?> mediaUri,
-      Value<double?> lat,
-      Value<double?> lon,
-      Value<List<String>> tagsJson,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
-    });
+typedef $$TripsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $TripsTable,
+    DbTrip,
+    $$TripsTableFilterComposer,
+    $$TripsTableOrderingComposer,
+    $$TripsTableAnnotationComposer,
+    $$TripsTableCreateCompanionBuilder,
+    $$TripsTableUpdateCompanionBuilder,
+    (DbTrip, $$TripsTableReferences),
+    DbTrip,
+    PrefetchHooks Function({bool entriesRefs})>;
+typedef $$EntriesTableCreateCompanionBuilder = EntriesCompanion Function({
+  required String id,
+  required String tripId,
+  required EntryType type,
+  Value<String?> textContent,
+  Value<String?> mediaUri,
+  Value<double?> lat,
+  Value<double?> lon,
+  required List<String> tagsJson,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$EntriesTableUpdateCompanionBuilder = EntriesCompanion Function({
+  Value<String> id,
+  Value<String> tripId,
+  Value<EntryType> type,
+  Value<String?> textContent,
+  Value<String?> mediaUri,
+  Value<double?> lat,
+  Value<double?> lon,
+  Value<List<String>> tagsJson,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
 
 final class $$EntriesTableReferences
     extends BaseReferences<_$AppDatabase, $EntriesTable, DbEntry> {
   $$EntriesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $TripsTable _tripIdTable(_$AppDatabase db) => db.trips.createAlias(
-    $_aliasNameGenerator(db.entries.tripId, db.trips.id),
-  );
+        $_aliasNameGenerator(db.entries.tripId, db.trips.id),
+      );
 
   $$TripsTableProcessedTableManager get tripId {
     final $_column = $_itemColumn<String>('trip_id')!;
@@ -2086,9 +2080,9 @@ class $$EntriesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.id,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnWithTypeConverterFilters<EntryType, EntryType, String> get type =>
       $composableBuilder(
@@ -2097,40 +2091,40 @@ class $$EntriesTableFilterComposer
       );
 
   ColumnFilters<String> get textContent => $composableBuilder(
-    column: $table.textContent,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.textContent,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get mediaUri => $composableBuilder(
-    column: $table.mediaUri,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.mediaUri,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<double> get lat => $composableBuilder(
-    column: $table.lat,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.lat,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<double> get lon => $composableBuilder(
-    column: $table.lon,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.lon,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnWithTypeConverterFilters<List<String>, List<String>, String>
-  get tagsJson => $composableBuilder(
-    column: $table.tagsJson,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
+      get tagsJson => $composableBuilder(
+            column: $table.tagsJson,
+            builder: (column) => ColumnWithTypeConverterFilters(column),
+          );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.createdAt,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.updatedAt,
+        builder: (column) => ColumnFilters(column),
+      );
 
   $$TripsTableFilterComposer get tripId {
     final $$TripsTableFilterComposer composer = $composerBuilder(
@@ -2138,19 +2132,18 @@ class $$EntriesTableFilterComposer
       getCurrentColumn: (t) => t.tripId,
       referencedTable: $db.trips,
       getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TripsTableFilterComposer(
-            $db: $db,
-            $table: $db.trips,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
+      builder: (
+        joinBuilder, {
+        $addJoinBuilderToRootComposer,
+        $removeJoinBuilderFromRootComposer,
+      }) =>
+          $$TripsTableFilterComposer(
+        $db: $db,
+        $table: $db.trips,
+        $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+        joinBuilder: joinBuilder,
+        $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+      ),
     );
     return composer;
   }
@@ -2166,49 +2159,49 @@ class $$EntriesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.id,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get type => $composableBuilder(
-    column: $table.type,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.type,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get textContent => $composableBuilder(
-    column: $table.textContent,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.textContent,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get mediaUri => $composableBuilder(
-    column: $table.mediaUri,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.mediaUri,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<double> get lat => $composableBuilder(
-    column: $table.lat,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.lat,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<double> get lon => $composableBuilder(
-    column: $table.lon,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.lon,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get tagsJson => $composableBuilder(
-    column: $table.tagsJson,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.tagsJson,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.createdAt,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.updatedAt,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   $$TripsTableOrderingComposer get tripId {
     final $$TripsTableOrderingComposer composer = $composerBuilder(
@@ -2216,19 +2209,18 @@ class $$EntriesTableOrderingComposer
       getCurrentColumn: (t) => t.tripId,
       referencedTable: $db.trips,
       getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TripsTableOrderingComposer(
-            $db: $db,
-            $table: $db.trips,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
+      builder: (
+        joinBuilder, {
+        $addJoinBuilderToRootComposer,
+        $removeJoinBuilderFromRootComposer,
+      }) =>
+          $$TripsTableOrderingComposer(
+        $db: $db,
+        $table: $db.trips,
+        $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+        joinBuilder: joinBuilder,
+        $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+      ),
     );
     return composer;
   }
@@ -2250,9 +2242,9 @@ class $$EntriesTableAnnotationComposer
       $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<String> get textContent => $composableBuilder(
-    column: $table.textContent,
-    builder: (column) => column,
-  );
+        column: $table.textContent,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get mediaUri =>
       $composableBuilder(column: $table.mediaUri, builder: (column) => column);
@@ -2278,193 +2270,179 @@ class $$EntriesTableAnnotationComposer
       getCurrentColumn: (t) => t.tripId,
       referencedTable: $db.trips,
       getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TripsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.trips,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
+      builder: (
+        joinBuilder, {
+        $addJoinBuilderToRootComposer,
+        $removeJoinBuilderFromRootComposer,
+      }) =>
+          $$TripsTableAnnotationComposer(
+        $db: $db,
+        $table: $db.trips,
+        $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+        joinBuilder: joinBuilder,
+        $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+      ),
     );
     return composer;
   }
 }
 
-class $$EntriesTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $EntriesTable,
-          DbEntry,
-          $$EntriesTableFilterComposer,
-          $$EntriesTableOrderingComposer,
-          $$EntriesTableAnnotationComposer,
-          $$EntriesTableCreateCompanionBuilder,
-          $$EntriesTableUpdateCompanionBuilder,
-          (DbEntry, $$EntriesTableReferences),
-          DbEntry,
-          PrefetchHooks Function({bool tripId})
-        > {
+class $$EntriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $EntriesTable,
+    DbEntry,
+    $$EntriesTableFilterComposer,
+    $$EntriesTableOrderingComposer,
+    $$EntriesTableAnnotationComposer,
+    $$EntriesTableCreateCompanionBuilder,
+    $$EntriesTableUpdateCompanionBuilder,
+    (DbEntry, $$EntriesTableReferences),
+    DbEntry,
+    PrefetchHooks Function({bool tripId})> {
   $$EntriesTableTableManager(_$AppDatabase db, $EntriesTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$EntriesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$EntriesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$EntriesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> tripId = const Value.absent(),
-                Value<EntryType> type = const Value.absent(),
-                Value<String?> textContent = const Value.absent(),
-                Value<String?> mediaUri = const Value.absent(),
-                Value<double?> lat = const Value.absent(),
-                Value<double?> lon = const Value.absent(),
-                Value<List<String>> tagsJson = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => EntriesCompanion(
-                id: id,
-                tripId: tripId,
-                type: type,
-                textContent: textContent,
-                mediaUri: mediaUri,
-                lat: lat,
-                lon: lon,
-                tagsJson: tagsJson,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String tripId,
-                required EntryType type,
-                Value<String?> textContent = const Value.absent(),
-                Value<String?> mediaUri = const Value.absent(),
-                Value<double?> lat = const Value.absent(),
-                Value<double?> lon = const Value.absent(),
-                required List<String> tagsJson,
-                required DateTime createdAt,
-                required DateTime updatedAt,
-                Value<int> rowid = const Value.absent(),
-              }) => EntriesCompanion.insert(
-                id: id,
-                tripId: tripId,
-                type: type,
-                textContent: textContent,
-                mediaUri: mediaUri,
-                lat: lat,
-                lon: lon,
-                tagsJson: tagsJson,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$EntriesTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({tripId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
+      : super(
+          TableManagerState(
+            db: db,
+            table: table,
+            createFilteringComposer: () =>
+                $$EntriesTableFilterComposer($db: db, $table: table),
+            createOrderingComposer: () =>
+                $$EntriesTableOrderingComposer($db: db, $table: table),
+            createComputedFieldComposer: () =>
+                $$EntriesTableAnnotationComposer($db: db, $table: table),
+            updateCompanionCallback: ({
+              Value<String> id = const Value.absent(),
+              Value<String> tripId = const Value.absent(),
+              Value<EntryType> type = const Value.absent(),
+              Value<String?> textContent = const Value.absent(),
+              Value<String?> mediaUri = const Value.absent(),
+              Value<double?> lat = const Value.absent(),
+              Value<double?> lon = const Value.absent(),
+              Value<List<String>> tagsJson = const Value.absent(),
+              Value<DateTime> createdAt = const Value.absent(),
+              Value<DateTime> updatedAt = const Value.absent(),
+              Value<int> rowid = const Value.absent(),
+            }) =>
+                EntriesCompanion(
+              id: id,
+              tripId: tripId,
+              type: type,
+              textContent: textContent,
+              mediaUri: mediaUri,
+              lat: lat,
+              lon: lon,
+              tagsJson: tagsJson,
+              createdAt: createdAt,
+              updatedAt: updatedAt,
+              rowid: rowid,
+            ),
+            createCompanionCallback: ({
+              required String id,
+              required String tripId,
+              required EntryType type,
+              Value<String?> textContent = const Value.absent(),
+              Value<String?> mediaUri = const Value.absent(),
+              Value<double?> lat = const Value.absent(),
+              Value<double?> lon = const Value.absent(),
+              required List<String> tagsJson,
+              required DateTime createdAt,
+              required DateTime updatedAt,
+              Value<int> rowid = const Value.absent(),
+            }) =>
+                EntriesCompanion.insert(
+              id: id,
+              tripId: tripId,
+              type: type,
+              textContent: textContent,
+              mediaUri: mediaUri,
+              lat: lat,
+              lon: lon,
+              tagsJson: tagsJson,
+              createdAt: createdAt,
+              updatedAt: updatedAt,
+              rowid: rowid,
+            ),
+            withReferenceMapper: (p0) => p0
+                .map(
+                  (e) => (
+                    e.readTable(table),
+                    $$EntriesTableReferences(db, table, e),
+                  ),
+                )
+                .toList(),
+            prefetchHooksCallback: ({tripId = false}) {
+              return PrefetchHooks(
+                db: db,
+                explicitlyWatchedTables: [],
+                addJoins: <
                     T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (tripId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.tripId,
-                                referencedTable: $$EntriesTableReferences
-                                    ._tripIdTable(db),
-                                referencedColumn: $$EntriesTableReferences
-                                    ._tripIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic,
+                        dynamic>>(state) {
+                  if (tripId) {
+                    state = state.withJoin(
+                      currentTable: table,
+                      currentColumn: table.tripId,
+                      referencedTable:
+                          $$EntriesTableReferences._tripIdTable(db),
+                      referencedColumn:
+                          $$EntriesTableReferences._tripIdTable(db).id,
+                    ) as T;
+                  }
 
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
-        ),
-      );
+                  return state;
+                },
+                getPrefetchedDataCallback: (items) async {
+                  return [];
+                },
+              );
+            },
+          ),
+        );
 }
 
-typedef $$EntriesTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $EntriesTable,
-      DbEntry,
-      $$EntriesTableFilterComposer,
-      $$EntriesTableOrderingComposer,
-      $$EntriesTableAnnotationComposer,
-      $$EntriesTableCreateCompanionBuilder,
-      $$EntriesTableUpdateCompanionBuilder,
-      (DbEntry, $$EntriesTableReferences),
-      DbEntry,
-      PrefetchHooks Function({bool tripId})
-    >;
-typedef $$UsersTableCreateCompanionBuilder =
-    UsersCompanion Function({
-      required String id,
-      required String name,
-      required String lastName,
-      required String email,
-      required String passwordHash,
-      required String passwordSalt,
-      required DateTime createdAt,
-      required DateTime updatedAt,
-      Value<int> rowid,
-    });
-typedef $$UsersTableUpdateCompanionBuilder =
-    UsersCompanion Function({
-      Value<String> id,
-      Value<String> name,
-      Value<String> lastName,
-      Value<String> email,
-      Value<String> passwordHash,
-      Value<String> passwordSalt,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
-    });
+typedef $$EntriesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $EntriesTable,
+    DbEntry,
+    $$EntriesTableFilterComposer,
+    $$EntriesTableOrderingComposer,
+    $$EntriesTableAnnotationComposer,
+    $$EntriesTableCreateCompanionBuilder,
+    $$EntriesTableUpdateCompanionBuilder,
+    (DbEntry, $$EntriesTableReferences),
+    DbEntry,
+    PrefetchHooks Function({bool tripId})>;
+typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
+  required String id,
+  required String name,
+  required String lastName,
+  required String email,
+  required String passwordHash,
+  required String passwordSalt,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String> lastName,
+  Value<String> email,
+  Value<String> passwordHash,
+  Value<String> passwordSalt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
 
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
   $$UsersTableFilterComposer({
@@ -2475,44 +2453,44 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.id,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.name,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get lastName => $composableBuilder(
-    column: $table.lastName,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.lastName,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get email => $composableBuilder(
-    column: $table.email,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.email,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get passwordHash => $composableBuilder(
-    column: $table.passwordHash,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.passwordHash,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<String> get passwordSalt => $composableBuilder(
-    column: $table.passwordSalt,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.passwordSalt,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.createdAt,
+        builder: (column) => ColumnFilters(column),
+      );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
+        column: $table.updatedAt,
+        builder: (column) => ColumnFilters(column),
+      );
 }
 
 class $$UsersTableOrderingComposer
@@ -2525,44 +2503,44 @@ class $$UsersTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.id,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.name,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get lastName => $composableBuilder(
-    column: $table.lastName,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.lastName,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get email => $composableBuilder(
-    column: $table.email,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.email,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get passwordHash => $composableBuilder(
-    column: $table.passwordHash,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.passwordHash,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<String> get passwordSalt => $composableBuilder(
-    column: $table.passwordSalt,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.passwordSalt,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.createdAt,
+        builder: (column) => ColumnOrderings(column),
+      );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
+        column: $table.updatedAt,
+        builder: (column) => ColumnOrderings(column),
+      );
 }
 
 class $$UsersTableAnnotationComposer
@@ -2587,14 +2565,14 @@ class $$UsersTableAnnotationComposer
       $composableBuilder(column: $table.email, builder: (column) => column);
 
   GeneratedColumn<String> get passwordHash => $composableBuilder(
-    column: $table.passwordHash,
-    builder: (column) => column,
-  );
+        column: $table.passwordHash,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get passwordSalt => $composableBuilder(
-    column: $table.passwordSalt,
-    builder: (column) => column,
-  );
+        column: $table.passwordSalt,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -2603,98 +2581,93 @@ class $$UsersTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$UsersTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $UsersTable,
-          DbUser,
-          $$UsersTableFilterComposer,
-          $$UsersTableOrderingComposer,
-          $$UsersTableAnnotationComposer,
-          $$UsersTableCreateCompanionBuilder,
-          $$UsersTableUpdateCompanionBuilder,
-          (DbUser, BaseReferences<_$AppDatabase, $UsersTable, DbUser>),
-          DbUser,
-          PrefetchHooks Function()
-        > {
+class $$UsersTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $UsersTable,
+    DbUser,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (DbUser, BaseReferences<_$AppDatabase, $UsersTable, DbUser>),
+    DbUser,
+    PrefetchHooks Function()> {
   $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$UsersTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$UsersTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$UsersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<String> lastName = const Value.absent(),
-                Value<String> email = const Value.absent(),
-                Value<String> passwordHash = const Value.absent(),
-                Value<String> passwordSalt = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => UsersCompanion(
-                id: id,
-                name: name,
-                lastName: lastName,
-                email: email,
-                passwordHash: passwordHash,
-                passwordSalt: passwordSalt,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String name,
-                required String lastName,
-                required String email,
-                required String passwordHash,
-                required String passwordSalt,
-                required DateTime createdAt,
-                required DateTime updatedAt,
-                Value<int> rowid = const Value.absent(),
-              }) => UsersCompanion.insert(
-                id: id,
-                name: name,
-                lastName: lastName,
-                email: email,
-                passwordHash: passwordHash,
-                passwordSalt: passwordSalt,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ),
-      );
+      : super(
+          TableManagerState(
+            db: db,
+            table: table,
+            createFilteringComposer: () =>
+                $$UsersTableFilterComposer($db: db, $table: table),
+            createOrderingComposer: () =>
+                $$UsersTableOrderingComposer($db: db, $table: table),
+            createComputedFieldComposer: () =>
+                $$UsersTableAnnotationComposer($db: db, $table: table),
+            updateCompanionCallback: ({
+              Value<String> id = const Value.absent(),
+              Value<String> name = const Value.absent(),
+              Value<String> lastName = const Value.absent(),
+              Value<String> email = const Value.absent(),
+              Value<String> passwordHash = const Value.absent(),
+              Value<String> passwordSalt = const Value.absent(),
+              Value<DateTime> createdAt = const Value.absent(),
+              Value<DateTime> updatedAt = const Value.absent(),
+              Value<int> rowid = const Value.absent(),
+            }) =>
+                UsersCompanion(
+              id: id,
+              name: name,
+              lastName: lastName,
+              email: email,
+              passwordHash: passwordHash,
+              passwordSalt: passwordSalt,
+              createdAt: createdAt,
+              updatedAt: updatedAt,
+              rowid: rowid,
+            ),
+            createCompanionCallback: ({
+              required String id,
+              required String name,
+              required String lastName,
+              required String email,
+              required String passwordHash,
+              required String passwordSalt,
+              required DateTime createdAt,
+              required DateTime updatedAt,
+              Value<int> rowid = const Value.absent(),
+            }) =>
+                UsersCompanion.insert(
+              id: id,
+              name: name,
+              lastName: lastName,
+              email: email,
+              passwordHash: passwordHash,
+              passwordSalt: passwordSalt,
+              createdAt: createdAt,
+              updatedAt: updatedAt,
+              rowid: rowid,
+            ),
+            withReferenceMapper: (p0) => p0
+                .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+                .toList(),
+            prefetchHooksCallback: null,
+          ),
+        );
 }
 
-typedef $$UsersTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $UsersTable,
-      DbUser,
-      $$UsersTableFilterComposer,
-      $$UsersTableOrderingComposer,
-      $$UsersTableAnnotationComposer,
-      $$UsersTableCreateCompanionBuilder,
-      $$UsersTableUpdateCompanionBuilder,
-      (DbUser, BaseReferences<_$AppDatabase, $UsersTable, DbUser>),
-      DbUser,
-      PrefetchHooks Function()
-    >;
+typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $UsersTable,
+    DbUser,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (DbUser, BaseReferences<_$AppDatabase, $UsersTable, DbUser>),
+    DbUser,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;

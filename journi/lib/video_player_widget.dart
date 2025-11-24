@@ -20,29 +20,27 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.file(widget.file)
-      ..initialize()
-          .then((_) {
-            setState(() {
-              _chewieController = ChewieController(
-                videoPlayerController: _controller,
-                aspectRatio: _controller.value.aspectRatio,
-                autoPlay: false,
-                looping: false,
-                errorBuilder: (context, errorMessage) {
-                  return Center(
-                    child: Text(
-                      '⚠️ No se puede reproducir este video.\n$errorMessage',
-                      style: const TextStyle(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                },
+      ..initialize().then((_) {
+        setState(() {
+          _chewieController = ChewieController(
+            videoPlayerController: _controller,
+            aspectRatio: _controller.value.aspectRatio,
+            autoPlay: false,
+            looping: false,
+            errorBuilder: (context, errorMessage) {
+              return Center(
+                child: Text(
+                  '⚠️ No se puede reproducir este video.\n$errorMessage',
+                  style: const TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
               );
-            });
-          })
-          .catchError((e) {
-            debugPrint("Error al inicializar el video: $e");
-          });
+            },
+          );
+        });
+      }).catchError((e) {
+        debugPrint("Error al inicializar el video: $e");
+      });
   }
 
   @override

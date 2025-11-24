@@ -20,12 +20,12 @@ class ValidationError extends AppError {
 
 class RepoError extends AppError {
   const RepoError(String message, {Object? cause, StackTrace? stackTrace})
-    : super(message, cause: cause, stackTrace: stackTrace);
+      : super(message, cause: cause, stackTrace: stackTrace);
 }
 
 class UnexpectedError extends AppError {
   const UnexpectedError(String message, {Object? cause, StackTrace? stackTrace})
-    : super(message, cause: cause, stackTrace: stackTrace);
+      : super(message, cause: cause, stackTrace: stackTrace);
 }
 
 // ===== Result<T> =====
@@ -63,7 +63,8 @@ class Ok<T> extends Result<T> {
   R fold<R>({
     required R Function(T value) onOk,
     required R Function(List<AppError> errors) onErr,
-  }) => onOk(value);
+  }) =>
+      onOk(value);
   @override
   String toString() => 'Ok($value)';
 }
@@ -77,7 +78,8 @@ class Err<T> extends Result<T> {
   R fold<R>({
     required R Function(T value) onOk,
     required R Function(List<AppError> errors) onErr,
-  }) => onErr(errors);
+  }) =>
+      onErr(errors);
   @override
   String toString() => 'Err(${errors.join(', ')})';
 }

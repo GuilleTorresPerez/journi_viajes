@@ -63,7 +63,9 @@ void main() {
     final onlyPhotos = (await repo.list(
       tripId: 't1',
       type: EntryType.photo,
-    )).asOk().value;
+    ))
+        .asOk()
+        .value;
     expect(onlyPhotos.map((e) => e.id), ['e2']);
   });
 

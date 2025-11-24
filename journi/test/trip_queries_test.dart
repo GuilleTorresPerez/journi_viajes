@@ -140,15 +140,15 @@ void main() {
       final ca = DateTime.utc(2025, 1, 1);
       final ua = DateTime.utc(2025, 1, 1);
       Trip mk(DateTime s, DateTime e) => _okTrip(
-        Trip.create(
-          id: '${s.millisecondsSinceEpoch}-${e.millisecondsSinceEpoch}',
-          title: 't',
-          startDate: s,
-          endDate: e,
-          createdAt: ca,
-          updatedAt: ua,
-        ),
-      );
+            Trip.create(
+              id: '${s.millisecondsSinceEpoch}-${e.millisecondsSinceEpoch}',
+              title: 't',
+              startDate: s,
+              endDate: e,
+              createdAt: ca,
+              updatedAt: ua,
+            ),
+          );
 
       final a = mk(DateTime.utc(2025, 1, 1), DateTime.utc(2025, 1, 2));
       final b = mk(DateTime.utc(2025, 1, 2), DateTime.utc(2025, 1, 3));

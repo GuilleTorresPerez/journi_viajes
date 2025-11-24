@@ -26,11 +26,11 @@ class DefaultEntryService implements EntryService {
     DeleteEntryUseCase? deleteUC,
     ListEntriesUseCase? listUC,
     WatchEntriesUseCase? watchUC,
-  }) : _createUC = createUC ?? CreateEntryUseCase(repo),
-       _getUC = getUC ?? GetEntryByIdUseCase(repo),
-       _deleteUC = deleteUC ?? DeleteEntryUseCase(repo),
-       _listUC = listUC ?? ListEntriesUseCase(repo),
-       _watchUC = watchUC ?? WatchEntriesUseCase(repo);
+  })  : _createUC = createUC ?? CreateEntryUseCase(repo),
+        _getUC = getUC ?? GetEntryByIdUseCase(repo),
+        _deleteUC = deleteUC ?? DeleteEntryUseCase(repo),
+        _listUC = listUC ?? ListEntriesUseCase(repo),
+        _watchUC = watchUC ?? WatchEntriesUseCase(repo);
 
   @override
   Future<Result<Entry>> create(CreateEntryCommand cmd) => _createUC(cmd);

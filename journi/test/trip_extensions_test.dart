@@ -9,13 +9,13 @@ Trip _okTrip(Result<Trip> r) {
 }
 
 Trip _baseTrip() => _okTrip(
-  Trip.create(
-    id: 'base',
-    title: 'Base',
-    createdAt: DateTime.utc(2025, 1, 1),
-    updatedAt: DateTime.utc(2025, 1, 1),
-  ),
-);
+      Trip.create(
+        id: 'base',
+        title: 'Base',
+        createdAt: DateTime.utc(2025, 1, 1),
+        updatedAt: DateTime.utc(2025, 1, 1),
+      ),
+    );
 
 void main() {
   group('TripMutators (extension methods)', () {

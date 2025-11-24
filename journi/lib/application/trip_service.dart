@@ -42,14 +42,14 @@ class DefaultTripService implements TripService {
     ListTripsUseCase? listUC,
     WatchTripsUseCase? watchUC,
     ListTripsForDayUseCase? listDayUC,
-  }) : _repo = repo,
-       _createUC = createUC ?? CreateTripUseCase(repo),
-       _updateUC = updateUC ?? UpdateTripUseCase(repo),
-       _deleteUC = deleteUC ?? DeleteTripUseCase(repo),
-       _updateTitleUC = updateTitleUC ?? UpdateTripTitleUseCase(repo),
-       _listUC = listUC ?? ListTripsUseCase(repo),
-       _watchUC = watchUC ?? WatchTripsUseCase(repo),
-       _listDayUC = listDayUC ?? ListTripsForDayUseCase(repo);
+  })  : _repo = repo,
+        _createUC = createUC ?? CreateTripUseCase(repo),
+        _updateUC = updateUC ?? UpdateTripUseCase(repo),
+        _deleteUC = deleteUC ?? DeleteTripUseCase(repo),
+        _updateTitleUC = updateTitleUC ?? UpdateTripTitleUseCase(repo),
+        _listUC = listUC ?? ListTripsUseCase(repo),
+        _watchUC = watchUC ?? WatchTripsUseCase(repo),
+        _listDayUC = listDayUC ?? ListTripsForDayUseCase(repo);
 
   @override
   Future<Result<Trip>> create(CreateTripCommand cmd) {
