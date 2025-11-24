@@ -100,12 +100,14 @@ class _MiPerfilState extends State<MiPerfil> {
               const SizedBox(height: 15),
 
               // FILA ID
-              _buildDataRow(Icons.perm_identity, "ID", widget.currentUser.id.toString()),
+              _buildDataRow(
+                  Icons.perm_identity, "ID", widget.currentUser.id.toString()),
 
               const SizedBox(height: 12),
 
               // FILA EMAIL
-              _buildDataRow(Icons.email_outlined, "Email", widget.currentUser.email),
+              _buildDataRow(
+                  Icons.email_outlined, "Email", widget.currentUser.email),
 
               const SizedBox(height: 12),
 
@@ -113,7 +115,8 @@ class _MiPerfilState extends State<MiPerfil> {
               _buildDataRow(
                 Icons.calendar_month,
                 "Usuario desde",
-                widget.currentUser.createdAt.toString().substring(0, 10) ?? "No disponible",
+                widget.currentUser.createdAt.toString().substring(0, 10) ??
+                    "No disponible",
               ),
 
               const SizedBox(height: 40),
@@ -121,7 +124,6 @@ class _MiPerfilState extends State<MiPerfil> {
           ),
         ),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.selectedIndex,
         backgroundColor: const Color(0xFFEDE5D0),
