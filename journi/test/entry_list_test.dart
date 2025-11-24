@@ -7,10 +7,12 @@ import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
+
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 import 'package:journi/domain/trip.dart';
 import 'package:journi/pantalla_viaje.dart';
+import 'fake_geocoding_repository.dart';
 
 void main() {
   final db = AppDatabase();
@@ -19,8 +21,9 @@ void main() {
     (tester) async {
       final tripRepo = InMemoryTripRepository();
       final entryRepo = InMemoryEntryRepository();
+      final geoRepo = FakeGeocodingRepository();
       final UserRepository userRepo = DriftUserRepository(db);
-      final tripService = makeTripService(tripRepo);
+      final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
       final entryService = makeEntryService(entryRepo);
       final userService = makeUserService(userRepo);
 
@@ -59,7 +62,8 @@ void main() {
   testWidgets('Muestra mensaje si no hay entradas registradas', (tester) async {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
-    final tripService = makeTripService(tripRepo);
+    final geoRepo = FakeGeocodingRepository();
+    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
@@ -99,7 +103,8 @@ void main() {
   testWidgets('Renderiza lista de entradas correctamente', (tester) async {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
-    final tripService = makeTripService(tripRepo);
+    final geoRepo = FakeGeocodingRepository();
+    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
@@ -165,7 +170,8 @@ void main() {
   ) async {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
-    final tripService = makeTripService(tripRepo);
+    final geoRepo = FakeGeocodingRepository();
+    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);

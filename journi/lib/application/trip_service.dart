@@ -1,8 +1,10 @@
-import 'package:journi/application/shared/result.dart';
 import 'package:journi/domain/trip.dart';
 import 'package:journi/domain/trip_queries.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/application/use_cases/use_cases.dart';
+import 'package:journi/application/use_cases/get_trip_country_use_case.dart';
+import 'package:journi/domain/ports/entry_repository.dart';
+import 'package:journi/domain/ports/geocoding_repository.dart';
 
 /// Puerto de servicio (fachada de aplicación).
 abstract class TripService {
@@ -20,6 +22,9 @@ abstract class TripService {
 
   /// Consultas específicas
   Future<Result<List<Trip>>> listForDayUtc(DateTime dayUtc);
+
+  /// Obtiene el país del viaje basado en sus entradas.
+  Future<Result<String?>> getCountry(String tripId);
 }
 
 /// Implementación por defecto del servicio.
@@ -32,9 +37,11 @@ class DefaultTripService implements TripService {
   final WatchTripsUseCase _watchUC;
   final ListTripsForDayUseCase _listDayUC;
   final TripRepository _repo;
+  final GetTripCountryUseCase _getCountryUC; // Nueva dependencia
 
   DefaultTripService({
     required TripRepository repo,
+    required GetTripCountryUseCase getCountryUC,
     CreateTripUseCase? createUC,
     UpdateTripUseCase? updateUC,
     DeleteTripUseCase? deleteUC,
@@ -49,7 +56,8 @@ class DefaultTripService implements TripService {
         _updateTitleUC = updateTitleUC ?? UpdateTripTitleUseCase(repo),
         _listUC = listUC ?? ListTripsUseCase(repo),
         _watchUC = watchUC ?? WatchTripsUseCase(repo),
-        _listDayUC = listDayUC ?? ListTripsForDayUseCase(repo);
+        _listDayUC = listDayUC ?? ListTripsForDayUseCase(repo),
+        _getCountryUC = getCountryUC;
 
   @override
   Future<Result<Trip>> create(CreateTripCommand cmd) {
@@ -99,8 +107,20 @@ class DefaultTripService implements TripService {
     }
     return _updateTitleUC.call(current, newTitle);
   }
+
+  @override
+  Future<Result<String?>> getCountry(String tripId) {
+    return _getCountryUC(tripId);
+  }
 }
 
 /// Factory cómoda para DI manual:
-DefaultTripService makeTripService(TripRepository repo) =>
-    DefaultTripService(repo: repo);
+DefaultTripService makeTripService(TripRepository tripRepo,
+    EntryRepository entryRepo, GeocodingRepository geoRepo) {
+  return DefaultTripService(
+    repo: tripRepo,
+    getCountryUC: GetTripCountryUseCase(entryRepo, geoRepo),
+    // Aquí el resto de UseCases se pueden instanciar por defecto como tenías antes
+    // o pasarlos como parámetros si escalas la inyección de dependencias.
+  );
+}

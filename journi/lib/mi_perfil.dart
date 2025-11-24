@@ -112,12 +112,8 @@ class _MiPerfilState extends State<MiPerfil> {
               const SizedBox(height: 12),
 
               // FILA FECHA CREACIÓN
-              _buildDataRow(
-                Icons.calendar_month,
-                "Usuario desde",
-                widget.currentUser.createdAt.toString().substring(0, 10) ??
-                    "No disponible",
-              ),
+              _buildDataRow(Icons.calendar_month, "Usuario desde",
+                  widget.currentUser.createdAt.toString().substring(0, 10)),
 
               const SizedBox(height: 40),
             ],

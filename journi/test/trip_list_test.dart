@@ -7,6 +7,7 @@ import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
+import 'fake_geocoding_repository.dart';
 import 'package:journi/domain/trip.dart';
 import 'package:journi/main.dart';
 import 'package:journi/pantalla_viaje.dart';
@@ -19,7 +20,8 @@ void main() {
       // Simulamos un stream que todavía no ha emitido nada
       final repo = InMemoryTripRepository();
       final entryRepo = InMemoryEntryRepository();
-      final tripService = makeTripService(repo);
+      final geoRepo = FakeGeocodingRepository();
+      final tripService = makeTripService(repo, entryRepo, geoRepo);
       final entryService = makeEntryService(entryRepo);
 
       final userRepo = DriftUserRepository(db);
@@ -49,7 +51,8 @@ void main() {
   testWidgets('Muestra mensaje si no hay viajes registrados', (tester) async {
     final repo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
-    final tripService = makeTripService(repo);
+    final geoRepo = FakeGeocodingRepository();
+    final tripService = makeTripService(repo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
@@ -78,7 +81,8 @@ void main() {
   testWidgets('Renderiza la lista de viajes correctamente', (tester) async {
     final repo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
-    final tripService = makeTripService(repo);
+    final geoRepo = FakeGeocodingRepository();
+    final tripService = makeTripService(repo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
@@ -128,7 +132,8 @@ void main() {
   testWidgets('Al pulsar un viaje navega a Pantalla_Viaje', (tester) async {
     final repo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
-    final tripService = makeTripService(repo);
+    final geoRepo = FakeGeocodingRepository();
+    final tripService = makeTripService(repo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);

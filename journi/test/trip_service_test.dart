@@ -7,6 +7,9 @@ import 'package:journi/domain/trip.dart';
 import 'package:journi/domain/trip_queries.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/application/use_cases/use_cases.dart';
+import 'package:journi/domain/entry.dart';
+import 'package:journi/domain/ports/entry_repository.dart';
+import 'package:journi/domain/ports/geocoding_repository.dart';
 import 'package:flutter/foundation.dart';
 
 /// ---------------------------
@@ -34,7 +37,6 @@ class FakeTripRepository implements TripRepository {
   }
 
   void _emit() {
-    // emite lista completa; watchers con phase aplican map()
     _ctrl.add(_snapshot());
   }
 
@@ -63,15 +65,42 @@ class FakeTripRepository implements TripRepository {
 
   @override
   Future<Result<Unit>> deleteById(String id) async {
-    // 👈 Unit unificado
     _store.remove(id);
     _emit();
-    return const Ok(unit); // 👈 Ok<Unit>
+    return const Ok(unit);
   }
 
   void dispose() {
     _ctrl.close();
   }
+}
+
+/// ---------------------------
+/// Fakes Adicionales (Mínimos para que compile el Servicio)
+/// ---------------------------
+
+// Fake EntryRepo básico
+class FakeEntryRepository implements EntryRepository {
+  @override
+  Future<Result<Entry>> upsert(Entry entry) async => Ok(entry);
+  @override
+  Future<Result<Unit>> deleteById(String id) async => const Ok(unit);
+  @override
+  Future<Result<Entry?>> findById(String id) async => const Ok(null);
+  @override
+  Future<Result<List<Entry>>> list({String? tripId, EntryType? type}) async =>
+      const Ok([]);
+  @override
+  Stream<List<Entry>> watchAll({String? tripId, EntryType? type}) =>
+      const Stream.empty();
+}
+
+// Fake GeocodingRepo básico
+class FakeGeocodingRepository implements GeocodingRepository {
+  @override
+  Future<Result<String?>> getCountryFromCoordinates(
+          double lat, double lon) async =>
+      const Ok('Test Country');
 }
 
 /// ---------------------------
@@ -108,11 +137,18 @@ CreateTripCommand makeCmd({
 void main() {
   group('DefaultTripService', () {
     late FakeTripRepository repo;
+    late FakeEntryRepository entryRepo; // 👈 Nuevo
+    late FakeGeocodingRepository geoRepo; // 👈 Nuevo
     late DefaultTripService service;
 
     setUp(() {
       repo = FakeTripRepository();
-      service = DefaultTripService(repo: repo);
+      entryRepo = FakeEntryRepository(); // 👈 Instanciamos
+      geoRepo = FakeGeocodingRepository(); // 👈 Instanciamos
+
+      // Construimos el servicio usando el factory para que cablee todo
+      // Ojo: makeTripService está en trip_service.dart
+      service = makeTripService(repo, entryRepo, geoRepo);
     });
 
     tearDown(() {
@@ -191,7 +227,7 @@ void main() {
       final streamIds = service
           .watch()
           .map((items) => items.map((t) => t.id).toList())
-          .distinct(listEquals); // 👈 evita duplicados consecutivos
+          .distinct(listEquals);
 
       final expectation = expectLater(
         streamIds,
@@ -202,7 +238,7 @@ void main() {
         ]),
       );
 
-      await pumpEventQueue(); // 👈 entrega el inicial
+      await pumpEventQueue();
 
       await service.create(makeCmd(id: 't4', title: 'Trip 4'));
       await service.deleteById('t4');
@@ -332,6 +368,15 @@ void main() {
       await service.deleteById('x');
 
       await expectation;
+    });
+
+    // 👇 TEST EXTRA OPCIONAL PARA VERIFICAR LA GEOCODIFICACIÓN
+    test('getCountry: devuelve OK si hay entradas y geo', () async {
+      // Como los Fakes están vacíos y desconectados,
+      // este test es trivial, pero valida que el método existe y no explota.
+      final res = await service.getCountry('trip1');
+      // FakeEntryRepo devuelve lista vacía -> GetTripCountry devuelve null (Ok(null))
+      expect(res, isA<Ok<String?>>());
     });
   });
 }
