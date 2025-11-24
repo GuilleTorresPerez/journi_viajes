@@ -23,9 +23,10 @@ import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
 // Dominio / aplicación
-import 'package:journi/application/shared/result.dart';
 
 import 'package:journi/login_screen.dart';
+import 'package:journi/data/external/platform_geocoding_repository.dart';
+import 'package:journi/domain/ports/geocoding_repository.dart';
 
 void main() {
   final db = AppDatabase();
@@ -33,7 +34,9 @@ void main() {
   final EntryRepository entryRepo = DriftEntryRepository(db);
   final UserRepository userRepo = DriftUserRepository(db);
 
-  final tripService = makeTripService(tripRepo);
+  final GeocodingRepository geoRepo = PlatformGeocodingRepository();
+
+  final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
   final entryService = makeEntryService(entryRepo);
   final userService = makeUserService(userRepo);
 

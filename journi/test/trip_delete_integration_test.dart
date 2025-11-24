@@ -5,6 +5,7 @@ import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
+import 'fake_geocoding_repository.dart';
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/entry_service.dart';
 import 'package:journi/main.dart';
@@ -42,7 +43,8 @@ void main() {
     setUp(() {
       tripRepo = InMemoryTripRepository();
       entryRepo = InMemoryEntryRepository();
-      tripService = DefaultTripService(repo: tripRepo);
+      final geoRepo = FakeGeocodingRepository();
+      tripService = makeTripService(tripRepo, entryRepo, geoRepo);
       entryService = DefaultEntryService(repo: entryRepo);
     });
 
