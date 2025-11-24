@@ -7,7 +7,7 @@ void main() {
   group('🧭 Pruebas de integración: Editar_Viaje (desactivadas)', () {
     testWidgets(
       '✅ Editar viaje correctamente',
-          (WidgetTester tester) async {
+      (WidgetTester tester) async {
         // Test desactivado temporalmente porque el flujo de UI ha cambiado.
         // Se mantiene el nombre para no romper el reporting del CI.
       },
@@ -16,7 +16,7 @@ void main() {
 
     testWidgets(
       '❌ Error: fecha de inicio posterior a fecha final',
-          (WidgetTester tester) async {
+      (WidgetTester tester) async {
         // Test desactivado temporalmente porque el flujo de UI ha cambiado.
       },
       skip: true, // 👈 También omitido
