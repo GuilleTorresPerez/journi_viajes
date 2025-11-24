@@ -8,7 +8,6 @@ import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
-//import 'main.dart';
 import 'domain/user.dart';
 import 'map_screen.dart';
 
@@ -24,7 +23,7 @@ class MiPerfil extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  final User currentUser; // 👈 AÑADIR ESTO
+  final User currentUser;
 
   MiPerfil({
     super.key,
@@ -37,7 +36,7 @@ class MiPerfil extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
-    required this.currentUser, // 👈 AÑADIR EN EL CONSTRUCTOR
+    required this.currentUser,
   });
 
   @override
@@ -53,22 +52,76 @@ class _MiPerfilState extends State<MiPerfil> {
         backgroundColor: Colors.teal[200],
         title: const Text('Mi perfil'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Aquí irá la información de tu perfil',
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Correo: ${widget.currentUser.email}',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+
+              // FOTO DE PERFIL
+              CircleAvatar(
+                radius: 55,
+                backgroundColor: Colors.teal[300],
+                child: const Icon(
+                  Icons.person,
+                  size: 70,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // NOMBRE COMPLETO
+              Text(
+                "${widget.currentUser.name} ${widget.currentUser.lastName}",
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Datos personales",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.teal[800],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // FILA ID
+              _buildDataRow(Icons.perm_identity, "ID", widget.currentUser.id.toString()),
+
+              const SizedBox(height: 12),
+
+              // FILA EMAIL
+              _buildDataRow(Icons.email_outlined, "Email", widget.currentUser.email),
+
+              const SizedBox(height: 12),
+
+              // FILA FECHA CREACIÓN
+              _buildDataRow(
+                Icons.calendar_month,
+                "Usuario desde",
+                widget.currentUser.createdAt.toString().substring(0, 10) ?? "No disponible",
+              ),
+
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.selectedIndex,
         backgroundColor: const Color(0xFFEDE5D0),
@@ -87,12 +140,9 @@ class _MiPerfilState extends State<MiPerfil> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],
         onTap: (int index) {
-          setState(() {
-            widget.selectedIndex = index;
-          });
+          setState(() => widget.selectedIndex = index);
 
           if (index == 0) {
-            // Volver a la pantalla anterior (MyHomePage original con su estado)
             Navigator.pop(context);
           } else if (index == 2) {
             Navigator.push(
@@ -132,6 +182,39 @@ class _MiPerfilState extends State<MiPerfil> {
           }
         },
       ),
+    );
+  }
+
+  /// widget para mostrar cada dato con icono + título + valor
+  Widget _buildDataRow(IconData icon, String title, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: Colors.teal[700], size: 26),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
