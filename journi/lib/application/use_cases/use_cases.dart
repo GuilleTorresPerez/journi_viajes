@@ -88,8 +88,9 @@ class UpdateTripUseCase {
       return Err<Trip>([ValidationError('Trip con id ${cmd.id} no existe')]);
     }
     if (cmd.title.isSet && cmd.title.value == null) {
-      return Err<Trip>(
-          [ValidationError('title no puede ser null; usa un string no vacío')]);
+      return Err<Trip>([
+        ValidationError('title no puede ser null; usa un string no vacío'),
+      ]);
     }
 
     // Calcula nuevos valores (permitiendo null si el patch lo fija a null)
@@ -138,8 +139,9 @@ class UpdateTripTitleUseCase {
     if (res is Err<Trip>) return res;
 
     final ok = res as Ok<Trip>;
-    final updatedRes =
-        ok.value.copyValidated(updatedAt: DateTime.now().toUtc());
+    final updatedRes = ok.value.copyValidated(
+      updatedAt: DateTime.now().toUtc(),
+    );
     if (updatedRes is Err<Trip>) return updatedRes;
 
     final updated = (updatedRes as Ok<Trip>).value;

@@ -29,20 +29,23 @@ void main() {
     });
 
     testWidgets('✅ Viaje listado correctamente', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: MyHomePage(
-          title: 'JOURNI',
-          inicionSesiada: false,
-          tripService: tripService,
-          entryService: entryService,
-          tripRepo: tripRepo,
-          entryRepo: entryRepo,
-          userRepo: userRepo,
-          userService: userService,
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MyHomePage(
+            title: 'JOURNI',
+            sesionIniciada: false,
+            viajes: [],
+            tripService: tripService,
+            entryService: entryService,
+            tripRepo: tripRepo,
+            entryRepo: entryRepo,
+            userRepo: userRepo,
+            userService: userService,
+          ),
         ),
-      ));
+      );
 
-// Pulsa el BottomNavigationBarItem "Nuevo viaje"
+      // Pulsa el BottomNavigationBarItem "Nuevo viaje"
       await tester.tap(find.byKey(const Key('anadirButton')));
       await tester.pumpAndSettle();
 
@@ -62,7 +65,8 @@ void main() {
 
       await tester.tap(find.byKey(const Key('guardarButton')));
       await tester.pumpAndSettle(
-          const Duration(seconds: 1)); // Espera a que el SnackBar aparezca
+        const Duration(seconds: 1),
+      ); // Espera a que el SnackBar aparezca
 
       // ✅ Verificar éxito
       // Verifica que la pantalla principal está visible
@@ -71,47 +75,52 @@ void main() {
     });
 
     testWidgets(
-        '❌ Error: El usuario ha cancelado la creacion, por lo que no se lista nada',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: MyHomePage(
-          title: 'JOURNI',
-          inicionSesiada: false,
-          tripService: tripService,
-          entryService: entryService,
-          tripRepo: tripRepo,
-          entryRepo: entryRepo,
-          userRepo: userRepo,
-          userService: userService,
-        ),
-      ));
+      '❌ Error: El usuario ha cancelado la creacion, por lo que no se lista nada',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MyHomePage(
+              title: 'JOURNI',
+              sesionIniciada: false,
+              viajes: [],
+              tripService: tripService,
+              entryService: entryService,
+              tripRepo: tripRepo,
+              entryRepo: entryRepo,
+              userRepo: userRepo,
+              userService: userService,
+            ),
+          ),
+        );
 
-// Pulsa el BottomNavigationBarItem "Nuevo viaje"
-      await tester.tap(find.byKey(const Key('anadirButton')));
-      await tester.pumpAndSettle();
+        // Pulsa el BottomNavigationBarItem "Nuevo viaje"
+        await tester.tap(find.byKey(const Key('anadirButton')));
+        await tester.pumpAndSettle();
 
-      // 🧩 Rellenar los campos
-      await tester.enterText(
-        find.byKey(const Key('tituloField')),
-        'Vacaciones 2025',
-      );
-      await tester.enterText(
-        find.byKey(const Key('fechaIniField')),
-        '01-01-2025',
-      );
-      await tester.enterText(
-        find.byKey(const Key('fechaFinField')),
-        '10-01-2025',
-      );
+        // 🧩 Rellenar los campos
+        await tester.enterText(
+          find.byKey(const Key('tituloField')),
+          'Vacaciones 2025',
+        );
+        await tester.enterText(
+          find.byKey(const Key('fechaIniField')),
+          '01-01-2025',
+        );
+        await tester.enterText(
+          find.byKey(const Key('fechaFinField')),
+          '10-01-2025',
+        );
 
-      await tester.tap(find.byTooltip('Back'));
-      await tester.pumpAndSettle(
-          const Duration(seconds: 1)); // Espera a que el SnackBar aparezca
+        await tester.tap(find.byTooltip('Back'));
+        await tester.pumpAndSettle(
+          const Duration(seconds: 1),
+        ); // Espera a que el SnackBar aparezca
 
-      // ✅ Verificar éxito
-      // Verifica que la pantalla principal está visible
-      expect(find.byType(MyHomePage), findsOneWidget);
-      expect(find.byKey(const Key('id0')), findsNothing);
-    });
+        // ✅ Verificar éxito
+        // Verifica que la pantalla principal está visible
+        expect(find.byType(MyHomePage), findsOneWidget);
+        expect(find.byKey(const Key('id0')), findsNothing);
+      },
+    );
   });
 }

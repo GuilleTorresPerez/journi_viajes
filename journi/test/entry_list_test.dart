@@ -15,43 +15,46 @@ import 'package:journi/pantalla_viaje.dart';
 void main() {
   final db = AppDatabase();
   testWidgets(
-      'Muestra CircularProgressIndicator mientras se cargan las entradas',
-      (tester) async {
-    final tripRepo = InMemoryTripRepository();
-    final entryRepo = InMemoryEntryRepository();
-    final UserRepository userRepo = DriftUserRepository(db);
-    final tripService = makeTripService(tripRepo);
-    final entryService = makeEntryService(entryRepo);
-    final userService = makeUserService(userRepo);
+    'Muestra CircularProgressIndicator mientras se cargan las entradas',
+    (tester) async {
+      final tripRepo = InMemoryTripRepository();
+      final entryRepo = InMemoryEntryRepository();
+      final UserRepository userRepo = DriftUserRepository(db);
+      final tripService = makeTripService(tripRepo);
+      final entryService = makeEntryService(entryRepo);
+      final userService = makeUserService(userRepo);
 
-    final trip = Trip(
-      id: '1',
-      title: 'Viaje Test',
-      startDate: DateTime(2025, 1, 1),
-      endDate: DateTime(2025, 1, 5),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    tripRepo.upsert(trip);
+      final trip = Trip(
+        id: '1',
+        title: 'Viaje Test',
+        startDate: DateTime(2025, 1, 1),
+        endDate: DateTime(2025, 1, 5),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      tripRepo.upsert(trip);
 
-    await tester.pumpWidget(MaterialApp(
-      home: Pantalla_Viaje(
-        selectedIndex: 0,
-        inicionSesiada: false,
-        viajes: [trip],
-        num_viaje: 0,
-        repo: tripRepo,
-        entryRepo: entryRepo,
-        tripService: tripService,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
-      ),
-    ));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Pantalla_Viaje(
+            selectedIndex: 0,
+            inicionSesiada: false,
+            viajes: [trip],
+            num_viaje: 0,
+            repo: tripRepo,
+            entryRepo: entryRepo,
+            tripService: tripService,
+            entryService: entryService,
+            userRepo: userRepo,
+            userService: userService,
+          ),
+        ),
+      );
 
-    // Estado inicial del StreamBuilder
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-  });
+      // Estado inicial del StreamBuilder
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    },
+  );
 
   testWidgets('Muestra mensaje si no hay entradas registradas', (tester) async {
     final tripRepo = InMemoryTripRepository();
@@ -71,20 +74,22 @@ void main() {
     );
     tripRepo.upsert(trip);
 
-    await tester.pumpWidget(MaterialApp(
-      home: Pantalla_Viaje(
-        selectedIndex: 0,
-        inicionSesiada: false,
-        viajes: [trip],
-        num_viaje: 0,
-        repo: tripRepo,
-        entryRepo: entryRepo,
-        tripService: tripService,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Pantalla_Viaje(
+          selectedIndex: 0,
+          inicionSesiada: false,
+          viajes: [trip],
+          num_viaje: 0,
+          repo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: tripService,
+          entryService: entryService,
+          userRepo: userRepo,
+          userService: userService,
+        ),
       ),
-    ));
+    );
 
     await tester.pumpAndSettle();
 
@@ -132,20 +137,22 @@ void main() {
     if (e1 is Ok<Entry>) entryRepo.upsert(e1.value);
     if (e2 is Ok<Entry>) entryRepo.upsert(e2.value);
 
-    await tester.pumpWidget(MaterialApp(
-      home: Pantalla_Viaje(
-        selectedIndex: 0,
-        inicionSesiada: false,
-        viajes: [trip],
-        num_viaje: 0,
-        repo: tripRepo,
-        entryRepo: entryRepo,
-        tripService: tripService,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Pantalla_Viaje(
+          selectedIndex: 0,
+          inicionSesiada: false,
+          viajes: [trip],
+          num_viaje: 0,
+          repo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: tripService,
+          entryService: entryService,
+          userRepo: userRepo,
+          userService: userService,
+        ),
       ),
-    ));
+    );
 
     await tester.pumpAndSettle();
 
@@ -153,8 +160,9 @@ void main() {
     expect(find.textContaining('Madrid'), findsOneWidget);
   });
 
-  testWidgets('Elimina una entrada al pulsar el icono de borrar',
-      (tester) async {
+  testWidgets('Elimina una entrada al pulsar el icono de borrar', (
+    tester,
+  ) async {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final tripService = makeTripService(tripRepo);
@@ -183,20 +191,22 @@ void main() {
 
     if (e is Ok<Entry>) entryRepo.upsert(e.value);
 
-    await tester.pumpWidget(MaterialApp(
-      home: Pantalla_Viaje(
-        selectedIndex: 0,
-        inicionSesiada: false,
-        viajes: [trip],
-        num_viaje: 0,
-        repo: tripRepo,
-        entryRepo: entryRepo,
-        tripService: tripService,
-        entryService: entryService,
-        userRepo: userRepo,
-        userService: userService,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Pantalla_Viaje(
+          selectedIndex: 0,
+          inicionSesiada: false,
+          viajes: [trip],
+          num_viaje: 0,
+          repo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: tripService,
+          entryService: entryService,
+          userRepo: userRepo,
+          userService: userService,
+        ),
       ),
-    ));
+    );
 
     await tester.pumpAndSettle();
 

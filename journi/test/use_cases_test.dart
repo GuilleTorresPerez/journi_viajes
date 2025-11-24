@@ -28,8 +28,10 @@ class InMemoryTripRepo implements TripRepository {
   }
 
   void _emit() {
-    _controller.add(_store.values.toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt))); // createdAt DESC
+    _controller.add(
+      _store.values.toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
+    ); // createdAt DESC
   }
 
   @override
@@ -145,8 +147,9 @@ void main() {
     });
 
     test('propaga un Err del repositorio en la persistencia', () async {
-      repo.upsertResultOverride =
-          Err<Trip>([ValidationError('fallo persistencia')]);
+      repo.upsertResultOverride = Err<Trip>([
+        ValidationError('fallo persistencia'),
+      ]);
 
       final cmd = CreateTripCommand(id: 't3', title: 'Título válido');
       final res = await useCase.call(cmd);
@@ -243,88 +246,100 @@ void main() {
 
     tearDown(() => repo.dispose());
 
-    test('no tocar campos (todo Patch.absent) solo actualiza updatedAt',
-        () async {
-      final prev = baseTrip;
-      final nowBefore = DateTime.now().toUtc();
+    test(
+      'no tocar campos (todo Patch.absent) solo actualiza updatedAt',
+      () async {
+        final prev = baseTrip;
+        final nowBefore = DateTime.now().toUtc();
 
-      final res = await useCase.call(const UpdateTripCommand(id: 'u1'));
-      final nowAfter = DateTime.now().toUtc();
+        final res = await useCase.call(const UpdateTripCommand(id: 'u1'));
+        final nowAfter = DateTime.now().toUtc();
 
-      expect(res, isA<Ok<Trip>>());
-      final updated = (res as Ok<Trip>).value;
-      expect(repo.upsertCalls, 1);
+        expect(res, isA<Ok<Trip>>());
+        final updated = (res as Ok<Trip>).value;
+        expect(repo.upsertCalls, 1);
 
-      // Nada cambia salvo updatedAt
-      expect(updated.id, prev.id);
-      expect(updated.title, prev.title);
-      expect(updated.description, prev.description);
-      expect(updated.coverImage, prev.coverImage);
-      expect(updated.startDate, prev.startDate);
-      expect(updated.endDate, prev.endDate);
-      expect(updated.createdAt, prev.createdAt);
+        // Nada cambia salvo updatedAt
+        expect(updated.id, prev.id);
+        expect(updated.title, prev.title);
+        expect(updated.description, prev.description);
+        expect(updated.coverImage, prev.coverImage);
+        expect(updated.startDate, prev.startDate);
+        expect(updated.endDate, prev.endDate);
+        expect(updated.createdAt, prev.createdAt);
 
-      expect(updated.updatedAt.isAfter(prev.updatedAt), isTrue);
-      bool inWindow(DateTime d) =>
-          !d.isBefore(nowBefore) && !d.isAfter(nowAfter);
-      expect(inWindow(updated.updatedAt), isTrue);
-    });
+        expect(updated.updatedAt.isAfter(prev.updatedAt), isTrue);
+        bool inWindow(DateTime d) =>
+            !d.isBefore(nowBefore) && !d.isAfter(nowAfter);
+        expect(inWindow(updated.updatedAt), isTrue);
+      },
+    );
 
-    test('Patch.value(null) limpia descripción; Patch.absent no toca portada',
-        () async {
-      final res = await useCase.call(const UpdateTripCommand(
-        id: 'u1',
-        description: Patch.value(null), // borrar
-        coverImage: Patch.absent(), // no tocar
-      ));
+    test(
+      'Patch.value(null) limpia descripción; Patch.absent no toca portada',
+      () async {
+        final res = await useCase.call(
+          const UpdateTripCommand(
+            id: 'u1',
+            description: Patch.value(null), // borrar
+            coverImage: Patch.absent(), // no tocar
+          ),
+        );
 
-      expect(res, isA<Ok<Trip>>());
-      final t = (res as Ok<Trip>).value;
+        expect(res, isA<Ok<Trip>>());
+        final t = (res as Ok<Trip>).value;
 
-      expect(t.description, isNull);
-      expect(t.coverImage, baseTrip.coverImage);
-    });
+        expect(t.description, isNull);
+        expect(t.coverImage, baseTrip.coverImage);
+      },
+    );
 
-    test('Patch.value(x) cambia título y fechas (UTC), respeta validaciones',
-        () async {
-      final res = await useCase.call(UpdateTripCommand(
-        id: 'u1',
-        title: const Patch.value(' Italia 2025  '), // con espacios
-        startDate:
-            Patch.value(DateTime(2025, 7, 2, 8)), // local -> toUtc en create()
-        endDate: Patch.value(DateTime(2025, 7, 12, 18)),
-      ));
+    test(
+      'Patch.value(x) cambia título y fechas (UTC), respeta validaciones',
+      () async {
+        final res = await useCase.call(
+          UpdateTripCommand(
+            id: 'u1',
+            title: const Patch.value(' Italia 2025  '), // con espacios
+            startDate: Patch.value(
+              DateTime(2025, 7, 2, 8),
+            ), // local -> toUtc en create()
+            endDate: Patch.value(DateTime(2025, 7, 12, 18)),
+          ),
+        );
 
-      expect(res, isA<Ok<Trip>>());
-      final t = (res as Ok<Trip>).value;
+        expect(res, isA<Ok<Trip>>());
+        final t = (res as Ok<Trip>).value;
 
-      // Título trimeado por Trip.create
-      expect(t.title, 'Italia 2025');
+        // Título trimeado por Trip.create
+        expect(t.title, 'Italia 2025');
 
-      // Fechas a UTC
-      expect(t.startDate!.isUtc, isTrue);
-      expect(t.endDate!.isUtc, isTrue);
-      expect(t.startDate, DateTime(2025, 7, 2, 8).toUtc());
-      expect(t.endDate, DateTime(2025, 7, 12, 18).toUtc());
-    });
+        // Fechas a UTC
+        expect(t.startDate!.isUtc, isTrue);
+        expect(t.endDate!.isUtc, isTrue);
+        expect(t.startDate, DateTime(2025, 7, 2, 8).toUtc());
+        expect(t.endDate, DateTime(2025, 7, 12, 18).toUtc());
+      },
+    );
 
     test('startDate > endDate -> Err y no llama a upsert', () async {
       repo.resetCounters();
-      final res = await useCase.call(UpdateTripCommand(
-        id: 'u1',
-        startDate: Patch.value(DateTime.utc(2025, 7, 20)),
-        endDate: Patch.value(DateTime.utc(2025, 7, 10)),
-      ));
+      final res = await useCase.call(
+        UpdateTripCommand(
+          id: 'u1',
+          startDate: Patch.value(DateTime.utc(2025, 7, 20)),
+          endDate: Patch.value(DateTime.utc(2025, 7, 10)),
+        ),
+      );
       expect(res, isA<Err<Trip>>());
       expect(repo.upsertCalls, 0);
     });
 
     test('title: Patch.value(null) -> Err (modo estricto)', () async {
       repo.resetCounters();
-      final res = await useCase.call(const UpdateTripCommand(
-        id: 'u1',
-        title: Patch.value(null),
-      ));
+      final res = await useCase.call(
+        const UpdateTripCommand(id: 'u1', title: Patch.value(null)),
+      );
       expect(res, isA<Err<Trip>>());
       expect(repo.upsertCalls, 0);
     });

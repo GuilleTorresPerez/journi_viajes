@@ -8,11 +8,15 @@ import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart'; // para poder ir al login
+import 'package:journi/application/use_cases/user_use_cases.dart';
+import 'package:journi/application/shared/result.dart';
+import 'package:journi/domain/user.dart';
 
+// ignore: must_be_immutable
 class RegisterScreen extends StatefulWidget {
-  final bool inicionSesiada;
-  final int selectedIndex;
-  final List<Trip> viajes;
+  final bool sesionIniciada;
+  int selectedIndex;
+  List<Trip> viajes;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
@@ -20,23 +24,25 @@ class RegisterScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  RegisterScreen(
-      {super.key,
-      required this.inicionSesiada,
-      required this.viajes,
-      required this.selectedIndex,
-      required this.tripRepo,
-      required this.entryRepo,
-      required this.tripService,
-      required this.entryService,
-      required this.userRepo,
-      required this.userService});
+  RegisterScreen({
+    super.key,
+    required this.sesionIniciada,
+    required this.viajes,
+    required this.selectedIndex,
+    required this.tripRepo,
+    required this.entryRepo,
+    required this.tripService,
+    required this.entryService,
+    required this.userRepo,
+    required this.userService,
+  });
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  //final TextEditingController _idController = TextEditingController();
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -44,6 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
+    //_idController.dispose();
     _nombreController.dispose();
     _apellidosController.dispose();
     _emailController.dispose();
@@ -51,46 +58,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _onGuardar() {
+  Future<void> _onGuardar() async {
+    //final id = _idController.text.trim();
     final nombre = _nombreController.text.trim();
     final apellidos = _apellidosController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
+    print('DEBUG REGISTRO: "$nombre" "$apellidos" "$email" "$password"');
+
     if (nombre.isEmpty ||
         apellidos.isEmpty ||
         email.isEmpty ||
         password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rellena todos los campos')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Falta algún campo')));
       return;
     }
 
-    // 🔐 Aquí iría tu lógica real de registro (API, base de datos, etc.)
-    // De momento solo avisamos y podrías navegar donde quieras (perfil, login, etc.)
+    // 🔑 Generar un id aleatorio/simple para el usuario
+    final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Usuario registrado correctamente')),
+    final cmd = RegisterUserCommand(
+      id: generatedId,
+      name: nombre,
+      lastName: apellidos,
+      email: email,
+      password: password,
     );
 
-    // Por ejemplo, tras registrar podrías ir a la pantalla de login:
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => LoginScreen(
-          selectedIndex: widget.selectedIndex,
-          inicionSesiada: widget.inicionSesiada,
-          viajes: widget.viajes,
-          tripRepo: widget.tripRepo,
-          entryRepo: widget.entryRepo,
-          tripService: widget.tripService,
-          entryService: widget.entryService,
-          userRepo: widget.userRepo,
-          userService: widget.userService,
+    final result = await widget.userService.register(cmd);
+
+    if (!mounted) return;
+
+    if (result is Ok<User>) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario registrado correctamente')),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LoginScreen(
+            selectedIndex: widget.selectedIndex,
+            sesionIniciada: widget.sesionIniciada,
+            viajes: widget.viajes,
+            tripRepo: widget.tripRepo,
+            entryRepo: widget.entryRepo,
+            tripService: widget.tripService,
+            entryService: widget.entryService,
+            userRepo: widget.userRepo,
+            userService: widget.userService,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      final msg = result.errorsOrEmpty.isNotEmpty
+          ? result.errorsOrEmpty.first.message
+          : 'Error al registrar usuario';
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
   }
 
   void _onYaTengoCuenta() {
@@ -99,7 +128,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       MaterialPageRoute(
         builder: (_) => LoginScreen(
           selectedIndex: widget.selectedIndex,
-          inicionSesiada: widget.inicionSesiada,
+          sesionIniciada: widget.sesionIniciada,
           viajes: widget.viajes,
           tripRepo: widget.tripRepo,
           entryRepo: widget.entryRepo,
@@ -161,8 +190,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 16),
 
               // Correo electrónico
-              _buildInput(_emailController, 'Correo electronico',
-                  keyboardType: TextInputType.emailAddress),
+              _buildInput(
+                _emailController,
+                'Correo electronico',
+                keyboardType: TextInputType.emailAddress,
+              ),
               const SizedBox(height: 16),
 
               // Contraseña

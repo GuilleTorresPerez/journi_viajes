@@ -33,7 +33,8 @@ class _MapaDetalleScreenState extends State<MapaDetalleScreen> {
     }
 
     Position posicion = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
 
     setState(() {
       _posicionUsuario = LatLng(posicion.latitude, posicion.longitude);

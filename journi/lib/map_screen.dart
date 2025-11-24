@@ -21,10 +21,11 @@ import 'main.dart';
 //
 // 🔹 Pantalla principal: lista de viajes
 //
+// ignore: must_be_immutable
 class MapaPaisScreen extends StatefulWidget {
-  final bool inicionSesiada;
-  final int selectedIndex;
-  final List<Trip> viajes;
+  final bool sesionIniciada;
+  int selectedIndex;
+  List<Trip> viajes;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
@@ -35,7 +36,7 @@ class MapaPaisScreen extends StatefulWidget {
   MapaPaisScreen({
     super.key,
     required this.viajes,
-    required this.inicionSesiada,
+    required this.sesionIniciada,
     required this.selectedIndex,
     required this.tripRepo,
     required this.entryRepo,
@@ -95,14 +96,22 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
           type: BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(
-                icon: Icon(Icons.folder), label: 'Mis viajes'),
+              icon: Icon(Icons.folder),
+              label: 'Mis viajes',
+            ),
             BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.add), label: 'Nuevo viaje'),
+              icon: Icon(Icons.add),
+              label: 'Nuevo viaje',
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.equalizer), label: 'Datos'),
+              icon: Icon(Icons.equalizer),
+              label: 'Datos',
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.person), label: 'Mi perfil'),
+              icon: Icon(Icons.person),
+              label: 'Mi perfil',
+            ),
           ],
           onTap: (int index) {
             setState(() {
@@ -114,7 +123,8 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
                     builder: (context) => MyHomePage(
                       title: 'JOURNI',
-                      inicionSesiada: widget.inicionSesiada,
+                      sesionIniciada: widget.sesionIniciada,
+                      viajes: widget.viajes,
                       tripRepo: widget.tripRepo,
                       entryRepo: widget.entryRepo,
                       tripService: widget.tripService,
@@ -131,7 +141,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     builder: (context) => Crear_Viaje(
                       selectedIndex: _selectedIndex,
                       viajes: _viajes!,
-                      inicionSesiada: widget.inicionSesiada,
+                      sesionIniciada: widget.sesionIniciada,
                       num_viaje: -1,
                       repo: widget.tripRepo,
                       entryRepo: widget.entryRepo,
@@ -169,7 +179,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                   MaterialPageRoute(
                     builder: (context) => LoginScreen(
                       selectedIndex: 1,
-                      inicionSesiada: widget.inicionSesiada,
+                      sesionIniciada: widget.sesionIniciada,
                       tripRepo: widget.tripRepo,
                       viajes: widget.viajes,
                       entryRepo: widget.entryRepo,
@@ -200,8 +210,10 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
               itemBuilder: (context, index) {
                 final viaje = _viajes![index];
                 return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   child: ListTile(
                     leading: const Icon(Icons.map, color: Colors.teal),
                     title: Text(
@@ -213,10 +225,12 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                       children: [
                         if (viaje.startDate != null)
                           Text(
-                              'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}'),
+                            'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}',
+                          ),
                         if (viaje.endDate != null)
                           Text(
-                              'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}'),
+                            'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}',
+                          ),
                       ],
                     ),
                     onTap: () {
@@ -241,7 +255,9 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.folder), label: 'Mis viajes'),
+            icon: Icon(Icons.folder),
+            label: 'Mis viajes',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
@@ -272,7 +288,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                   builder: (context) => Crear_Viaje(
                     selectedIndex: _selectedIndex,
                     viajes: _viajes!,
-                    inicionSesiada: widget.inicionSesiada,
+                    sesionIniciada: widget.sesionIniciada,
                     num_viaje: -1,
                     repo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
@@ -310,7 +326,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                 MaterialPageRoute(
                   builder: (context) => LoginScreen(
                     selectedIndex: 1,
-                    inicionSesiada: widget.inicionSesiada,
+                    sesionIniciada: widget.sesionIniciada,
                     tripRepo: widget.tripRepo,
                     viajes: widget.viajes,
                     entryRepo: widget.entryRepo,
@@ -342,10 +358,7 @@ class OpcionesViajeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.teal[200],
       appBar: AppBar(
-        title: Text(
-          viaje.title,
-          textAlign: TextAlign.center,
-        ),
+        title: Text(viaje.title, textAlign: TextAlign.center),
         backgroundColor: Colors.teal[200],
       ),
       body: Padding(
@@ -359,8 +372,10 @@ class OpcionesViajeScreen extends StatelessWidget {
                 backgroundColor: Colors.teal,
                 minimumSize: const Size(double.infinity, 50),
               ),
-              label: const Text('Ver mapa',
-                  style: TextStyle(fontSize: 18, color: Colors.white)),
+              label: const Text(
+                'Ver mapa',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -377,8 +392,10 @@ class OpcionesViajeScreen extends StatelessWidget {
                 backgroundColor: Colors.teal,
                 minimumSize: const Size(double.infinity, 50),
               ),
-              label: const Text('Ver línea temporal',
-                  style: TextStyle(fontSize: 18, color: Colors.white)),
+              label: const Text(
+                'Ver línea temporal',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -428,7 +445,8 @@ class _MapaDetalleScreenState extends State<MapaDetalleScreen> {
     }
 
     Position posicion = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
 
     setState(() {
       _posicionUsuario = LatLng(posicion.latitude, posicion.longitude);
@@ -489,9 +507,7 @@ class LineaTemporalScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.teal,
       appBar: AppBar(
-        title: Text(
-          'Línea temporal: ${viaje.title}',
-        ),
+        title: Text('Línea temporal: ${viaje.title}'),
         backgroundColor: Colors.teal,
       ),
       body: const Center(

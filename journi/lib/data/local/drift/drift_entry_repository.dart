@@ -38,7 +38,8 @@ Entry _toDomain(db.DbEntry row) {
 
   if (res.isErr) {
     throw StateError(
-        'Fila entries inválida (id=${row.id}): ${res.asErr().errors}');
+      'Fila entries inválida (id=${row.id}): ${res.asErr().errors}',
+    );
   }
   return res.asOk().value;
 }
@@ -50,8 +51,9 @@ class DriftEntryRepository implements EntryRepository {
   @override
   Future<Result<Entry>> upsert(Entry entry) async {
     await _db.into(_db.entries).insertOnConflictUpdate(_toCompanion(entry));
-    final row = await (_db.select(_db.entries)
-          ..where((e) => e.id.equals(entry.id)))
+    final row = await (_db.select(
+      _db.entries,
+    )..where((e) => e.id.equals(entry.id)))
         .getSingle();
     return Ok(_toDomain(row));
   }
@@ -64,7 +66,9 @@ class DriftEntryRepository implements EntryRepository {
 
   @override
   Future<Result<Entry?>> findById(String id) async {
-    final row = await (_db.select(_db.entries)..where((e) => e.id.equals(id)))
+    final row = await (_db.select(
+      _db.entries,
+    )..where((e) => e.id.equals(id)))
         .getSingleOrNull();
     return Ok(row == null ? null : _toDomain(row));
   }

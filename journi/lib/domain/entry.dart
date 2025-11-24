@@ -77,7 +77,8 @@ class Entry {
       case EntryType.location:
         if (text == null || text.trim().isEmpty) {
           errors.add(
-              ValidationError('Una ubicación debe tener texto o coordenadas'));
+            ValidationError('Una ubicación debe tener texto o coordenadas'),
+          );
         }
         break;
     }
@@ -96,17 +97,19 @@ class Entry {
 
     if (errors.isNotEmpty) return Err<Entry>(errors);
 
-    return Ok(Entry._(
-      id: id.trim(),
-      tripId: tripId.trim(),
-      type: type,
-      text: text?.trim(),
-      mediaUri: mediaUri?.trim(),
-      location: location,
-      tags: List.unmodifiable(normTags),
-      createdAt: createdAt.toUtc(),
-      updatedAt: updatedAt.toUtc(),
-    ));
+    return Ok(
+      Entry._(
+        id: id.trim(),
+        tripId: tripId.trim(),
+        type: type,
+        text: text?.trim(),
+        mediaUri: mediaUri?.trim(),
+        location: location,
+        tags: List.unmodifiable(normTags),
+        createdAt: createdAt.toUtc(),
+        updatedAt: updatedAt.toUtc(),
+      ),
+    );
   }
 
   /// Copia con updatedAt revalidado (para futuras mutaciones controladas si las necesitáis).

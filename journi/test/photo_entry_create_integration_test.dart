@@ -66,11 +66,6 @@ void main() {
   //     await tester.tap(find.byKey(const Key('adjuntarFoto')));
   //     await tester.pumpAndSettle();
 
-  //     expect(find.byKey(const Key('eid0')), findsOneWidget);
-  //     // ✅ Verificar éxito
-  //     // Verifica que la pantalla principal está visible
-  //   });
-
   //   testWidgets('❌ Error: Cancela operación de añadir foto',
   //       (WidgetTester tester) async {
   //     await tester.pumpWidget(MaterialApp(
@@ -88,7 +83,6 @@ void main() {
   //         userService: userService,
   //       ),
   //     ));
-
   //     await tester.pumpAndSettle();
   //     await tester.tap(find.byKey(const Key('anadirFoto')));
   //     await tester.pumpAndSettle();

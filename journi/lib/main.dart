@@ -12,6 +12,7 @@ import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'application/entry_service.dart';
 import 'package:journi/application/user_service.dart';
 import 'domain/trip.dart';
+import 'domain/user.dart';
 import 'application/trip_service.dart';
 import 'map_screen.dart';
 import 'mockImagePicker.dart';
@@ -20,6 +21,9 @@ import 'mockImagePicker.dart';
 import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
+
+// Dominio / aplicación
+import 'package:journi/application/shared/result.dart';
 
 import 'package:journi/login_screen.dart';
 
@@ -33,14 +37,16 @@ void main() {
   final entryService = makeEntryService(entryRepo);
   final userService = makeUserService(userRepo);
 
-  runApp(MyApp(
-    tripRepo: tripRepo,
-    tripService: tripService,
-    entryRepo: entryRepo,
-    entryService: entryService,
-    userRepo: userRepo,
-    userService: userService,
-  ));
+  runApp(
+    MyApp(
+      tripRepo: tripRepo,
+      tripService: tripService,
+      entryRepo: entryRepo,
+      entryService: entryService,
+      userRepo: userRepo,
+      userService: userService,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -72,7 +78,8 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(
         title: 'JOURNI',
-        inicionSesiada: false,
+        sesionIniciada: false,
+        viajes: const [],
         tripRepo: tripRepo,
         tripService: tripService,
         entryRepo: entryRepo,
@@ -84,32 +91,36 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
   MyHomePage({
     super.key,
     required this.title,
-    required this.inicionSesiada,
+    required this.sesionIniciada,
+    required this.viajes,
     required this.tripRepo,
     required this.tripService,
     required this.entryRepo,
     required this.entryService,
     required this.userRepo,
-    required this.userService,
+    required this.userService, //required bool inicionSesiada,
   });
 
   final String title;
-  final bool inicionSesiada;
+  final bool sesionIniciada;
 
   final TripRepository tripRepo;
   final TripService tripService;
 
   final EntryRepository entryRepo;
+  final MockImagePicker picker = MockImagePicker();
+
   final EntryService entryService;
+
+  List<Trip> viajes = [];
 
   final UserRepository userRepo;
   final UserService userService;
-
-  final MockImagePicker picker = MockImagePicker();
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -120,11 +131,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 🔽 snapshot inicial para cuando el stream aún no ha emitido
   List<Trip>? _initialTrips;
-  List<Trip> _viajes = [];
+
+  bool _sesionIniciada = false; // 👈 NUEVO
+  User? _currentUser; // 👈 NUEVO
 
   @override
   void initState() {
     super.initState();
+    _sesionIniciada = widget.sesionIniciada; // 👈 IMPORTANTE
     _loadInitial();
   }
 
@@ -148,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(
         builder: (context) => Crear_Viaje(
           selectedIndex: _selectedIndex,
-          inicionSesiada: widget.inicionSesiada,
+          sesionIniciada: _sesionIniciada,
           viajes: const [],
           num_viaje: -1,
           repo: widget.tripRepo,
@@ -157,6 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
           entryService: widget.entryService,
           userRepo: widget.userRepo,
           userService: widget.userService,
+          currentUser: _currentUser,
         ),
       ),
     );
@@ -189,8 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          _viajes = items;
-
+          widget.viajes = items;
           if (items.isEmpty) {
             return const Center(
               child: Text(
@@ -226,10 +240,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       if (viaje.startDate != null)
                         Text(
-                            'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}'),
+                          'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}',
+                        ),
                       if (viaje.endDate != null)
                         Text(
-                            'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}'),
+                          'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}',
+                        ),
                       const SizedBox(height: 4),
                     ],
                   ),
@@ -240,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialPageRoute(
                         builder: (context) => Pantalla_Viaje(
                           selectedIndex: _selectedIndex,
-                          inicionSesiada: widget.inicionSesiada,
+                          inicionSesiada: _sesionIniciada,
                           viajes: items,
                           num_viaje: index,
                           repo: widget.tripRepo,
@@ -250,6 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           picker: widget.picker,
                           userRepo: widget.userRepo,
                           userService: widget.userService,
+                          currentUser: _currentUser, // 👈 NUEVO
                         ),
                       ),
                     );
@@ -274,42 +291,87 @@ class _MyHomePageState extends State<MyHomePage> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.folder), label: 'Mis viajes'),
+            icon: Icon(Icons.folder),
+            label: 'Mis viajes',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],
-        onTap: (int index) {
+        onTap: (int index) async {
+          // Actualizamos índice básico
           setState(() {
             _selectedIndex = index;
-            if (_selectedIndex == 2) {
+          });
+
+          if (index == 2) {
+            // Nuevo viaje
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Crear_Viaje(
+                  selectedIndex: _selectedIndex,
+                  sesionIniciada: _sesionIniciada,
+                  viajes: widget.viajes,
+                  num_viaje: -1,
+                  repo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                ),
+              ),
+            );
+          } else if (index == 1) {
+            // Mapa
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MapaPaisScreen(
+                  selectedIndex: index,
+                  sesionIniciada: _sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                ),
+              ),
+            );
+          } else if (index == 4) {
+            // Perfil
+            if (_sesionIniciada && _currentUser != null) {
+              // Ya tenía sesión -> ir directo a MiPerfil
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Crear_Viaje(
-                    selectedIndex: _selectedIndex,
-                    inicionSesiada: widget.inicionSesiada,
-                    viajes: _viajes,
-                    num_viaje: -1,
-                    repo: widget.tripRepo,
+                  builder: (context) => MiPerfil(
+                    selectedIndex: index,
+                    sesionIniciada: _sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: _currentUser!, //loggedUser
                   ),
                 ),
               );
-            } else if (index == 1) {
-              // Ir al mapa
-              Navigator.push(
+            } else {
+              // No hay sesión -> ir a Login y esperar resultado
+              final loggedUser = await Navigator.push<User?>(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MapaPaisScreen(
+                  builder: (context) => LoginScreen(
                     selectedIndex: index,
-                    inicionSesiada: widget.inicionSesiada,
-                    viajes: _viajes,
+                    sesionIniciada: _sesionIniciada,
+                    viajes: widget.viajes,
                     tripRepo: widget.tripRepo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
@@ -319,45 +381,34 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               );
-            } else if (index == 4) {
-              //mi perfil
-              if (widget.inicionSesiada) {
+
+              if (loggedUser != null && mounted) {
+                setState(() {
+                  _sesionIniciada = true;
+                  _currentUser = loggedUser;
+                });
+
+                // Una vez logueado, lo llevamos al perfil
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => MiPerfil(
                       selectedIndex: index,
-                      inicionSesiada: widget.inicionSesiada,
-                      viajes: _viajes,
+                      sesionIniciada: _sesionIniciada,
+                      viajes: widget.viajes,
                       tripRepo: widget.tripRepo,
                       entryRepo: widget.entryRepo,
                       tripService: widget.tripService,
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
-                    ),
-                  ),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      selectedIndex: index,
-                      inicionSesiada: widget.inicionSesiada,
-                      viajes: _viajes,
-                      tripRepo: widget.tripRepo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
+                      currentUser: loggedUser,
                     ),
                   ),
                 );
               }
             }
-          });
+          }
         },
       ),
     );

@@ -55,7 +55,8 @@ class Trip {
     }
     if (description != null && description.length > descriptionMax) {
       errs.add(
-          ValidationError('description supera $descriptionMax caracteres'));
+        ValidationError('description supera $descriptionMax caracteres'),
+      );
     }
 
     // Normaliza antes de comparar (evita errores por zonas horarias)

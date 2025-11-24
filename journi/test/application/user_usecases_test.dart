@@ -41,43 +41,51 @@ void main() {
 
   test('authenticate ok y wrong password falla', () async {
     // registro
-    final reg = await service.register(RegisterUserCommand(
-      id: 'u1',
-      name: 'Ada',
-      lastName: 'Lovelace',
-      email: 'ada@example.com',
-      password: 'pass123',
-    ));
+    final reg = await service.register(
+      RegisterUserCommand(
+        id: 'u1',
+        name: 'Ada',
+        lastName: 'Lovelace',
+        email: 'ada@example.com',
+        password: 'pass123',
+      ),
+    );
     expect(reg.isOk, isTrue);
 
     // login correcto (case-insensitive email)
     final ok = await service.authenticate(
       const AuthenticateUserCommand(
-          email: 'ADA@EXAMPLE.COM', password: 'pass123'),
+        email: 'ADA@EXAMPLE.COM',
+        password: 'pass123',
+      ),
     );
     expect(ok.isOk, isTrue);
 
     // login incorrecto
     final bad = await service.authenticate(
       const AuthenticateUserCommand(
-          email: 'ada@example.com', password: 'wrong'),
+        email: 'ada@example.com',
+        password: 'wrong',
+      ),
     );
     expect(bad.isErr, isTrue);
   });
 
   test('duplicate email en register -> Err(RepoError)', () async {
     final c1 = RegisterUserCommand(
-        id: 'u1',
-        name: 'A',
-        lastName: 'B',
-        email: 'dup@example.com',
-        password: 'x');
+      id: 'u1',
+      name: 'A',
+      lastName: 'B',
+      email: 'dup@example.com',
+      password: 'x',
+    );
     final c2 = RegisterUserCommand(
-        id: 'u2',
-        name: 'C',
-        lastName: 'D',
-        email: 'dup@example.com',
-        password: 'y');
+      id: 'u2',
+      name: 'C',
+      lastName: 'D',
+      email: 'dup@example.com',
+      password: 'y',
+    );
 
     expect((await service.register(c1)).isOk, isTrue);
     final r2 = await service.register(c2);

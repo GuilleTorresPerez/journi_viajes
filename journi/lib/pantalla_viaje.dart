@@ -10,6 +10,7 @@ import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/trip.dart' hide Ok;
+import 'package:journi/domain/user.dart';
 
 import 'application/shared/result.dart';
 import 'application/user_service.dart';
@@ -17,7 +18,7 @@ import 'crear_viaje.dart';
 import 'domain/ports/user_repository.dart';
 import 'editar_viaje.dart';
 import 'map_screen.dart';
-import 'select_location_screen.dart';
+//import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
 class Pantalla_Viaje extends StatefulWidget {
@@ -35,19 +36,21 @@ class Pantalla_Viaje extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  Pantalla_Viaje(
-      {super.key,
-      required this.selectedIndex,
-      required this.inicionSesiada,
-      required this.viajes,
-      required this.num_viaje,
-      required this.repo,
-      required this.entryRepo,
-      required this.tripService,
-      required this.entryService,
-      this.picker,
-      required this.userRepo,
-      required this.userService});
+  Pantalla_Viaje({
+    super.key,
+    required this.selectedIndex,
+    required this.inicionSesiada,
+    required this.viajes,
+    required this.num_viaje,
+    required this.repo,
+    required this.entryRepo,
+    required this.tripService,
+    required this.entryService,
+    this.picker,
+    required this.userRepo,
+    required this.userService,
+    User? currentUser,
+  });
 
   @override
   _PantallaViajeState createState() => _PantallaViajeState();
@@ -55,7 +58,7 @@ class Pantalla_Viaje extends StatefulWidget {
 
 class _PantallaViajeState extends State<Pantalla_Viaje> {
   final ImagePicker _picker = ImagePicker();
-  final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
+  //final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
   final TextEditingController _textoController = TextEditingController();
 
   late int _selectedIndex;
@@ -179,11 +182,17 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 ),
                                 items: const [
                                   DropdownMenuItem(
-                                      value: "España", child: Text("España")),
+                                    value: "España",
+                                    child: Text("España"),
+                                  ),
                                   DropdownMenuItem(
-                                      value: "Francia", child: Text("Francia")),
+                                    value: "Francia",
+                                    child: Text("Francia"),
+                                  ),
                                   DropdownMenuItem(
-                                      value: "Italia", child: Text("Italia")),
+                                    value: "Italia",
+                                    child: Text("Italia"),
+                                  ),
                                 ],
                                 onChanged: (value) {
                                   setState(() => ubicacion = value);
@@ -194,8 +203,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         ),
                         actions: [
                           TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cerrar')),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cerrar'),
+                          ),
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
@@ -239,7 +249,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         const Text(
                           "Compartir viaje",
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         TextField(
@@ -258,7 +270,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                    "Invitación enviada a ${emailCtrl.text}"),
+                                  "Invitación enviada a ${emailCtrl.text}",
+                                ),
                               ),
                             );
                           },
@@ -282,7 +295,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => Editar_viaje(
                     selectedIndex: 2,
                     viajes: widget.viajes,
-                    inicionSesiada: widget.inicionSesiada,
+                    sesionIniciada: widget.inicionSesiada,
                     num_viaje: widget.num_viaje,
                     repo: widget.repo,
                     entryRepo: widget.entryRepo,
@@ -306,24 +319,27 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 builder: (context) {
                   return AlertDialog(
                     title: const Text('Confirmar eliminación'),
-                    content:
-                        const Text('¿Seguro que quieres eliminar este viaje?'),
+                    content: const Text(
+                      '¿Seguro que quieres eliminar este viaje?',
+                    ),
                     actions: [
                       TextButton(
-                          key: const Key('cancelarButton'),
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cancelar')),
+                        key: const Key('cancelarButton'),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancelar'),
+                      ),
                       TextButton(
                         key: const Key('aceptarButton'),
                         onPressed: () async {
                           final tripToDelete = currentTrip;
-                          final result = await widget.tripService
-                              .deleteById(tripToDelete.id);
+                          final result = await widget.tripService.deleteById(
+                            tripToDelete.id,
+                          );
                           if (result is Ok<Unit>) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content:
-                                      Text('Viaje eliminado correctamente.')),
+                                content: Text('Viaje eliminado correctamente.'),
+                              ),
                             );
                             widget.viajes.removeAt(widget.num_viaje);
 
@@ -333,7 +349,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text('Error al eliminar el viaje')),
+                                content: Text('Error al eliminar el viaje'),
+                              ),
                             );
                           }
                         },
@@ -382,15 +399,18 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     return Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: ListTile(
                         leading: const Icon(Icons.notes, color: Colors.teal),
                         title: Text(e.text!),
                         subtitle: Text('Añadido el $fechaFormateada'),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Colors.red),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
                           onPressed: () async {
                             await widget.entryService.deleteById(e.id);
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -413,7 +433,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     return Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
                         children: [
@@ -428,8 +449,10 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                       return Dialog(
                                         child: InteractiveViewer(
                                           panEnabled: true,
-                                          child: Image.file(file,
-                                              fit: BoxFit.contain),
+                                          child: Image.file(
+                                            file,
+                                            fit: BoxFit.contain,
+                                          ),
                                         ),
                                       );
                                     },
@@ -437,7 +460,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 },
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(15)),
+                                    top: Radius.circular(15),
+                                  ),
                                   child: Image.file(
                                     file,
                                     height: 200,
@@ -447,13 +471,16 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                 ),
                               ),
                               IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
                                 onPressed: () async {
                                   await widget.entryService.deleteById(e.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text('Foto eliminada')),
+                                      content: Text('Foto eliminada'),
+                                    ),
                                   );
                                 },
                               ),
@@ -464,7 +491,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             child: Text(
                               'Añadida el $fechaFormateada',
                               style: const TextStyle(
-                                  fontSize: 14, color: Colors.black54),
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
                             ),
                           ),
                         ],
@@ -504,8 +533,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         ),
                         actions: [
                           TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancelar')),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancelar'),
+                          ),
                           TextButton(
                             onPressed: () async {
                               final texto = _textoController.text.trim();
@@ -521,8 +551,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Texto añadido')));
+                                const SnackBar(content: Text('Texto añadido')),
+                              );
                             },
                             child: const Text('Aceptar'),
                           ),
@@ -544,13 +574,15 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text(
-                            '¿Qué tipo de archivo multimedia quieres añadir?'),
+                          '¿Qué tipo de archivo multimedia quieres añadir?',
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
                               final XFile? pickedFile = await _picker.pickImage(
-                                  source: ImageSource.gallery);
+                                source: ImageSource.gallery,
+                              );
                               if (pickedFile != null) {
                                 final cmd = CreateEntryCommand(
                                   id: UniqueKey().toString(),
@@ -567,7 +599,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             onPressed: () async {
                               Navigator.pop(context);
                               final XFile? imagen = await _picker.pickImage(
-                                  source: ImageSource.camera);
+                                source: ImageSource.camera,
+                              );
                               if (imagen != null) {
                                 final file = File(imagen.path);
                                 final cmd = CreateEntryCommand(
@@ -585,7 +618,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             onPressed: () async {
                               Navigator.pop(context);
                               final XFile? video = await _picker.pickVideo(
-                                  source: ImageSource.gallery);
+                                source: ImageSource.gallery,
+                              );
                               if (video != null) {
                                 final cmd = CreateEntryCommand(
                                   id: UniqueKey().toString(),
@@ -619,7 +653,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.folder), label: 'Mis viajes'),
+            icon: Icon(Icons.folder),
+            label: 'Mis viajes',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
@@ -639,7 +675,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => MapaPaisScreen(
                     selectedIndex: widget.selectedIndex,
                     viajes: widget.viajes,
-                    inicionSesiada: widget.inicionSesiada,
+                    sesionIniciada: widget.inicionSesiada,
                     tripRepo: widget.repo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
@@ -656,7 +692,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => Crear_Viaje(
                     selectedIndex: widget.selectedIndex,
                     viajes: widget.viajes,
-                    inicionSesiada: widget.inicionSesiada,
+                    sesionIniciada: widget.inicionSesiada,
                     num_viaje: -1,
                     repo: widget.repo,
                     entryRepo: widget.entryRepo,
@@ -675,7 +711,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
                   builder: (context) => LoginScreen(
                     selectedIndex: 0,
-                    inicionSesiada: widget.inicionSesiada,
+                    sesionIniciada: widget.inicionSesiada,
                     viajes: widget.viajes,
                     tripRepo: widget.repo,
                     entryRepo: widget.entryRepo,

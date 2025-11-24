@@ -39,20 +39,23 @@ void main() {
     });
 
     testWidgets('✅ Crear viaje correctamente', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: MyHomePage(
-          title: 'JOURNI',
-          inicionSesiada: false,
-          tripService: tripService,
-          entryService: entryService,
-          tripRepo: tripRepo,
-          entryRepo: entryRepo,
-          userRepo: userRepo,
-          userService: userService,
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MyHomePage(
+            title: 'JOURNI',
+            sesionIniciada: false,
+            viajes: [],
+            tripService: tripService,
+            entryService: entryService,
+            tripRepo: tripRepo,
+            entryRepo: entryRepo,
+            userRepo: userRepo,
+            userService: userService,
+          ),
         ),
-      ));
+      );
 
-// Pulsa el BottomNavigationBarItem "Nuevo viaje"
+      // Pulsa el BottomNavigationBarItem "Nuevo viaje"
       await tester.tap(find.byKey(const Key('anadirButton')));
       await tester.pumpAndSettle();
 
@@ -79,22 +82,25 @@ void main() {
       expect(find.text('Error'), findsNothing);
     });
 
-    testWidgets('❌ Error: fecha de inicio posterior a fecha final',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Crear_Viaje(
-          selectedIndex: 2,
-          inicionSesiada: false,
-          viajes: [],
-          num_viaje: -1,
-          repo: tRepo,
-          entryRepo: eRepo,
-          tripService: tripService,
-          entryService: entryService,
-          userRepo: userRepo,
-          userService: userService,
+    testWidgets('❌ Error: fecha de inicio posterior a fecha final', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Crear_Viaje(
+            selectedIndex: 2,
+            sesionIniciada: false,
+            viajes: [],
+            num_viaje: -1,
+            repo: tRepo,
+            entryRepo: eRepo,
+            tripService: tripService,
+            entryService: entryService,
+            userRepo: userRepo,
+            userService: userService,
+          ),
         ),
-      ));
+      );
 
       await tester.pumpAndSettle();
 
@@ -117,8 +123,10 @@ void main() {
 
       // ❌ Verificar error
       expect(find.text('Error'), findsOneWidget);
-      expect(find.text('La fecha de inicio no puede ser posterior a la final'),
-          findsOneWidget);
+      expect(
+        find.text('La fecha de inicio no puede ser posterior a la final'),
+        findsOneWidget,
+      );
       expect(find.text('Viaje creado correctamente'), findsNothing);
     });
   });

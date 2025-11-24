@@ -2,17 +2,22 @@ import 'package:flutter/material.dart';
 import 'application/entry_service.dart';
 import 'application/trip_service.dart';
 import 'application/user_service.dart';
+import 'package:journi/application/use_cases/user_use_cases.dart';
+import 'package:journi/application/shared/result.dart';
+import 'package:journi/domain/user.dart';
+//import 'data/local/drift/app_database.dart';
+//import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/entry_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
-import 'mi_perfil.dart'; // importa tu pantalla de perfil
+//import 'mi_perfil.dart'; // importa tu pantalla de perfil
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final int selectedIndex;
   final List<Trip> viajes;
-  final bool inicionSesiada;
+  final bool sesionIniciada;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
   final TripService tripService;
@@ -20,9 +25,9 @@ class LoginScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  const LoginScreen({
+  LoginScreen({
     super.key,
-    required this.inicionSesiada,
+    required this.sesionIniciada,
     required this.viajes,
     required this.selectedIndex,
     required this.tripRepo,
@@ -49,12 +54,13 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onEntrar() {
+  Future<void> _onEntrar() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,35 +72,40 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!emailRegex.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-                'El correo introducido no sigue el formato correcto. Inténtelo de nuevo')),
+          content: Text(
+            'El correo introducido no sigue el formato correcto. Inténtelo de nuevo',
+          ),
+        ),
       );
       return;
     }
 
-    // 🔐 Simulamos login correcto
-    //sesionIniciada = true; // ✅ Ahora la reconoce correctamente
+    // 🔐 Llamada real al caso de uso de login
+    final cmd = AuthenticateUserCommand(email: email, password: password);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sesión iniciada correctamente')),
-    );
+    final result = await widget.userService.authenticate(cmd);
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MiPerfil(
-          selectedIndex: widget.selectedIndex,
-          inicionSesiada: true,
-          viajes: widget.viajes,
-          tripRepo: widget.tripRepo,
-          entryRepo: widget.entryRepo,
-          tripService: widget.tripService,
-          entryService: widget.entryService,
-          userRepo: widget.userRepo,
-          userService: widget.userService,
-        ),
-      ),
-    );
+    if (!mounted) return;
+
+    if (result is Ok<User>) {
+      final user = result.value;
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Bienvenido, ${user.name}')));
+
+      // 👇 Devolvemos el usuario a la pantalla anterior (MyHomePage)
+      Navigator.pop<User>(context, user);
+    } else {
+      // ❌ Error de autenticación
+      final msg = result.errorsOrEmpty.isNotEmpty
+          ? result.errorsOrEmpty.first.message
+          : 'Error al iniciar sesión';
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
   }
 
   @override
@@ -192,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(
                         builder: (_) => RegisterScreen(
                           selectedIndex: widget.selectedIndex,
-                          inicionSesiada: widget.inicionSesiada,
+                          sesionIniciada: widget.sesionIniciada,
                           viajes: widget.viajes,
                           tripRepo: widget.tripRepo,
                           entryRepo: widget.entryRepo,

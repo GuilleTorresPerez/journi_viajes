@@ -40,9 +40,10 @@ abstract class Result<T> {
   T? get valueOrNull => isOk ? asOk().value : null;
   List<AppError> get errorsOrEmpty => isOk ? const [] : asErr().errors;
 
-  R fold<R>(
-      {required R Function(T value) onOk,
-      required R Function(List<AppError> errors) onErr});
+  R fold<R>({
+    required R Function(T value) onOk,
+    required R Function(List<AppError> errors) onErr,
+  });
 
   Result<U> map<U>(U Function(T value) transform) =>
       isOk ? Ok<U>(transform(asOk().value)) : Err<U>(asErr().errors);
@@ -59,9 +60,10 @@ class Ok<T> extends Result<T> {
   @override
   bool get isOk => true;
   @override
-  R fold<R>(
-          {required R Function(T value) onOk,
-          required R Function(List<AppError> errors) onErr}) =>
+  R fold<R>({
+    required R Function(T value) onOk,
+    required R Function(List<AppError> errors) onErr,
+  }) =>
       onOk(value);
   @override
   String toString() => 'Ok($value)';
@@ -73,9 +75,10 @@ class Err<T> extends Result<T> {
   @override
   bool get isOk => false;
   @override
-  R fold<R>(
-          {required R Function(T value) onOk,
-          required R Function(List<AppError> errors) onErr}) =>
+  R fold<R>({
+    required R Function(T value) onOk,
+    required R Function(List<AppError> errors) onErr,
+  }) =>
       onErr(errors);
   @override
   String toString() => 'Err(${errors.join(', ')})';

@@ -8,12 +8,14 @@ Trip _okTrip(Result<Trip> r) {
   return (r as Ok<Trip>).value;
 }
 
-Trip _baseTrip() => _okTrip(Trip.create(
-      id: 'base',
-      title: 'Base',
-      createdAt: DateTime.utc(2025, 1, 1),
-      updatedAt: DateTime.utc(2025, 1, 1),
-    ));
+Trip _baseTrip() => _okTrip(
+      Trip.create(
+        id: 'base',
+        title: 'Base',
+        createdAt: DateTime.utc(2025, 1, 1),
+        updatedAt: DateTime.utc(2025, 1, 1),
+      ),
+    );
 
 void main() {
   group('TripMutators (extension methods)', () {
@@ -55,7 +57,9 @@ void main() {
 
       // rango inválido
       final bad = t.withDates(
-          start: DateTime.utc(2025, 1, 12), end: DateTime.utc(2025, 1, 11));
+        start: DateTime.utc(2025, 1, 12),
+        end: DateTime.utc(2025, 1, 11),
+      );
       expect(bad, isA<Err<Trip>>());
     });
 

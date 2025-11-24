@@ -63,23 +63,27 @@ class DriftTripRepository implements TripRepository {
 
     final t = validated.asOk().value;
     await _db.into(_db.trips).insertOnConflictUpdate(_toCompanion(t));
-    final row = await (_db.select(_db.trips)
-          ..where((tbl) => tbl.id.equals(t.id)))
+    final row = await (_db.select(
+      _db.trips,
+    )..where((tbl) => tbl.id.equals(t.id)))
         .getSingle();
     return Ok(_toDomain(row));
   }
 
   @override
   Future<Result<Trip?>> findById(String id) async {
-    final row = await (_db.select(_db.trips)..where((t) => t.id.equals(id)))
+    final row = await (_db.select(
+      _db.trips,
+    )..where((t) => t.id.equals(id)))
         .getSingleOrNull();
     return Ok(row == null ? null : _toDomain(row));
   }
 
   @override
   Future<Result<List<Trip>>> list({TripPhase? phase}) async {
-    final rows = await (_db.select(_db.trips)
-          ..orderBy([(t) => d.OrderingTerm.desc(t.createdAt)]))
+    final rows = await (_db.select(
+      _db.trips,
+    )..orderBy([(t) => d.OrderingTerm.desc(t.createdAt)]))
         .get();
     var items = rows.map(_toDomain).toList();
     if (phase != null) items = items.where((t) => t.phase == phase).toList();
