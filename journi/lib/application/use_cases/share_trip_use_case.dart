@@ -17,16 +17,17 @@ class ShareTripUseCase {
 
     // 2. Comprobar si el usuario existe
     final userResult = await _userRepository.findByEmail(emailClean);
-    
+
     // CORRECCIÓN AQUÍ: Usamos .asErr().errors
     if (userResult.isErr) {
       return Err(userResult.asErr().errors);
     }
-    
+
     final user = userResult.asOk().value;
-    
+
     if (user == null) {
-      return Err([ValidationError('Usuario con email $emailClean no encontrado')]);
+      return Err(
+          [ValidationError('Usuario con email $emailClean no encontrado')]);
     }
 
     // 3. Persistir la relación
