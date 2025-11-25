@@ -23,20 +23,23 @@ import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
 // Dominio / aplicación
-
 import 'package:journi/login_screen.dart';
 import 'package:journi/data/external/platform_geocoding_repository.dart';
 import 'package:journi/domain/ports/geocoding_repository.dart';
 
 void main() {
   final db = AppDatabase();
+
+  // 1. Instanciamos los repositorios
   final TripRepository tripRepo = DriftTripRepository(db);
   final EntryRepository entryRepo = DriftEntryRepository(db);
   final UserRepository userRepo = DriftUserRepository(db);
-
   final GeocodingRepository geoRepo = PlatformGeocodingRepository();
 
-  final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+  // 2. Inyectamos las dependencias.
+  // CORRECCIÓN: Añadimos userRepo como segundo argumento en makeTripService
+  final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
+
   final entryService = makeEntryService(entryRepo);
   final userService = makeUserService(userRepo);
 
@@ -106,7 +109,7 @@ class MyHomePage extends StatefulWidget {
     required this.entryRepo,
     required this.entryService,
     required this.userRepo,
-    required this.userService, //required bool inicionSesiada,
+    required this.userService,
   });
 
   final String title;
@@ -135,13 +138,13 @@ class _MyHomePageState extends State<MyHomePage> {
   // 🔽 snapshot inicial para cuando el stream aún no ha emitido
   List<Trip>? _initialTrips;
 
-  bool _sesionIniciada = false; // 👈 NUEVO
-  User? _currentUser; // 👈 NUEVO
+  bool _sesionIniciada = false;
+  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
-    _sesionIniciada = widget.sesionIniciada; // 👈 IMPORTANTE
+    _sesionIniciada = widget.sesionIniciada;
     _loadInitial();
   }
 
@@ -269,7 +272,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           picker: widget.picker,
                           userRepo: widget.userRepo,
                           userService: widget.userService,
-                          currentUser: _currentUser, // 👈 NUEVO
+                          currentUser: _currentUser,
                         ),
                       ),
                     );
@@ -348,7 +351,6 @@ class _MyHomePageState extends State<MyHomePage> {
           } else if (index == 4) {
             // Perfil
             if (_sesionIniciada && _currentUser != null) {
-              // Ya tenía sesión -> ir directo a MiPerfil
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -362,12 +364,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
-                    currentUser: _currentUser!, //loggedUser
+                    currentUser: _currentUser!,
                   ),
                 ),
               );
             } else {
-              // No hay sesión -> ir a Login y esperar resultado
               final loggedUser = await Navigator.push<User?>(
                 context,
                 MaterialPageRoute(
@@ -391,7 +392,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   _currentUser = loggedUser;
                 });
 
-                // Una vez logueado, lo llevamos al perfil
                 Navigator.push(
                   context,
                   MaterialPageRoute(
