@@ -107,4 +107,21 @@ class DriftTripRepository implements TripRepository {
     await (_db.delete(_db.trips)..where((t) => t.id.equals(id))).go();
     return const Ok(unit);
   }
+
+  @override
+  Future<Result<Unit>> addParticipant(String tripId, String userId) async {
+    try {
+      await _db.into(_db.tripParticipants).insert(
+            db.TripParticipantsCompanion(
+              tripId: d.Value(tripId),
+              userId: d.Value(userId),
+            ),
+            mode: d.InsertMode.insertOrIgnore, // Idempotente
+          );
+      return const Ok(unit);
+    } catch (e) {
+      // Manejo básico de errores de BD
+      return Err([UnexpectedError(e.toString())]);
+    }
+  }
 }
