@@ -40,7 +40,10 @@ class InMemoryTripRepository implements TripRepository {
       endDate: trip.endDate,
       createdAt: trip.createdAt,
       updatedAt: trip.updatedAt,
+      // IMPORTANTE: Aseguramos pasar los participantes al recrear/validar
+      participantIds: trip.participantIds,
     );
+
     if (res is Err<Trip>) return res;
     final ok = res as Ok<Trip>;
     _store[ok.value.id] = ok.value;
@@ -68,6 +71,48 @@ class InMemoryTripRepository implements TripRepository {
   Future<Result<Unit>> deleteById(String id) async {
     _store.remove(id);
     _emit();
+    return const Ok(unit);
+  }
+
+  // 👇 IMPLEMENTACIÓN AÑADIDA PARA CORREGIR EL ERROR
+  @override
+  Future<Result<Unit>> addParticipant(String tripId, String userId) async {
+    final currentTrip = _store[tripId];
+
+    if (currentTrip == null) {
+      return Err([ValidationError('Trip con id $tripId no encontrado')]);
+    }
+
+    // Evitamos duplicados si el usuario ya está en la lista
+    if (currentTrip.participantIds.contains(userId)) {
+      return const Ok(unit);
+    }
+
+    // Creamos la nueva lista de participantes
+    final newParticipants = List<String>.from(currentTrip.participantIds)
+      ..add(userId);
+
+    // Reconstruimos el Trip (Inmutabilidad) actualizando la fecha
+    final updatedRes = Trip.create(
+      id: currentTrip.id,
+      title: currentTrip.title,
+      description: currentTrip.description,
+      coverImage: currentTrip.coverImage,
+      startDate: currentTrip.startDate,
+      endDate: currentTrip.endDate,
+      createdAt: currentTrip.createdAt,
+      updatedAt: DateTime.now().toUtc(), // Actualizamos timestamp
+      participantIds: newParticipants,
+    );
+
+    if (updatedRes is Err<Trip>) {
+      return Err(updatedRes.errors);
+    }
+
+    // Guardamos y notificamos
+    _store[tripId] = (updatedRes as Ok<Trip>).value;
+    _emit();
+
     return const Ok(unit);
   }
 
