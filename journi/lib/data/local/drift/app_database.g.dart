@@ -1380,17 +1380,218 @@ class UsersCompanion extends UpdateCompanion<DbUser> {
   }
 }
 
+class $TripParticipantsTable extends TripParticipants
+    with TableInfo<$TripParticipantsTable, DbTripParticipant> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TripParticipantsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tripIdMeta = const VerificationMeta('tripId');
+  @override
+  late final GeneratedColumn<String> tripId = GeneratedColumn<String>(
+      'trip_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES trips (id) ON DELETE CASCADE'));
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES users (id) ON DELETE CASCADE'));
+  @override
+  List<GeneratedColumn> get $columns => [tripId, userId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'trip_participants';
+  @override
+  VerificationContext validateIntegrity(Insertable<DbTripParticipant> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('trip_id')) {
+      context.handle(_tripIdMeta,
+          tripId.isAcceptableOrUnknown(data['trip_id']!, _tripIdMeta));
+    } else if (isInserting) {
+      context.missing(_tripIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {tripId, userId};
+  @override
+  DbTripParticipant map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DbTripParticipant(
+      tripId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}trip_id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+    );
+  }
+
+  @override
+  $TripParticipantsTable createAlias(String alias) {
+    return $TripParticipantsTable(attachedDatabase, alias);
+  }
+}
+
+class DbTripParticipant extends DataClass
+    implements Insertable<DbTripParticipant> {
+  final String tripId;
+  final String userId;
+  const DbTripParticipant({required this.tripId, required this.userId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['trip_id'] = Variable<String>(tripId);
+    map['user_id'] = Variable<String>(userId);
+    return map;
+  }
+
+  TripParticipantsCompanion toCompanion(bool nullToAbsent) {
+    return TripParticipantsCompanion(
+      tripId: Value(tripId),
+      userId: Value(userId),
+    );
+  }
+
+  factory DbTripParticipant.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DbTripParticipant(
+      tripId: serializer.fromJson<String>(json['tripId']),
+      userId: serializer.fromJson<String>(json['userId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tripId': serializer.toJson<String>(tripId),
+      'userId': serializer.toJson<String>(userId),
+    };
+  }
+
+  DbTripParticipant copyWith({String? tripId, String? userId}) =>
+      DbTripParticipant(
+        tripId: tripId ?? this.tripId,
+        userId: userId ?? this.userId,
+      );
+  DbTripParticipant copyWithCompanion(TripParticipantsCompanion data) {
+    return DbTripParticipant(
+      tripId: data.tripId.present ? data.tripId.value : this.tripId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DbTripParticipant(')
+          ..write('tripId: $tripId, ')
+          ..write('userId: $userId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(tripId, userId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DbTripParticipant &&
+          other.tripId == this.tripId &&
+          other.userId == this.userId);
+}
+
+class TripParticipantsCompanion extends UpdateCompanion<DbTripParticipant> {
+  final Value<String> tripId;
+  final Value<String> userId;
+  final Value<int> rowid;
+  const TripParticipantsCompanion({
+    this.tripId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TripParticipantsCompanion.insert({
+    required String tripId,
+    required String userId,
+    this.rowid = const Value.absent(),
+  })  : tripId = Value(tripId),
+        userId = Value(userId);
+  static Insertable<DbTripParticipant> custom({
+    Expression<String>? tripId,
+    Expression<String>? userId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tripId != null) 'trip_id': tripId,
+      if (userId != null) 'user_id': userId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TripParticipantsCompanion copyWith(
+      {Value<String>? tripId, Value<String>? userId, Value<int>? rowid}) {
+    return TripParticipantsCompanion(
+      tripId: tripId ?? this.tripId,
+      userId: userId ?? this.userId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tripId.present) {
+      map['trip_id'] = Variable<String>(tripId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TripParticipantsCompanion(')
+          ..write('tripId: $tripId, ')
+          ..write('userId: $userId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $TripsTable trips = $TripsTable(this);
   late final $EntriesTable entries = $EntriesTable(this);
   late final $UsersTable users = $UsersTable(this);
+  late final $TripParticipantsTable tripParticipants =
+      $TripParticipantsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [trips, entries, users];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [trips, entries, users, tripParticipants];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
         [
@@ -1399,6 +1600,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
                 limitUpdateKind: UpdateKind.delete),
             result: [
               TableUpdate('entries', kind: UpdateKind.delete),
+            ],
+          ),
+          WritePropagation(
+            on: TableUpdateQuery.onTableName('trips',
+                limitUpdateKind: UpdateKind.delete),
+            result: [
+              TableUpdate('trip_participants', kind: UpdateKind.delete),
+            ],
+          ),
+          WritePropagation(
+            on: TableUpdateQuery.onTableName('users',
+                limitUpdateKind: UpdateKind.delete),
+            result: [
+              TableUpdate('trip_participants', kind: UpdateKind.delete),
             ],
           ),
         ],
@@ -1442,6 +1657,23 @@ final class $$TripsTableReferences
         .filter((f) => f.tripId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_entriesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$TripParticipantsTable, List<DbTripParticipant>>
+      _tripParticipantsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.tripParticipants,
+              aliasName: $_aliasNameGenerator(
+                  db.trips.id, db.tripParticipants.tripId));
+
+  $$TripParticipantsTableProcessedTableManager get tripParticipantsRefs {
+    final manager =
+        $$TripParticipantsTableTableManager($_db, $_db.tripParticipants)
+            .filter((f) => f.tripId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_tripParticipantsRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -1492,6 +1724,27 @@ class $$TripsTableFilterComposer extends Composer<_$AppDatabase, $TripsTable> {
             $$EntriesTableFilterComposer(
               $db: $db,
               $table: $db.entries,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> tripParticipantsRefs(
+      Expression<bool> Function($$TripParticipantsTableFilterComposer f) f) {
+    final $$TripParticipantsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tripParticipants,
+        getReferencedColumn: (t) => t.tripId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TripParticipantsTableFilterComposer(
+              $db: $db,
+              $table: $db.tripParticipants,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1588,6 +1841,27 @@ class $$TripsTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> tripParticipantsRefs<T extends Object>(
+      Expression<T> Function($$TripParticipantsTableAnnotationComposer a) f) {
+    final $$TripParticipantsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tripParticipants,
+        getReferencedColumn: (t) => t.tripId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TripParticipantsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.tripParticipants,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$TripsTableTableManager extends RootTableManager<
@@ -1601,7 +1875,7 @@ class $$TripsTableTableManager extends RootTableManager<
     $$TripsTableUpdateCompanionBuilder,
     (DbTrip, $$TripsTableReferences),
     DbTrip,
-    PrefetchHooks Function({bool entriesRefs})> {
+    PrefetchHooks Function({bool entriesRefs, bool tripParticipantsRefs})> {
   $$TripsTableTableManager(_$AppDatabase db, $TripsTable table)
       : super(TableManagerState(
           db: db,
@@ -1660,10 +1934,14 @@ class $$TripsTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$TripsTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({entriesRefs = false}) {
+          prefetchHooksCallback: (
+              {entriesRefs = false, tripParticipantsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (entriesRefs) db.entries],
+              explicitlyWatchedTables: [
+                if (entriesRefs) db.entries,
+                if (tripParticipantsRefs) db.tripParticipants
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -1674,6 +1952,19 @@ class $$TripsTableTableManager extends RootTableManager<
                             $$TripsTableReferences._entriesRefsTable(db),
                         managerFromTypedResult: (p0) =>
                             $$TripsTableReferences(db, table, p0).entriesRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.tripId == item.id),
+                        typedResults: items),
+                  if (tripParticipantsRefs)
+                    await $_getPrefetchedData<DbTrip, $TripsTable,
+                            DbTripParticipant>(
+                        currentTable: table,
+                        referencedTable: $$TripsTableReferences
+                            ._tripParticipantsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$TripsTableReferences(db, table, p0)
+                                .tripParticipantsRefs,
                         referencedItemsForCurrentItem: (item,
                                 referencedItems) =>
                             referencedItems.where((e) => e.tripId == item.id),
@@ -1696,7 +1987,7 @@ typedef $$TripsTableProcessedTableManager = ProcessedTableManager<
     $$TripsTableUpdateCompanionBuilder,
     (DbTrip, $$TripsTableReferences),
     DbTrip,
-    PrefetchHooks Function({bool entriesRefs})>;
+    PrefetchHooks Function({bool entriesRefs, bool tripParticipantsRefs})>;
 typedef $$EntriesTableCreateCompanionBuilder = EntriesCompanion Function({
   required String id,
   required String tripId,
@@ -2068,6 +2359,28 @@ typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<int> rowid,
 });
 
+final class $$UsersTableReferences
+    extends BaseReferences<_$AppDatabase, $UsersTable, DbUser> {
+  $$UsersTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TripParticipantsTable, List<DbTripParticipant>>
+      _tripParticipantsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.tripParticipants,
+              aliasName: $_aliasNameGenerator(
+                  db.users.id, db.tripParticipants.userId));
+
+  $$TripParticipantsTableProcessedTableManager get tripParticipantsRefs {
+    final manager =
+        $$TripParticipantsTableTableManager($_db, $_db.tripParticipants)
+            .filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_tripParticipantsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
   $$UsersTableFilterComposer({
     required super.$db,
@@ -2099,6 +2412,27 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> tripParticipantsRefs(
+      Expression<bool> Function($$TripParticipantsTableFilterComposer f) f) {
+    final $$TripParticipantsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tripParticipants,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TripParticipantsTableFilterComposer(
+              $db: $db,
+              $table: $db.tripParticipants,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$UsersTableOrderingComposer
@@ -2169,6 +2503,27 @@ class $$UsersTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  Expression<T> tripParticipantsRefs<T extends Object>(
+      Expression<T> Function($$TripParticipantsTableAnnotationComposer a) f) {
+    final $$TripParticipantsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tripParticipants,
+        getReferencedColumn: (t) => t.userId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TripParticipantsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.tripParticipants,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$UsersTableTableManager extends RootTableManager<
@@ -2180,9 +2535,9 @@ class $$UsersTableTableManager extends RootTableManager<
     $$UsersTableAnnotationComposer,
     $$UsersTableCreateCompanionBuilder,
     $$UsersTableUpdateCompanionBuilder,
-    (DbUser, BaseReferences<_$AppDatabase, $UsersTable, DbUser>),
+    (DbUser, $$UsersTableReferences),
     DbUser,
-    PrefetchHooks Function()> {
+    PrefetchHooks Function({bool tripParticipantsRefs})> {
   $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
       : super(TableManagerState(
           db: db,
@@ -2238,9 +2593,35 @@ class $$UsersTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) =>
+                  (e.readTable(table), $$UsersTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({tripParticipantsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (tripParticipantsRefs) db.tripParticipants
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (tripParticipantsRefs)
+                    await $_getPrefetchedData<DbUser, $UsersTable,
+                            DbTripParticipant>(
+                        currentTable: table,
+                        referencedTable: $$UsersTableReferences
+                            ._tripParticipantsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$UsersTableReferences(db, table, p0)
+                                .tripParticipantsRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.userId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
@@ -2253,9 +2634,315 @@ typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
     $$UsersTableAnnotationComposer,
     $$UsersTableCreateCompanionBuilder,
     $$UsersTableUpdateCompanionBuilder,
-    (DbUser, BaseReferences<_$AppDatabase, $UsersTable, DbUser>),
+    (DbUser, $$UsersTableReferences),
     DbUser,
-    PrefetchHooks Function()>;
+    PrefetchHooks Function({bool tripParticipantsRefs})>;
+typedef $$TripParticipantsTableCreateCompanionBuilder
+    = TripParticipantsCompanion Function({
+  required String tripId,
+  required String userId,
+  Value<int> rowid,
+});
+typedef $$TripParticipantsTableUpdateCompanionBuilder
+    = TripParticipantsCompanion Function({
+  Value<String> tripId,
+  Value<String> userId,
+  Value<int> rowid,
+});
+
+final class $$TripParticipantsTableReferences extends BaseReferences<
+    _$AppDatabase, $TripParticipantsTable, DbTripParticipant> {
+  $$TripParticipantsTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $TripsTable _tripIdTable(_$AppDatabase db) => db.trips.createAlias(
+      $_aliasNameGenerator(db.tripParticipants.tripId, db.trips.id));
+
+  $$TripsTableProcessedTableManager get tripId {
+    final $_column = $_itemColumn<String>('trip_id')!;
+
+    final manager = $$TripsTableTableManager($_db, $_db.trips)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tripIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $UsersTable _userIdTable(_$AppDatabase db) => db.users.createAlias(
+      $_aliasNameGenerator(db.tripParticipants.userId, db.users.id));
+
+  $$UsersTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<String>('user_id')!;
+
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$TripParticipantsTableFilterComposer
+    extends Composer<_$AppDatabase, $TripParticipantsTable> {
+  $$TripParticipantsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$TripsTableFilterComposer get tripId {
+    final $$TripsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tripId,
+        referencedTable: $db.trips,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TripsTableFilterComposer(
+              $db: $db,
+              $table: $db.trips,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$UsersTableFilterComposer get userId {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TripParticipantsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TripParticipantsTable> {
+  $$TripParticipantsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$TripsTableOrderingComposer get tripId {
+    final $$TripsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tripId,
+        referencedTable: $db.trips,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TripsTableOrderingComposer(
+              $db: $db,
+              $table: $db.trips,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$UsersTableOrderingComposer get userId {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableOrderingComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TripParticipantsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TripParticipantsTable> {
+  $$TripParticipantsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$TripsTableAnnotationComposer get tripId {
+    final $$TripsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tripId,
+        referencedTable: $db.trips,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TripsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.trips,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$UsersTableAnnotationComposer get userId {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.userId,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TripParticipantsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $TripParticipantsTable,
+    DbTripParticipant,
+    $$TripParticipantsTableFilterComposer,
+    $$TripParticipantsTableOrderingComposer,
+    $$TripParticipantsTableAnnotationComposer,
+    $$TripParticipantsTableCreateCompanionBuilder,
+    $$TripParticipantsTableUpdateCompanionBuilder,
+    (DbTripParticipant, $$TripParticipantsTableReferences),
+    DbTripParticipant,
+    PrefetchHooks Function({bool tripId, bool userId})> {
+  $$TripParticipantsTableTableManager(
+      _$AppDatabase db, $TripParticipantsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TripParticipantsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TripParticipantsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TripParticipantsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> tripId = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TripParticipantsCompanion(
+            tripId: tripId,
+            userId: userId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String tripId,
+            required String userId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TripParticipantsCompanion.insert(
+            tripId: tripId,
+            userId: userId,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$TripParticipantsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({tripId = false, userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (tripId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.tripId,
+                    referencedTable:
+                        $$TripParticipantsTableReferences._tripIdTable(db),
+                    referencedColumn:
+                        $$TripParticipantsTableReferences._tripIdTable(db).id,
+                  ) as T;
+                }
+                if (userId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.userId,
+                    referencedTable:
+                        $$TripParticipantsTableReferences._userIdTable(db),
+                    referencedColumn:
+                        $$TripParticipantsTableReferences._userIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$TripParticipantsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $TripParticipantsTable,
+    DbTripParticipant,
+    $$TripParticipantsTableFilterComposer,
+    $$TripParticipantsTableOrderingComposer,
+    $$TripParticipantsTableAnnotationComposer,
+    $$TripParticipantsTableCreateCompanionBuilder,
+    $$TripParticipantsTableUpdateCompanionBuilder,
+    (DbTripParticipant, $$TripParticipantsTableReferences),
+    DbTripParticipant,
+    PrefetchHooks Function({bool tripId, bool userId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2266,4 +2953,6 @@ class $AppDatabaseManager {
       $$EntriesTableTableManager(_db, _db.entries);
   $$UsersTableTableManager get users =>
       $$UsersTableTableManager(_db, _db.users);
+  $$TripParticipantsTableTableManager get tripParticipants =>
+      $$TripParticipantsTableTableManager(_db, _db.tripParticipants);
 }

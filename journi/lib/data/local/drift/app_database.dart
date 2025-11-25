@@ -12,7 +12,7 @@ part 'app_database.g.dart';
 part 'converters.dart';
 part 'tables.dart';
 
-@DriftDatabase(tables: [Trips, Entries, Users])
+@DriftDatabase(tables: [Trips, Entries, Users, TripParticipants])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openLazy());
 
