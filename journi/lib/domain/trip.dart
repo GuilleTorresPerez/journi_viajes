@@ -22,6 +22,7 @@ class Trip {
   final DateTime? endDate;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final List<String> participantIds;
 
   const Trip({
     required this.id,
@@ -32,6 +33,7 @@ class Trip {
     this.endDate,
     required this.createdAt,
     required this.updatedAt,
+    this.participantIds = const [],
   });
 
   static Result<Trip> create({
@@ -43,6 +45,7 @@ class Trip {
     DateTime? endDate,
     required DateTime createdAt,
     required DateTime updatedAt,
+    List<String> participantIds = const [],
   }) {
     final errs = <ValidationError>[];
 
@@ -80,6 +83,7 @@ class Trip {
         endDate: eUtc,
         createdAt: createdAt.toUtc(),
         updatedAt: updatedAt.toUtc(),
+        participantIds: participantIds,
       ),
     );
   }
