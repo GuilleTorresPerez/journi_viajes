@@ -57,3 +57,18 @@ class Users extends Table {
   @override
   List<String> get customConstraints => ['UNIQUE(email)']; // email único
 }
+
+@DataClassName('DbTripParticipant')
+class TripParticipants extends Table {
+  // Clave foránea al Viaje. Si se borra el viaje, se borra la relación.
+  TextColumn get tripId =>
+      text().references(Trips, #id, onDelete: KeyAction.cascade)();
+
+  // Clave foránea al Usuario. Si se borra el usuario, se borra la relación.
+  TextColumn get userId =>
+      text().references(Users, #id, onDelete: KeyAction.cascade)();
+
+  // Clave primaria compuesta: evita duplicados (el mismo usuario en el mismo viaje 2 veces)
+  @override
+  Set<Column> get primaryKey => {tripId, userId};
+}
