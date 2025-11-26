@@ -148,102 +148,106 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Barra superior con JOURNI y X
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'JOURNI',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Barra superior con JOURNI y X
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'JOURNI',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-
-              const Text(
-                'Crear Usuario',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-              // Nombre
-              _buildInput(_nombreController, 'Nombre'),
-              const SizedBox(height: 16),
-
-              // Apellidos
-              _buildInput(_apellidosController, 'Apellidos'),
-              const SizedBox(height: 16),
-
-              // Correo electrónico
-              _buildInput(
-                _emailController,
-                'Correo electronico',
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-
-              // Contraseña
-              _buildInput(_passwordController, 'Contraseña', obscureText: true),
-
-              const SizedBox(height: 8),
-
-              // Texto "Ya tengo una cuenta creada" clicable
-              Center(
-                child: GestureDetector(
-                  onTap: _onYaTengoCuenta,
-                  child: const Text(
-                    'Ya tengo una cuenta creada',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                      decoration: TextDecoration.underline,
-                    ),
+                const Text(
+                  'Crear Usuario',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                const SizedBox(height: 40),
 
-              const Spacer(),
+                // Nombre
+                _buildInput(_nombreController, 'Nombre'),
+                const SizedBox(height: 16),
 
-              // Botón Guardar
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _onGuardar,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF4B54C), // naranja
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: const Text(
-                    'Guardar',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                // Apellidos
+                _buildInput(_apellidosController, 'Apellidos'),
+                const SizedBox(height: 16),
+
+                // Correo electrónico
+                _buildInput(
+                  _emailController,
+                  'Correo electronico',
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+
+                // Contraseña
+                _buildInput(_passwordController, 'Contraseña', obscureText: true),
+
+                const SizedBox(height: 8),
+
+                // Texto "Ya tengo una cuenta creada" clicable
+                Center(
+                  child: GestureDetector(
+                    onTap: _onYaTengoCuenta,
+                    child: const Text(
+                      'Ya tengo una cuenta creada',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
-            ],
+                SizedBox(height: 40),
+
+                // Botón Guardar
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _onGuardar,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF4B54C), // naranja
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text(
+                      'Guardar',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
