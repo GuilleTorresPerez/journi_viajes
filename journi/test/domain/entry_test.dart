@@ -90,22 +90,61 @@ void main() {
     });
   });
 
-  group('Entry.copyValidated', () {
-    test('actualiza texto y updatedAt', () {
+  group('Entry.copyValidated (Actualización Inmutable)', () {
+    late Entry originalEntry;
+
+    setUp(() {
       final now = DateTime.utc(2025, 1, 1, 12);
-      final res = Entry.create(
+      originalEntry = Entry.create(
         id: 'e1',
         tripId: 't1',
         type: EntryType.note,
-        text: 'hola',
+        text: 'Texto original',
         createdAt: now,
         updatedAt: now,
       ).asOk().value;
+    });
 
-      final copy = res.copyValidated(text: 'adiós').asOk().value;
-      expect(copy.text, 'adiós');
-      expect(copy.updatedAt.isAfter(res.updatedAt), isTrue);
-      expect(copy.createdAt, res.createdAt);
+    test('Éxito: actualiza texto y actualiza updatedAt automáticamente', () {
+      final copyRes = originalEntry.copyValidated(text: 'Texto nuevo');
+
+      expect(copyRes.isOk, isTrue);
+      final copy = copyRes.asOk().value;
+
+      expect(copy.text, 'Texto nuevo');
+      expect(copy.id, originalEntry.id); // ID no cambia
+      expect(copy.createdAt, originalEntry.createdAt); // CreatedAt no cambia
+      expect(copy.updatedAt.isAfter(originalEntry.updatedAt),
+          isTrue); // UpdatedAt cambia
+    });
+
+    test('Éxito: actualiza ubicación y mantiene otros campos', () {
+      const newLoc = EntryLocation(lat: 40.0, lon: -3.0);
+      final copyRes = originalEntry.copyValidated(location: newLoc);
+
+      expect(copyRes.isOk, isTrue);
+      final copy = copyRes.asOk().value;
+
+      expect(copy.location!.lat, 40.0);
+      expect(copy.text, 'Texto original'); // El texto se mantiene
+    });
+
+    test('Fallo: validación impide dejar NOTE sin texto al actualizar', () {
+      // Intentamos actualizar con texto vacío
+      final copyRes = originalEntry.copyValidated(text: '   ');
+
+      expect(copyRes.isErr, isTrue);
+      expect(
+        copyRes.asErr().errors.first.toString(),
+        contains('texto'),
+      );
+    });
+
+    test('Fallo: validación impide coordenadas inválidas al actualizar', () {
+      final copyRes = originalEntry.copyValidated(
+        location: const EntryLocation(lat: 100, lon: 0), // Latitud inválida
+      );
+      expect(copyRes.isErr, isTrue);
     });
   });
 }
