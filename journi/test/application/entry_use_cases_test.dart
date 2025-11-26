@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/application/use_cases/entry_use_cases.dart';
+import 'package:journi/application/shared/result.dart';
 
 Entry _mk({
   required String id,
@@ -47,6 +48,71 @@ void main() {
       expect(res.isErr, isTrue);
       final stored = await repo.findById('e1');
       expect(stored.asOk().value, isNull);
+    });
+  });
+
+  group('UpdateEntryUseCase', () {
+    late InMemoryEntryRepository repo;
+    late UpdateEntryUseCase updateUC;
+
+    setUp(() {
+      repo = InMemoryEntryRepository();
+      updateUC = UpdateEntryUseCase(repo);
+    });
+
+    test('Actualiza correctamente una entrada existente', () async {
+      // 1. Arrange: Insertar entrada inicial
+      await repo.upsert(_mk(id: 'e1', trip: 't1', ts: DateTime.utc(2025)));
+
+      // 2. Act: Ejecutar comando de actualización
+      final cmd = UpdateEntryCommand(
+        id: 'e1',
+        text: 'Texto Actualizado',
+        tags: ['editado'],
+      );
+      final res = await updateUC(cmd);
+
+      // 3. Assert: Resultado exitoso y persistencia verificada
+      expect(res.isOk, isTrue);
+
+      final savedRes = await repo.findById('e1');
+      final savedEntry = savedRes.asOk().value!;
+
+      expect(savedEntry.text, 'Texto Actualizado');
+      expect(savedEntry.tags, contains('editado'));
+      expect(savedEntry.tripId, 't1'); // No debe cambiar
+    });
+
+    test('Retorna Error si la entrada NO existe (ID incorrecto)', () async {
+      final cmd = UpdateEntryCommand(
+        id: 'ghost_id',
+        text: 'No existo',
+      );
+      final res = await updateUC(cmd);
+
+      expect(res.isErr, isTrue);
+      // Verificamos que sea un error de repositorio o lógica, no excepción
+      expect(res.asErr().errors.first, isA<AppError>());
+    });
+
+    test('Retorna Error si la validación de dominio falla durante el update',
+        () async {
+      // Arrange
+      await repo.upsert(_mk(id: 'e1', trip: 't1', ts: DateTime.utc(2025)));
+
+      // Act: Intentar borrar el texto de una Nota (lo cual es ilegal en el dominio)
+      final cmd = UpdateEntryCommand(
+        id: 'e1',
+        text: '', // Texto vacío inválido
+      );
+      final res = await updateUC(cmd);
+
+      // Assert
+      expect(res.isErr, isTrue);
+
+      // Verificar que en base de datos NO cambió
+      final saved = (await repo.findById('e1')).asOk().value!;
+      expect(saved.text, 'text'); // Se mantiene el valor original
     });
   });
 
