@@ -51,7 +51,8 @@ void main() {
             tripService: tripService,
             entryService: entryService,
             userRepo: userRepo,
-            userService: userService, currentUser: _currentUser,
+            userService: userService,
+            currentUser: _currentUser,
           ),
         ),
       );
@@ -93,7 +94,8 @@ void main() {
           tripService: tripService,
           entryService: entryService,
           userRepo: userRepo,
-          userService: userService, currentUser: _currentUser,
+          userService: userService,
+          currentUser: _currentUser,
         ),
       ),
     );
@@ -158,7 +160,8 @@ void main() {
           tripService: tripService,
           entryService: entryService,
           userRepo: userRepo,
-          userService: userService, currentUser: _currentUser,
+          userService: userService,
+          currentUser: _currentUser,
         ),
       ),
     );
@@ -214,7 +217,8 @@ void main() {
           tripService: tripService,
           entryService: entryService,
           userRepo: userRepo,
-          userService: userService, currentUser: _currentUser,
+          userService: userService,
+          currentUser: _currentUser,
         ),
       ),
     );

@@ -201,7 +201,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
 
                 // Contraseña
-                _buildInput(_passwordController, 'Contraseña', obscureText: true),
+                _buildInput(_passwordController, 'Contraseña',
+                    obscureText: true),
 
                 const SizedBox(height: 8),
 

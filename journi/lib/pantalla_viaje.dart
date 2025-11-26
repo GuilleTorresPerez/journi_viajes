@@ -39,21 +39,20 @@ class Pantalla_Viaje extends StatefulWidget {
   final UserService userService;
   User? currentUser;
 
-  Pantalla_Viaje({
-    super.key,
-    required this.selectedIndex,
-    required this.sesionIniciada,
-    required this.viajes,
-    required this.num_viaje,
-    required this.repo,
-    required this.entryRepo,
-    required this.tripService,
-    required this.entryService,
-    this.picker,
-    required this.userRepo,
-    required this.userService,
-    required this.currentUser
-  });
+  Pantalla_Viaje(
+      {super.key,
+      required this.selectedIndex,
+      required this.sesionIniciada,
+      required this.viajes,
+      required this.num_viaje,
+      required this.repo,
+      required this.entryRepo,
+      required this.tripService,
+      required this.entryService,
+      this.picker,
+      required this.userRepo,
+      required this.userService,
+      required this.currentUser});
 
   @override
   _PantallaViajeState createState() => _PantallaViajeState();
