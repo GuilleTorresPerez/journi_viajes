@@ -21,15 +21,13 @@ import 'map_screen.dart';
 //import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
-import 'mi_perfil.dart';
-
 class Pantalla_Viaje extends StatefulWidget {
   final int
       selectedIndex; // primer item de la bottom navigation bar seleccionado por defecto
   final List<Trip> viajes;
   final int num_viaje;
   final ImagePicker? picker;
-  final bool sesionIniciada;
+  final bool inicionSesiada;
   // 👉 Puerto (interfaz) en lugar del repo in-memory
   final TripRepository repo;
   final EntryRepository entryRepo;
@@ -37,12 +35,11 @@ class Pantalla_Viaje extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
-  User? currentUser;
 
   Pantalla_Viaje({
     super.key,
     required this.selectedIndex,
-    required this.sesionIniciada,
+    required this.inicionSesiada,
     required this.viajes,
     required this.num_viaje,
     required this.repo,
@@ -52,7 +49,7 @@ class Pantalla_Viaje extends StatefulWidget {
     this.picker,
     required this.userRepo,
     required this.userService,
-    required this.currentUser
+    User? currentUser,
   });
 
   @override
@@ -298,7 +295,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => Editar_viaje(
                     selectedIndex: 2,
                     viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
+                    sesionIniciada: widget.inicionSesiada,
                     num_viaje: widget.num_viaje,
                     repo: widget.repo,
                     entryRepo: widget.entryRepo,
@@ -665,7 +662,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],
         onTap: (int inIndex) {
-          setState(() async {
+          setState(() {
             _selectedIndex = inIndex;
             if (_selectedIndex == 0) {
               // ✅ Volver a la home existente
@@ -678,7 +675,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => MapaPaisScreen(
                     selectedIndex: widget.selectedIndex,
                     viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
+                    sesionIniciada: widget.inicionSesiada,
                     tripRepo: widget.repo,
                     entryRepo: widget.entryRepo,
                     tripService: widget.tripService,
@@ -695,7 +692,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   builder: (context) => Crear_Viaje(
                     selectedIndex: widget.selectedIndex,
                     viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
+                    sesionIniciada: widget.inicionSesiada,
                     num_viaje: -1,
                     repo: widget.repo,
                     entryRepo: widget.entryRepo,
@@ -706,71 +703,25 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 ),
               );
-            } else if (_selectedIndex == 4) {
-              // Perfil
-              if (widget.sesionIniciada && widget.currentUser != null) {
-                // Ya tenía sesión -> ir directo a MiPerfil
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MiPerfil(
-                      selectedIndex: _selectedIndex,
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.repo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
-                      currentUser: widget.currentUser!, //loggedUser
-                    ),
+            } else if (widget.selectedIndex == 4) {
+              inIndex = 0;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
+                  builder: (context) => LoginScreen(
+                    selectedIndex: 0,
+                    sesionIniciada: widget.inicionSesiada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
                   ),
-                );
-              } else {
-                // No hay sesión -> ir a Login y esperar resultado
-                final loggedUser = await Navigator.push<User?>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      selectedIndex: _selectedIndex,
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.repo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
-                    ),
-                  ),
-                );
-
-                if (loggedUser != null && mounted) {
-                  setState(() {
-                    widget.currentUser = loggedUser;
-                  });
-
-                  // Una vez logueado, lo llevamos al perfil
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MiPerfil(
-                        selectedIndex: _selectedIndex,
-                        sesionIniciada: true,
-                        viajes: widget.viajes,
-                        tripRepo: widget.repo,
-                        entryRepo: widget.entryRepo,
-                        tripService: widget.tripService,
-                        entryService: widget.entryService,
-                        userRepo: widget.userRepo,
-                        userService: widget.userService,
-                        currentUser: loggedUser,
-                      ),
-                    ),
-                  );
-                }
-              }
+                ),
+              );
             }
           });
         },

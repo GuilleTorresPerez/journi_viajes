@@ -96,7 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Bienvenido, ${user.name}')));
 
-
       // 👇 Devolvemos el usuario a la pantalla anterior (MyHomePage)
       Navigator.pop<User>(context, user);
     } else {
