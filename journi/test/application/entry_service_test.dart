@@ -5,11 +5,12 @@ import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/domain/entry.dart';
 
 void main() {
-  test('EntryService crea y lista por trip', () async {
+  test('EntryService crea, actualiza y lista', () async {
     final repo = InMemoryEntryRepository();
-    final svc = makeEntryService(repo);
+    final svc = makeEntryService(repo); // Usa la fábrica por defecto
 
-    final r = await svc.create(
+    // 1. Crear
+    final rCreate = await svc.create(
       const CreateEntryCommand(
         id: 'e1',
         tripId: 't1',
@@ -17,11 +18,21 @@ void main() {
         text: 'hola',
       ),
     );
-    expect(r.isOk, isTrue);
+    expect(rCreate.isOk, isTrue);
 
+    // 2. Actualizar (Prueba de integración del servicio con el nuevo caso de uso)
+    final rUpdate = await svc.update(
+      const UpdateEntryCommand(
+        id: 'e1',
+        text: 'hola editado',
+      ),
+    );
+    expect(rUpdate.isOk, isTrue);
+    expect(rUpdate.asOk().value.text, 'hola editado');
+
+    // 3. Verificar listado
     final listed = await svc.listByTrip('t1');
-    expect(listed.asOk().value.length, 1);
-    expect(listed.asOk().value.first.id, 'e1');
+    expect(listed.asOk().value.first.text, 'hola editado');
   });
 
   test('EntryService.watchByTrip emite inicial y cambios', () async {
