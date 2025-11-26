@@ -11,6 +11,7 @@ import 'package:journi/data/memory/in_memory_trip_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 import 'package:journi/domain/trip.dart';
+import 'package:journi/domain/user.dart';
 import 'package:journi/pantalla_viaje.dart';
 import 'fake_geocoding_repository.dart';
 
@@ -26,6 +27,7 @@ void main() {
       final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
       final entryService = makeEntryService(entryRepo);
       final userService = makeUserService(userRepo);
+      User? _currentUser; // 👈 NUEVO
 
       final trip = Trip(
         id: '1',
@@ -41,7 +43,7 @@ void main() {
         MaterialApp(
           home: Pantalla_Viaje(
             selectedIndex: 0,
-            inicionSesiada: false,
+            sesionIniciada: false,
             viajes: [trip],
             num_viaje: 0,
             repo: tripRepo,
@@ -49,7 +51,7 @@ void main() {
             tripService: tripService,
             entryService: entryService,
             userRepo: userRepo,
-            userService: userService,
+            userService: userService, currentUser: _currentUser,
           ),
         ),
       );
@@ -67,6 +69,7 @@ void main() {
     final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
+    User? _currentUser; // 👈 NUEVO
 
     final trip = Trip(
       id: '1',
@@ -82,7 +85,7 @@ void main() {
       MaterialApp(
         home: Pantalla_Viaje(
           selectedIndex: 0,
-          inicionSesiada: false,
+          sesionIniciada: false,
           viajes: [trip],
           num_viaje: 0,
           repo: tripRepo,
@@ -90,7 +93,7 @@ void main() {
           tripService: tripService,
           entryService: entryService,
           userRepo: userRepo,
-          userService: userService,
+          userService: userService, currentUser: _currentUser,
         ),
       ),
     );
@@ -108,6 +111,7 @@ void main() {
     final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
+    User? _currentUser; // 👈 NUEVO
 
     final trip = Trip(
       id: '1',
@@ -146,7 +150,7 @@ void main() {
       MaterialApp(
         home: Pantalla_Viaje(
           selectedIndex: 0,
-          inicionSesiada: false,
+          sesionIniciada: false,
           viajes: [trip],
           num_viaje: 0,
           repo: tripRepo,
@@ -154,7 +158,7 @@ void main() {
           tripService: tripService,
           entryService: entryService,
           userRepo: userRepo,
-          userService: userService,
+          userService: userService, currentUser: _currentUser,
         ),
       ),
     );
@@ -175,6 +179,7 @@ void main() {
     final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
+    User? _currentUser; // 👈 NUEVO
 
     final trip = Trip(
       id: '1',
@@ -201,7 +206,7 @@ void main() {
       MaterialApp(
         home: Pantalla_Viaje(
           selectedIndex: 0,
-          inicionSesiada: false,
+          sesionIniciada: false,
           viajes: [trip],
           num_viaje: 0,
           repo: tripRepo,
@@ -209,7 +214,7 @@ void main() {
           tripService: tripService,
           entryService: entryService,
           userRepo: userRepo,
-          userService: userService,
+          userService: userService, currentUser: _currentUser,
         ),
       ),
     );
