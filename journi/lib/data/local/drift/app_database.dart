@@ -19,7 +19,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 3; // ⬆️ bump a v3
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -29,10 +29,12 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(users);
           }
           if (from < 3) {
-            // añadimos columnas de password
             await m.addColumn(users, users.passwordHash);
             await m.addColumn(users, users.passwordSalt);
           }
+        },
+        beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
         },
       );
 }
