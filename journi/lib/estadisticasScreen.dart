@@ -58,7 +58,6 @@ class _EstadisticasState extends State<EstadisticasScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // Mensaje dinámico de países visitados
             Builder(
               builder: (_) {
@@ -69,7 +68,8 @@ class _EstadisticasState extends State<EstadisticasScreen> {
 
                 return Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.teal[100],
                       borderRadius: BorderRadius.circular(16),
@@ -140,14 +140,9 @@ class _EstadisticasState extends State<EstadisticasScreen> {
             ),
 
             const SizedBox(height: 30),
-
-
-
           ],
-
         ),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.selectedIndex,
         backgroundColor: const Color(0xFFEDE5D0),
@@ -170,7 +165,8 @@ class _EstadisticasState extends State<EstadisticasScreen> {
 
           if (index == 0) {
             Navigator.pop(context);
-          } if (index == 2) {
+          }
+          if (index == 2) {
             // Nuevo viaje
             Navigator.push(
               context,
@@ -231,8 +227,8 @@ class _EstadisticasState extends State<EstadisticasScreen> {
       ),
     );
   }
-
 }
+
 Widget _buildChartCard({required String title, required Widget chart}) {
   return Container(
     padding: const EdgeInsets.all(16),
@@ -352,8 +348,6 @@ Widget _buildBarChart({required List<Trip> viajes}) {
   );
 }
 
-
-
 Widget _buildPieChart({required List<Trip> viajes}) {
   if (viajes.isEmpty) {
     return const Center(
@@ -370,13 +364,12 @@ Widget _buildPieChart({required List<Trip> viajes}) {
     // Si falta alguna fecha, ignoramos ese viaje
     if (trip.startDate == null || trip.endDate == null) continue;
 
-    final int days =
-        trip.endDate!.difference(trip.startDate!).inDays + 1;
+    final int days = trip.endDate!.difference(trip.startDate!).inDays + 1;
 
     secciones.add(
       PieChartSectionData(
-        value: days.toDouble(),      // tamaño según duración
-        title: trip.title,          // nombre del viaje
+        value: days.toDouble(), // tamaño según duración
+        title: trip.title, // nombre del viaje
         radius: 45,
         titleStyle: const TextStyle(
           fontSize: 11,
@@ -395,6 +388,3 @@ Widget _buildPieChart({required List<Trip> viajes}) {
     ),
   );
 }
-
-
-
