@@ -14,6 +14,7 @@ import 'package:journi/application/user_service.dart';
 import 'domain/trip.dart';
 import 'domain/user.dart';
 import 'application/trip_service.dart';
+import 'estadisticasScreen.dart';
 import 'map_screen.dart';
 import 'mockImagePicker.dart';
 
@@ -345,6 +346,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                ),
+              ),
+            );
+          } else if (index == 3) {
+            // Estadisticas
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EstadisticasScreen(
+                  selectedIndex: index,
+                  sesionIniciada: _sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: _currentUser!,
                 ),
               ),
             );
