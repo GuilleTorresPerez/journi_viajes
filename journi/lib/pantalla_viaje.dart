@@ -263,7 +263,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           final email = emailCtrl.text.trim();
                           if (email.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Introduce un correo válido')),
+                              const SnackBar(
+                                  content: Text('Introduce un correo válido')),
                             );
                             return;
                           }
@@ -271,7 +272,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           Navigator.pop(context); // cerrar diálogo
 
                           final currentTrip = widget.viajes[widget.num_viaje];
-                          final result = await widget.tripService.shareTrip(currentTrip.id, email);
+                          final result = await widget.tripService
+                              .shareTrip(currentTrip.id, email);
 
                           if (result is Ok<Unit>) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -280,10 +282,12 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                               ),
                             );
                           } else if (result is Err<Unit>) {
-                            final errorMsg = result.errors.map((e) => e.message).join(', ');
+                            final errorMsg =
+                                result.errors.map((e) => e.message).join(', ');
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("Error al enviar invitación: $errorMsg"),
+                                content: Text(
+                                    "Error al enviar invitación: $errorMsg"),
                               ),
                             );
                           }
@@ -296,7 +300,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
               );
             },
           ),
-
 
           // EDITAR
           IconButton(
