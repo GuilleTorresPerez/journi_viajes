@@ -235,56 +235,68 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
             icon: const Icon(Icons.share, color: Colors.black),
             tooltip: 'Compartir viaje',
             onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (context) {
-                  TextEditingController emailCtrl = TextEditingController();
+              TextEditingController emailCtrl = TextEditingController();
 
-                  return Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          "Compartir viaje",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: emailCtrl,
-                          decoration: const InputDecoration(
-                            labelText: 'Correo de la persona',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.send),
-                          label: const Text("Enviar invitación"),
-                          onPressed: () {
-                            Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text(
+                      "Compartir viaje",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: TextField(
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Correo de la persona',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final email = emailCtrl.text.trim();
+                          if (email.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Introduce un correo válido')),
+                            );
+                            return;
+                          }
+
+                          Navigator.pop(context); // cerrar diálogo
+
+                          final currentTrip = widget.viajes[widget.num_viaje];
+                          final result = await widget.tripService.shareTrip(currentTrip.id, email);
+
+                          if (result is Ok<Unit>) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(
-                                  "Invitación enviada a ${emailCtrl.text}",
-                                ),
+                                content: Text("Invitación enviada a $email"),
                               ),
                             );
-                          },
-                        ),
-                      ],
-                    ),
+                          } else if (result is Err<Unit>) {
+                            final errorMsg = result.errors.map((e) => e.message).join(', ');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Error al enviar invitación: $errorMsg"),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text("Enviar"),
+                      ),
+                    ],
                   );
                 },
               );
             },
           ),
+
 
           // EDITAR
           IconButton(
