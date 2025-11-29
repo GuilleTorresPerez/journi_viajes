@@ -18,4 +18,7 @@ abstract class TripRepository {
 
   /// Elimina por id.
   Future<Result<Unit>> deleteById(String id); // <- Unit unificado
+
+  /// Añade un participante al viaje.
+  Future<Result<Unit>> addParticipant(String tripId, String userId);
 }

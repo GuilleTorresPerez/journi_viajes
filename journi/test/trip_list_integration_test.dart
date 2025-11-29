@@ -1,3 +1,4 @@
+import 'package:drift/native.dart'; // 👈 Importante para NativeDatabase
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/entry_service.dart';
@@ -18,16 +19,30 @@ void main() {
     late InMemoryEntryRepository entryRepo;
     late DefaultTripService tripService;
     late DefaultEntryService entryService;
-    final db = AppDatabase();
-    final userRepo = DriftUserRepository(db);
-    final userService = makeUserService(userRepo);
+
+    // Usamos late para inicializar en setUp
+    late AppDatabase db;
+    late DriftUserRepository userRepo;
+    late DefaultUserService userService;
 
     setUp(() {
+      // 1. Base de datos en memoria (limpia para cada test)
+      db = AppDatabase.forTesting(NativeDatabase.memory());
+      userRepo = DriftUserRepository(db);
+      userService = makeUserService(userRepo);
+
       tripRepo = InMemoryTripRepository();
       entryRepo = InMemoryEntryRepository();
       final geoRepo = FakeGeocodingRepository();
-      tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+
+      // 2. CORRECCIÓN: Pasamos userRepo como 4º argumento
+      tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
+
       entryService = DefaultEntryService(repo: entryRepo);
+    });
+
+    tearDown(() async {
+      await db.close(); // Limpiamos recursos
     });
 
     testWidgets('✅ Viaje listado correctamente', (WidgetTester tester) async {
@@ -36,7 +51,7 @@ void main() {
           home: MyHomePage(
             title: 'JOURNI',
             sesionIniciada: false,
-            viajes: [],
+            viajes: const [],
             tripService: tripService,
             entryService: entryService,
             tripRepo: tripRepo,
@@ -47,44 +62,36 @@ void main() {
         ),
       );
 
-      // Pulsa el BottomNavigationBarItem "Nuevo viaje"
+      // Pulsa "Nuevo viaje"
       await tester.tap(find.byKey(const Key('anadirButton')));
       await tester.pumpAndSettle();
 
-      // 🧩 Rellenar los campos
+      // Rellenar campos
       await tester.enterText(
-        find.byKey(const Key('tituloField')),
-        'Vacaciones 2025',
-      );
+          find.byKey(const Key('tituloField')), 'Vacaciones 2025');
       await tester.enterText(
-        find.byKey(const Key('fechaIniField')),
-        '01-01-2025',
-      );
+          find.byKey(const Key('fechaIniField')), '01-01-2025');
       await tester.enterText(
-        find.byKey(const Key('fechaFinField')),
-        '10-01-2025',
-      );
+          find.byKey(const Key('fechaFinField')), '10-01-2025');
 
       await tester.tap(find.byKey(const Key('guardarButton')));
-      await tester.pumpAndSettle(
-        const Duration(seconds: 1),
-      ); // Espera a que el SnackBar aparezca
+      await tester.pumpAndSettle(const Duration(seconds: 1));
 
-      // ✅ Verificar éxito
-      // Verifica que la pantalla principal está visible
+      // Verificar éxito
       expect(find.byType(MyHomePage), findsOneWidget);
+      // Nota: Asumimos que el ID generado es 'id0' por la lógica del InMemoryRepo
       expect(find.byKey(const Key('id0')), findsOneWidget);
     });
 
     testWidgets(
-      '❌ Error: El usuario ha cancelado la creacion, por lo que no se lista nada',
+      '❌ Error: El usuario ha cancelado la creacion',
       (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: MyHomePage(
               title: 'JOURNI',
               sesionIniciada: false,
-              viajes: [],
+              viajes: const [],
               tripService: tripService,
               entryService: entryService,
               tripRepo: tripRepo,
@@ -95,31 +102,14 @@ void main() {
           ),
         );
 
-        // Pulsa el BottomNavigationBarItem "Nuevo viaje"
         await tester.tap(find.byKey(const Key('anadirButton')));
         await tester.pumpAndSettle();
 
-        // 🧩 Rellenar los campos
         await tester.enterText(
-          find.byKey(const Key('tituloField')),
-          'Vacaciones 2025',
-        );
-        await tester.enterText(
-          find.byKey(const Key('fechaIniField')),
-          '01-01-2025',
-        );
-        await tester.enterText(
-          find.byKey(const Key('fechaFinField')),
-          '10-01-2025',
-        );
+            find.byKey(const Key('tituloField')), 'Vacaciones 2025');
+        await tester.tap(find.byTooltip('Back')); // Volver atrás
+        await tester.pumpAndSettle(const Duration(seconds: 1));
 
-        await tester.tap(find.byTooltip('Back'));
-        await tester.pumpAndSettle(
-          const Duration(seconds: 1),
-        ); // Espera a que el SnackBar aparezca
-
-        // ✅ Verificar éxito
-        // Verifica que la pantalla principal está visible
         expect(find.byType(MyHomePage), findsOneWidget);
         expect(find.byKey(const Key('id0')), findsNothing);
       },

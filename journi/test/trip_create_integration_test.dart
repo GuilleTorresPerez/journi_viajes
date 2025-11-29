@@ -1,3 +1,4 @@
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:journi/application/user_service.dart';
@@ -26,7 +27,7 @@ void main() {
     late DefaultEntryService entryService;
     late TripRepository tRepo;
     late EntryRepository eRepo;
-    final db = AppDatabase();
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
 
@@ -34,7 +35,12 @@ void main() {
       tripRepo = InMemoryTripRepository();
       entryRepo = InMemoryEntryRepository();
       final geoRepo = FakeGeocodingRepository();
-      tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+      tripService = makeTripService(
+        tripRepo,
+        userRepo,
+        entryRepo,
+        geoRepo,
+      );
       entryService = DefaultEntryService(repo: entryRepo);
       tRepo = DriftTripRepository(db);
       eRepo = DriftEntryRepository(db);

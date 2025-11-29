@@ -24,7 +24,8 @@ void main() {
       final entryRepo = InMemoryEntryRepository();
       final geoRepo = FakeGeocodingRepository();
       final UserRepository userRepo = DriftUserRepository(db);
-      final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+      final tripService =
+          makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
       final entryService = makeEntryService(entryRepo);
       final userService = makeUserService(userRepo);
       User? _currentUser; // 👈 NUEVO
@@ -66,9 +67,9 @@ void main() {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+    final userRepo = DriftUserRepository(db);
+    final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
-    final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
     User? _currentUser; // 👈 NUEVO
 
@@ -109,10 +110,10 @@ void main() {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
-    final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
+    final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
     final userService = makeUserService(userRepo);
+    final entryService = makeEntryService(entryRepo);
     User? _currentUser; // 👈 NUEVO
 
     final trip = Trip(
@@ -178,9 +179,9 @@ void main() {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
-    final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
+    final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
+    final entryService = makeEntryService(entryRepo);
     final userService = makeUserService(userRepo);
     User? _currentUser; // 👈 NUEVO
 
