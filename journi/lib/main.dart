@@ -136,7 +136,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  // 🔽 snapshot inicial para cuando el stream aún no ha emitido
+  // snapshot inicial para cuando el stream aún no ha emitido
   List<Trip>? _initialTrips;
 
   bool _sesionIniciada = false;
@@ -146,8 +146,50 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _sesionIniciada = widget.sesionIniciada;
+    _checkSession();
     _loadInitial();
   }
+
+  Future<void> _checkSession() async {
+
+    final user = await _currentUser;
+
+    if (!mounted) return;
+
+    if (user != null) {
+      setState(() {
+        _currentUser = user;
+        _sesionIniciada = true;
+      });
+
+    } else {
+      // Si no hay usuario, mostramos login
+      final loggedUser = await Navigator.push<User?>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LoginScreen(
+            selectedIndex: _selectedIndex,
+            sesionIniciada: _sesionIniciada,
+            viajes: widget.viajes,
+            tripRepo: widget.tripRepo,
+            entryRepo: widget.entryRepo,
+            tripService: widget.tripService,
+            entryService: widget.entryService,
+            userRepo: widget.userRepo,
+            userService: widget.userService,
+          ),
+        ),
+      );
+
+      if (loggedUser != null && mounted) {
+        setState(() {
+          _currentUser = loggedUser;
+          _sesionIniciada = true;
+        });
+      }
+    }
+  }
+
 
   Future<void> _loadInitial() async {
     final res = await widget.tripRepo.list();
