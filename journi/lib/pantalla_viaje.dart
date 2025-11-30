@@ -60,7 +60,6 @@ class Pantalla_Viaje extends StatefulWidget {
 }
 
 class _PantallaViajeState extends State<Pantalla_Viaje> {
-
   VideoPlayerController? _videoController;
 
   Future<void> _initVideo(File file) async {
@@ -540,15 +539,18 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           FutureBuilder(
                             future: _initVideo(file),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState != ConnectionState.done) {
+                              if (snapshot.connectionState !=
+                                  ConnectionState.done) {
                                 return const SizedBox(
                                   height: 200,
-                                  child: Center(child: CircularProgressIndicator()),
+                                  child: Center(
+                                      child: CircularProgressIndicator()),
                                 );
                               }
 
                               return AspectRatio(
-                                aspectRatio: _videoController!.value.aspectRatio,
+                                aspectRatio:
+                                    _videoController!.value.aspectRatio,
                                 child: VideoPlayer(_videoController!),
                               );
                             },
@@ -568,7 +570,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             onPressed: () async {
                               await widget.entryService.deleteById(e.id);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Video eliminado')),
+                                const SnackBar(
+                                    content: Text('Video eliminado')),
                               );
                             },
                           ),
@@ -576,7 +579,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       ),
                     );
                   }
-
 
                   return const SizedBox.shrink();
                 },
@@ -740,7 +742,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
         ],
         onTap: (int inIndex) {
           setState(() async {
-
             _selectedIndex = inIndex;
             if (_selectedIndex == 0) {
               // ✅ Volver a la home existente

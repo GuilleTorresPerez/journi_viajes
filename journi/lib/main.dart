@@ -151,7 +151,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _checkSession() async {
-
     final user = await _currentUser;
 
     if (!mounted) return;
@@ -161,7 +160,6 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentUser = user;
         _sesionIniciada = true;
       });
-
     } else {
       // Si no hay usuario, mostramos login
       final loggedUser = await Navigator.push<User?>(
@@ -189,7 +187,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
-
 
   Future<void> _loadInitial() async {
     final res = await widget.tripRepo.list();

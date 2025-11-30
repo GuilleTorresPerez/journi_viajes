@@ -224,8 +224,7 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                 ),
               ),
             );
-          }
-          else if (index == 4){
+          } else if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(

@@ -178,8 +178,7 @@ class _MiPerfilState extends State<MiPerfil> {
                 ),
               ),
             );
-          }
-          else if (index == 3){
+          } else if (index == 3) {
             Navigator.push(
               context,
               MaterialPageRoute(
