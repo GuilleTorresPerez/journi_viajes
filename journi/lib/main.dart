@@ -9,6 +9,7 @@ import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_entry_repository.dart';
 import 'package:journi/data/local/drift/drift_trip_repository.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
+import 'package:journi/searchTrip.dart';
 import 'application/entry_service.dart';
 import 'package:journi/application/user_service.dart';
 import 'domain/trip.dart';
@@ -242,6 +243,43 @@ class _MyHomePageState extends State<MyHomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.black),
+            onPressed: () async {
+              final items = widget.viajes;
+
+              final selectedTrip = await showSearch<Trip?>(
+                context: context,
+                delegate: SearchTripsDelegate(items),
+              );
+
+              // Opcional: si el usuario selecciona un viaje, lo abrimos
+              if (selectedTrip != null && mounted) {
+                final index = items.indexOf(selectedTrip);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => Pantalla_Viaje(
+                      selectedIndex: _selectedIndex,
+                      sesionIniciada: _sesionIniciada,
+                      viajes: items,
+                      num_viaje: index,
+                      repo: widget.tripRepo,
+                      entryRepo: widget.entryRepo,
+                      tripService: widget.tripService,
+                      entryService: widget.entryService,
+                      picker: widget.picker,
+                      userRepo: widget.userRepo,
+                      userService: widget.userService,
+                      currentUser: _currentUser,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<List<Trip>>(
         stream: widget.tripRepo.watchAll(),
