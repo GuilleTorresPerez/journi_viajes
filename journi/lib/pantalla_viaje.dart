@@ -11,6 +11,7 @@ import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/trip.dart' hide Ok;
 import 'package:journi/domain/user.dart';
+import 'package:video_player/video_player.dart';
 
 import 'application/shared/result.dart';
 import 'application/user_service.dart';
@@ -59,6 +60,15 @@ class Pantalla_Viaje extends StatefulWidget {
 }
 
 class _PantallaViajeState extends State<Pantalla_Viaje> {
+
+  VideoPlayerController? _videoController;
+
+  Future<void> _initVideo(File file) async {
+    _videoController?.dispose();
+    _videoController = VideoPlayerController.file(file);
+    await _videoController!.initialize();
+  }
+
   final ImagePicker _picker = ImagePicker();
   //final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
   final TextEditingController _textoController = TextEditingController();
@@ -518,6 +528,56 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     );
                   }
 
+                  // ---- VIDEO ----
+                  if (e.type == EntryType.video && e.mediaUri != null) {
+                    final file = File(e.mediaUri!);
+
+                    return Card(
+                      color: Colors.white,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        children: [
+                          FutureBuilder(
+                            future: _initVideo(file),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState != ConnectionState.done) {
+                                return const SizedBox(
+                                  height: 200,
+                                  child: Center(child: CircularProgressIndicator()),
+                                );
+                              }
+
+                              return AspectRatio(
+                                aspectRatio: _videoController!.value.aspectRatio,
+                                child: VideoPlayer(_videoController!),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.play_arrow),
+                            onPressed: () {
+                              setState(() {
+                                _videoController!.value.isPlaying
+                                    ? _videoController!.pause()
+                                    : _videoController!.play();
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              await widget.entryService.deleteById(e.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Video eliminado')),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+
                   return const SizedBox.shrink();
                 },
               );
@@ -680,6 +740,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
         ],
         onTap: (int inIndex) {
           setState(() async {
+
             _selectedIndex = inIndex;
             if (_selectedIndex == 0) {
               // ✅ Volver a la home existente
