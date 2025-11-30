@@ -85,8 +85,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
   Widget build(BuildContext context) {
     final currentTrip = widget.viajes[widget.num_viaje];
 
-
-
     return Scaffold(
       backgroundColor: Colors.teal[200],
       appBar: AppBar(
@@ -105,7 +103,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
             icon: const Icon(Icons.search, color: Colors.black),
             tooltip: 'Buscar',
             onPressed: () {
-              TextEditingController searchCtrl = TextEditingController(text: _searchQuery);
+              TextEditingController searchCtrl =
+                  TextEditingController(text: _searchQuery);
 
               showDialog(
                 context: context,
@@ -137,7 +136,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
               );
             },
           ),
-
 
           // COMPARTIR VIAJE
           IconButton(
@@ -313,186 +311,204 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
               if (_searchQuery.isNotEmpty) {
                 entries = entries.where((e) {
                   if (e.type == EntryType.note && e.text != null) {
-                    return e.text!.toLowerCase().contains(_searchQuery.toLowerCase());
+                    return e.text!
+                        .toLowerCase()
+                        .contains(_searchQuery.toLowerCase());
                   }
                   return false; // fotos y vídeos no se filtran
                 }).toList();
               }
 
-              return ListView.builder(
-                padding: const EdgeInsets.all(8),
-                itemCount: entries.length,
-                itemBuilder: (context, index) {
-                  final e = entries[index];
+              return Column(children: [
+                if (_searchQuery.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _searchQuery = "";
+                        });
+                      },
+                      child: const Text("Deshacer búsqueda"),
+                    ),
+                  ),
+                Expanded(
+                    child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: entries.length,
+                  itemBuilder: (context, index) {
+                    final e = entries[index];
 
-                  // ---- TEXTO ----
-                  if (e.type == EntryType.note && e.text != null) {
-                    final fecha = e.createdAt.toLocal();
-                    final fechaFormateada =
-                        "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
-                        "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
+                    // ---- TEXTO ----
+                    if (e.type == EntryType.note && e.text != null) {
+                      final fecha = e.createdAt.toLocal();
+                      final fechaFormateada =
+                          "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
+                          "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
 
-                    return Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        leading: const Icon(Icons.notes, color: Colors.teal),
-                        title: Text(e.text!),
-                        subtitle: Text('Añadido el $fechaFormateada'),
-                        trailing: IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () async {
-                            await widget.entryService.deleteById(e.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Texto eliminado')),
-                            );
-                          },
+                      return Card(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                    );
-                  }
-
-                  // ---- FOTO ----
-                  if (e.type == EntryType.photo && e.mediaUri != null) {
-                    final file = File(e.mediaUri!);
-                    final fecha = e.createdAt.toLocal();
-                    final fechaFormateada =
-                        "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
-                        "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
-
-                    return Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        children: [
-                          Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: InteractiveViewer(
-                                          panEnabled: true,
-                                          child: Image.file(
-                                            file,
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(15),
-                                  ),
-                                  child: Image.file(
-                                    file,
-                                    height: 200,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  await widget.entryService.deleteById(e.id);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Foto eliminada'),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(
-                              'Añadida el $fechaFormateada',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: ListTile(
+                          leading: const Icon(Icons.notes, color: Colors.teal),
+                          title: Text(e.text!),
+                          subtitle: Text('Añadido el $fechaFormateada'),
+                          trailing: IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  // ---- VIDEO ----
-                  if (e.type == EntryType.video && e.mediaUri != null) {
-                    final file = File(e.mediaUri!);
-
-                    return Card(
-                      color: Colors.white,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        children: [
-                          FutureBuilder(
-                            future: _initVideo(file),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState !=
-                                  ConnectionState.done) {
-                                return const SizedBox(
-                                  height: 200,
-                                  child: Center(
-                                      child: CircularProgressIndicator()),
-                                );
-                              }
-
-                              return AspectRatio(
-                                aspectRatio:
-                                    _videoController!.value.aspectRatio,
-                                child: VideoPlayer(_videoController!),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.play_arrow),
-                            onPressed: () {
-                              setState(() {
-                                _videoController!.value.isPlaying
-                                    ? _videoController!.pause()
-                                    : _videoController!.play();
-                              });
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
                               await widget.entryService.deleteById(e.id);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text('Video eliminado')),
+                                    content: Text('Texto eliminado')),
                               );
                             },
                           ),
-                        ],
-                      ),
-                    );
-                  }
+                        ),
+                      );
+                    }
 
-                  return const SizedBox.shrink();
-                },
-              );
+                    // ---- FOTO ----
+                    if (e.type == EntryType.photo && e.mediaUri != null) {
+                      final file = File(e.mediaUri!);
+                      final fecha = e.createdAt.toLocal();
+                      final fechaFormateada =
+                          "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
+                          "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
+
+                      return Card(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          child: InteractiveViewer(
+                                            panEnabled: true,
+                                            child: Image.file(
+                                              file,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(15),
+                                    ),
+                                    child: Image.file(
+                                      file,
+                                      height: 200,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () async {
+                                    await widget.entryService.deleteById(e.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Foto eliminada'),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Text(
+                                'Añadida el $fechaFormateada',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // ---- VIDEO ----
+                    if (e.type == EntryType.video && e.mediaUri != null) {
+                      final file = File(e.mediaUri!);
+
+                      return Card(
+                        color: Colors.white,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: [
+                            FutureBuilder(
+                              future: _initVideo(file),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState !=
+                                    ConnectionState.done) {
+                                  return const SizedBox(
+                                    height: 200,
+                                    child: Center(
+                                        child: CircularProgressIndicator()),
+                                  );
+                                }
+
+                                return AspectRatio(
+                                  aspectRatio:
+                                      _videoController!.value.aspectRatio,
+                                  child: VideoPlayer(_videoController!),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.play_arrow),
+                              onPressed: () {
+                                setState(() {
+                                  _videoController!.value.isPlaying
+                                      ? _videoController!.pause()
+                                      : _videoController!.play();
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                await widget.entryService.deleteById(e.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Video eliminado')),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return const SizedBox.shrink();
+                  },
+                ))
+              ]);
             },
           ),
 
