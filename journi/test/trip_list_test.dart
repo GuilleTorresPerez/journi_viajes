@@ -53,6 +53,7 @@ void main() {
             entryService: entryService,
             userRepo: userRepo,
             userService: userService,
+            skipLogin: true,
           ),
         ),
       );
@@ -82,6 +83,7 @@ void main() {
           entryService: entryService,
           userRepo: userRepo,
           userService: userService,
+          skipLogin: true,
         ),
       ),
     );
@@ -121,6 +123,7 @@ void main() {
           entryService: entryService,
           userRepo: userRepo,
           userService: userService,
+          skipLogin: true,
         ),
       ),
     );
@@ -160,6 +163,7 @@ void main() {
           entryService: entryService,
           userRepo: userRepo,
           userService: userService,
+          skipLogin: true,
         ),
       ),
     );

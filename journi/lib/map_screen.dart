@@ -131,6 +131,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                       entryService: widget.entryService,
                       userRepo: userRepo,
                       userService: userService,
+                      skipLogin: false
                     ),
                   ),
                 );

@@ -59,6 +59,8 @@ void main() {
             entryRepo: entryRepo,
             userRepo: userRepo,
             userService: userService,
+            skipLogin: true,
+
           ),
         ),
       );

@@ -93,6 +93,7 @@ class MyApp extends StatelessWidget {
         entryService: entryService,
         userRepo: userRepo,
         userService: userService,
+        skipLogin: false, // por defecto false
       ),
     );
   }
@@ -111,8 +112,10 @@ class MyHomePage extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
+    required this.skipLogin,
   });
 
+  final bool skipLogin; // nuevo flag para tests
   final String title;
   final bool sesionIniciada;
 
@@ -151,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _checkSession() async {
+    if (widget.skipLogin) return; // Saltamos login automático en tests
     final user = await _currentUser;
 
     if (!mounted) return;
