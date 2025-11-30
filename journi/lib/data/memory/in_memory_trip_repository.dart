@@ -4,7 +4,7 @@ import 'package:journi/domain/trip.dart';
 import 'package:journi/domain/trip_queries.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 
-/// Repositorio en memoria (mínimo viable) para desarrollo sin BD.
+/// Repositorio en memoria actualizado para soportar Roles y OwnerId.
 class InMemoryTripRepository implements TripRepository {
   final Map<String, Trip> _store;
   final _controller = StreamController<List<Trip>>.broadcast();
@@ -31,8 +31,10 @@ class InMemoryTripRepository implements TripRepository {
 
   @override
   Future<Result<Trip>> upsert(Trip trip) async {
+    // 1. Corrección: Añadimos ownerId y usamos el mapa 'participants'
     final res = Trip.create(
       id: trip.id,
+      ownerId: trip.ownerId, // 👈 Obligatorio ahora
       title: trip.title,
       description: trip.description,
       coverImage: trip.coverImage,
@@ -40,8 +42,7 @@ class InMemoryTripRepository implements TripRepository {
       endDate: trip.endDate,
       createdAt: trip.createdAt,
       updatedAt: trip.updatedAt,
-      // IMPORTANTE: Aseguramos pasar los participantes al recrear/validar
-      participantIds: trip.participantIds,
+      participants: trip.participants, // 👈 Pasamos el mapa, no una lista
     );
 
     if (res is Err<Trip>) return res;
@@ -60,10 +61,8 @@ class InMemoryTripRepository implements TripRepository {
 
   @override
   Stream<List<Trip>> watchAll({TripPhase? phase}) {
-    // ❗️Sin snapshot inicial: solo reemitimos lo que publique _controller.
-    final base = _controller.stream; // broadcast; múltiples listeners
+    final base = _controller.stream;
     if (phase == null) return base;
-    // Filtramos manteniendo el orden por createdAt (ya viene ordenado).
     return base.map((items) => items.where((t) => t.phase == phase).toList());
   }
 
@@ -74,47 +73,90 @@ class InMemoryTripRepository implements TripRepository {
     return const Ok(unit);
   }
 
-  // 👇 IMPLEMENTACIÓN AÑADIDA PARA CORREGIR EL ERROR
+  // 👇 Corrección: Firma actualizada con 'TripRole'
   @override
-  Future<Result<Unit>> addParticipant(String tripId, String userId) async {
+  Future<Result<Unit>> addParticipant(
+      String tripId, String userId, TripRole role) async {
     final currentTrip = _store[tripId];
 
     if (currentTrip == null) {
       return Err([ValidationError('Trip con id $tripId no encontrado')]);
     }
 
-    // Evitamos duplicados si el usuario ya está en la lista
-    if (currentTrip.participantIds.contains(userId)) {
-      return const Ok(unit);
-    }
+    // 2. Lógica actualizada para Map<String, TripRole>
+    // Creamos una copia mutable del mapa actual
+    final newParticipants =
+        Map<String, TripRole>.from(currentTrip.participants);
 
-    // Creamos la nueva lista de participantes
-    final newParticipants = List<String>.from(currentTrip.participantIds)
-      ..add(userId);
+    // Insertamos o actualizamos el rol del usuario
+    newParticipants[userId] = role;
 
-    // Reconstruimos el Trip (Inmutabilidad) actualizando la fecha
+    // Reconstruimos el Trip
     final updatedRes = Trip.create(
       id: currentTrip.id,
+      ownerId: currentTrip.ownerId, // 👈 No olvidar mantener el owner
       title: currentTrip.title,
       description: currentTrip.description,
       coverImage: currentTrip.coverImage,
       startDate: currentTrip.startDate,
       endDate: currentTrip.endDate,
       createdAt: currentTrip.createdAt,
-      updatedAt: DateTime.now().toUtc(), // Actualizamos timestamp
-      participantIds: newParticipants,
+      updatedAt: DateTime.now().toUtc(),
+      participants: newParticipants, // 👈 Pasamos el nuevo mapa
     );
 
     if (updatedRes is Err<Trip>) {
       return Err(updatedRes.errors);
     }
 
-    // Guardamos y notificamos
     _store[tripId] = (updatedRes as Ok<Trip>).value;
     _emit();
 
     return const Ok(unit);
   }
 
-  Future<void> dispose() async => _controller.close(); // emite done a listeners
+  // 👇 Corrección: Implementación del método faltante
+  @override
+  Future<Result<Unit>> removeParticipant(String tripId, String userId) async {
+    final currentTrip = _store[tripId];
+    if (currentTrip == null) {
+      return Err([ValidationError('Trip con id $tripId no encontrado')]);
+    }
+
+    // Si es el dueño, no deberíamos permitir borrarlo (regla de negocio opcional, pero recomendada)
+    if (currentTrip.ownerId == userId) {
+      return Err(
+          [ValidationError('No se puede eliminar al propietario del viaje')]);
+    }
+
+    if (!currentTrip.participants.containsKey(userId)) {
+      return const Ok(unit); // No estaba, operación idempotente
+    }
+
+    final newParticipants =
+        Map<String, TripRole>.from(currentTrip.participants);
+    newParticipants.remove(userId);
+
+    final updatedRes = Trip.create(
+      id: currentTrip.id,
+      ownerId: currentTrip.ownerId,
+      title: currentTrip.title,
+      description: currentTrip.description,
+      coverImage: currentTrip.coverImage,
+      startDate: currentTrip.startDate,
+      endDate: currentTrip.endDate,
+      createdAt: currentTrip.createdAt,
+      updatedAt: DateTime.now().toUtc(),
+      participants: newParticipants,
+    );
+
+    if (updatedRes is Err<Trip>) return Err(updatedRes.errors);
+
+    _store[tripId] = (updatedRes as Ok<Trip>).value;
+    _emit();
+
+    return const Ok(unit);
+  }
+
+  Future<void> dispose() async => _controller.close();
 }

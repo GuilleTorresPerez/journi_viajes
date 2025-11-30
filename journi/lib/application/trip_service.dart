@@ -1,4 +1,4 @@
-import 'package:journi/domain/trip.dart';
+import 'package:journi/domain/trip.dart'; // 👈 Aquí está TripRole
 import 'package:journi/domain/trip_queries.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
@@ -12,24 +12,22 @@ import 'package:journi/application/use_cases/share_trip_use_case.dart';
 abstract class TripService {
   Future<Result<Trip>> create(CreateTripCommand cmd);
   Future<Result<Trip>> patch(UpdateTripCommand cmd);
-  Future<Result<Unit>> deleteById(String id); // 👈 Unit unificado
+  Future<Result<Unit>> deleteById(String id);
 
-  /// Helper que resuelve el `current` por id y delega en UpdateTripTitleUseCase.
   Future<Result<Trip>> updateTitleById(String id, String newTitle);
 
-  /// Lectura/consulta
   Future<Result<Trip?>> getById(String id);
   Future<Result<List<Trip>>> list({TripPhase? phase});
   Stream<List<Trip>> watch({TripPhase? phase});
 
-  /// Consultas específicas
   Future<Result<List<Trip>>> listForDayUtc(DateTime dayUtc);
 
-  /// Obtiene el país del viaje basado en sus entradas.
   Future<Result<String?>> getCountry(String tripId);
 
   /// Comparte el viaje con otro usuario por email.
-  Future<Result<Unit>> shareTrip(String tripId, String email);
+  /// ⚠️ CAMBIO: Ahora aceptamos un rol opcional (por defecto viewer)
+  Future<Result<Unit>> shareTrip(String tripId, String email,
+      {TripRole role = TripRole.viewer});
 }
 
 /// Implementación por defecto del servicio.
@@ -42,7 +40,7 @@ class DefaultTripService implements TripService {
   final WatchTripsUseCase _watchUC;
   final ListTripsForDayUseCase _listDayUC;
   final TripRepository _repo;
-  final GetTripCountryUseCase _getCountryUC; // Nueva dependencia
+  final GetTripCountryUseCase _getCountryUC;
   final ShareTripUseCase _shareTripUC;
 
   DefaultTripService({
@@ -69,6 +67,7 @@ class DefaultTripService implements TripService {
 
   @override
   Future<Result<Trip>> create(CreateTripCommand cmd) {
+    // Nota: El 'cmd' ahora incluye ownerId, el servicio solo lo pasa.
     return _createUC(cmd);
   }
 
@@ -79,7 +78,6 @@ class DefaultTripService implements TripService {
 
   @override
   Future<Result<Unit>> deleteById(String id) {
-    // 👈 Unit unificado
     return _deleteUC(id);
   }
 
@@ -122,8 +120,10 @@ class DefaultTripService implements TripService {
   }
 
   @override
-  Future<Result<Unit>> shareTrip(String tripId, String email) {
-    return _shareTripUC(tripId, email);
+  Future<Result<Unit>> shareTrip(String tripId, String email,
+      {TripRole role = TripRole.viewer}) {
+    // ⚠️ CAMBIO: Pasamos el argumento 'role' al caso de uso
+    return _shareTripUC(tripId, email, role: role);
   }
 }
 

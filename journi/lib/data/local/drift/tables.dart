@@ -4,6 +4,8 @@ part of 'app_database.dart';
 @DataClassName('DbTrip')
 class Trips extends Table {
   TextColumn get id => text()();
+  TextColumn get ownerId =>
+      text().references(Users, #id, onDelete: KeyAction.cascade)();
   TextColumn get title => text()();
   TextColumn get description => text().nullable()();
   TextColumn get coverImage => text().nullable()();
@@ -60,15 +62,15 @@ class Users extends Table {
 
 @DataClassName('DbTripParticipant')
 class TripParticipants extends Table {
-  // Clave foránea al Viaje. Si se borra el viaje, se borra la relación.
   TextColumn get tripId =>
       text().references(Trips, #id, onDelete: KeyAction.cascade)();
 
-  // Clave foránea al Usuario. Si se borra el usuario, se borra la relación.
   TextColumn get userId =>
       text().references(Users, #id, onDelete: KeyAction.cascade)();
 
-  // Clave primaria compuesta: evita duplicados (el mismo usuario en el mismo viaje 2 veces)
+  // 2. NUEVO: Rol del participante (Admin/Viewer)
+  TextColumn get role => text().map(const TripRoleConverter())();
+
   @override
   Set<Column> get primaryKey => {tripId, userId};
 }

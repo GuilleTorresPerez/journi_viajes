@@ -2,6 +2,16 @@ import 'trip.dart';
 
 enum TripPhase { planned, ongoing, finished, undated }
 
+extension TripPermissions on Trip {
+  bool isViewer(String userId) => participants[userId] == TripRole.viewer;
+
+  bool isAdmin(String userId) =>
+      participants[userId] == TripRole.admin || userId == ownerId;
+
+  /// Determina si un usuario puede editar el viaje
+  bool canEdit(String userId) => isAdmin(userId);
+}
+
 extension TripQueries on Trip {
   bool get hasDates => startDate != null || endDate != null;
 

@@ -18,6 +18,7 @@ class Patch<T> {
 
 class CreateTripCommand {
   final String id;
+  final String ownerId; // 👈 Nuevo campo
   final String title;
   final String? description;
   final String? coverImage;
@@ -26,6 +27,7 @@ class CreateTripCommand {
 
   CreateTripCommand({
     required this.id,
+    required this.ownerId, // Requerido
     required this.title,
     this.description,
     this.coverImage,
@@ -58,8 +60,11 @@ class CreateTripUseCase {
 
   Future<Result<Trip>> call(CreateTripCommand cmd) async {
     final now = DateTime.now().toUtc();
+
+    // Pasamos el ownerId a la fábrica
     final res = Trip.create(
       id: cmd.id,
+      ownerId: cmd.ownerId,
       title: cmd.title,
       description: cmd.description,
       coverImage: cmd.coverImage,
@@ -67,7 +72,10 @@ class CreateTripUseCase {
       endDate: cmd.endDate,
       createdAt: now,
       updatedAt: now,
+      // Al crear, el mapa de participantes se inicializa vacío en el argumento,
+      // pero la fábrica `Trip.create` insertará al owner como admin.
     );
+
     if (res is Err<Trip>) return res;
     return repo.upsert((res as Ok<Trip>).value);
   }
@@ -107,6 +115,7 @@ class UpdateTripUseCase {
     final nowUtc = DateTime.now().toUtc();
     final validated = Trip.create(
       id: current.id,
+      ownerId: current.ownerId, // 👈 Mantener persistencia del owner
       title: newTitle,
       description: newDescription,
       coverImage: newCoverImage,
@@ -114,6 +123,7 @@ class UpdateTripUseCase {
       endDate: newEnd,
       createdAt: current.createdAt,
       updatedAt: nowUtc,
+      participants: current.participants, // 👈 Mantener participantes
     );
     if (validated is Err<Trip>) return validated;
     return repo.upsert((validated as Ok<Trip>).value);
