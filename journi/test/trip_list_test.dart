@@ -1,4 +1,4 @@
-import 'package:drift/native.dart'; // 👈 Importante
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/entry_service.dart';
@@ -14,13 +14,11 @@ import 'package:journi/main.dart';
 import 'package:journi/pantalla_viaje.dart';
 
 void main() {
-  // Configuración global para pruebas
   late AppDatabase db;
   late DriftUserRepository userRepo;
   late DefaultUserService userService;
 
   setUp(() {
-    // Usamos DB en memoria para que sea rápido y aislado
     db = AppDatabase.forTesting(NativeDatabase.memory());
     userRepo = DriftUserRepository(db);
     userService = makeUserService(userRepo);
@@ -30,14 +28,25 @@ void main() {
     await db.close();
   });
 
+  // Helper local para limpiar el código repetitivo
+  Trip createTrip(String id, String title) {
+    return Trip(
+      id: id,
+      ownerId: 'u1', // 👈 CORREGIDO
+      title: title,
+      startDate: DateTime(2025, 1, 1),
+      endDate: DateTime(2025, 1, 5),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
   testWidgets(
     'Muestra CircularProgressIndicator mientras se cargan los viajes',
     (tester) async {
       final repo = InMemoryTripRepository();
       final entryRepo = InMemoryEntryRepository();
       final geoRepo = FakeGeocodingRepository();
-
-      // CORRECCIÓN DE INYECCIÓN
       final tripService = makeTripService(repo, userRepo, entryRepo, geoRepo);
       final entryService = makeEntryService(entryRepo);
 
@@ -66,8 +75,6 @@ void main() {
     final repo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-
-    // CORRECCIÓN DE INYECCIÓN
     final tripService = makeTripService(repo, userRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
 
@@ -96,19 +103,10 @@ void main() {
     final repo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-
-    // CORRECCIÓN DE INYECCIÓN
     final tripService = makeTripService(repo, userRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
 
-    final trip1 = Trip(
-      id: '1',
-      title: 'Madrid',
-      startDate: DateTime(2025, 1, 1),
-      endDate: DateTime(2025, 1, 5),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+    final trip1 = createTrip('1', 'Madrid'); // 👈 Usamos helper corregido
     repo.upsert(trip1);
 
     await tester.pumpWidget(
@@ -136,19 +134,10 @@ void main() {
     final repo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-
-    // CORRECCIÓN DE INYECCIÓN
     final tripService = makeTripService(repo, userRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
 
-    final trip = Trip(
-      id: '1',
-      title: 'TestTrip',
-      startDate: DateTime.now(),
-      endDate: DateTime.now(),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+    final trip = createTrip('1', 'TestTrip'); // 👈 Usamos helper corregido
     repo.upsert(trip);
 
     await tester.pumpWidget(

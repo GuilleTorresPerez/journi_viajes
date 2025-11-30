@@ -9,12 +9,8 @@ import 'package:journi/application/use_cases/use_cases.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/geocoding_repository.dart';
-import 'package:journi/domain/ports/user_repository.dart'; // 👈 Importar
-import 'package:journi/domain/user.dart'; // 👈 Importar
-
-// ... (Aquí iría tu clase FakeTripRepository existente) ...
-// Para ahorrar espacio, asumo que FakeTripRepository está aquí como en tu código original.
-// Asegúrate de copiarla o mantenerla.
+import 'package:journi/domain/ports/user_repository.dart';
+import 'package:journi/domain/user.dart';
 
 class FakeTripRepository implements TripRepository {
   final _store = <String, Trip>{};
@@ -27,8 +23,7 @@ class FakeTripRepository implements TripRepository {
       },
     );
   }
-  // ... (Resto de implementación igual a tu código original) ...
-  // Solo implemento lo mínimo para el ejemplo:
+
   List<Trip> _snapshot({TripPhase? phase}) {
     var items = _store.values.toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -62,16 +57,18 @@ class FakeTripRepository implements TripRepository {
     return const Ok(unit);
   }
 
-  // Implementación vacía para el test unitario de Share Trip (si hiciera falta)
+  // 👇 CORRECCIÓN: Firma exacta a la interfaz (posicional, no named)
   @override
-  Future<Result<Unit>> addParticipant(String t, String u) async =>
+  Future<Result<Unit>> addParticipant(
+          String t, String u, TripRole role) async =>
       const Ok(unit);
+
+  @override
+  Future<Result<Unit>> removeParticipant(String tripId, String userId) async =>
+      const Ok(unit);
+
   void dispose() => _ctrl.close();
 }
-
-/// ---------------------------
-/// Fakes Adicionales
-/// ---------------------------
 
 class FakeEntryRepository implements EntryRepository {
   @override
@@ -95,7 +92,6 @@ class FakeGeocodingRepository implements GeocodingRepository {
       const Ok('Test Country');
 }
 
-// 🔧 NUEVO: FakeUserRepository necesario para crear el TripService
 class FakeUserRepository implements UserRepository {
   @override
   Future<Result<User>> upsert(User user) async => Ok(user);
@@ -109,21 +105,14 @@ class FakeUserRepository implements UserRepository {
   Stream<List<User>> watchAll() => const Stream.empty();
 }
 
-/// ---------------------------
-/// Helpers
-/// ---------------------------
 T expectOk<T>(Result<T> r) {
   expect(r, isA<Ok<T>>());
   return (r as Ok<T>).value;
 }
 
-List<AppError> expectErrList<T>(Result<T> r) {
-  expect(r, isA<Err<T>>());
-  return (r as Err<T>).errors;
-}
-
 CreateTripCommand makeCmd(
     {required String id,
+    required String ownerId,
     required String title,
     String? description,
     String? cover,
@@ -131,6 +120,7 @@ CreateTripCommand makeCmd(
     DateTime? end}) {
   return CreateTripCommand(
       id: id,
+      ownerId: ownerId,
       title: title,
       description: description,
       coverImage: cover,
@@ -143,16 +133,15 @@ void main() {
     late FakeTripRepository repo;
     late FakeEntryRepository entryRepo;
     late FakeGeocodingRepository geoRepo;
-    late FakeUserRepository userRepo; // 👈 Declarar
+    late FakeUserRepository userRepo;
     late DefaultTripService service;
 
     setUp(() {
       repo = FakeTripRepository();
       entryRepo = FakeEntryRepository();
       geoRepo = FakeGeocodingRepository();
-      userRepo = FakeUserRepository(); // 👈 Instanciar
+      userRepo = FakeUserRepository();
 
-      // CORRECCIÓN DE INYECCIÓN
       service = makeTripService(repo, userRepo, entryRepo, geoRepo);
     });
 
@@ -160,14 +149,12 @@ void main() {
       repo.dispose();
     });
 
-    // ... (Tus tests existentes siguen aquí sin cambios) ...
-
     test('create: Ok y persistencia básica', () async {
-      final res = await service.create(makeCmd(id: 't1', title: 'Viaje A'));
+      final res = await service
+          .create(makeCmd(id: 't1', ownerId: 'u1', title: 'Viaje A'));
       final trip = expectOk(res);
       expect(trip.id, 't1');
+      expect(trip.ownerId, 'u1');
     });
-
-    // ... (Resto de tests) ...
   });
 }

@@ -1,14 +1,13 @@
-// Ajusta imports según tu estructura. Si el código está en lib/, usa:
-// import 'package:tu_paquete/trip.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/domain/trip.dart';
-import 'package:journi/application/shared/result.dart'; // <- añade el Result oficial
+import 'package:journi/application/shared/result.dart';
 
 void main() {
   group('Trip.create - validaciones y normalización', () {
     test('trimea el título y devuelve Ok', () {
       final res = Trip.create(
         id: 't1',
+        ownerId: 'user1', // 👈 Nuevo
         title: '  Mi viaje  ',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -21,6 +20,7 @@ void main() {
     test('title vacío -> Err', () {
       final res = Trip.create(
         id: 't2',
+        ownerId: 'user1', // 👈 Nuevo
         title: '   ',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -34,6 +34,7 @@ void main() {
       final longTitle = List.filled(Trip.titleMax + 1, 'a').join();
       final res = Trip.create(
         id: 't3',
+        ownerId: 'user1', // 👈 Nuevo
         title: longTitle,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -47,6 +48,7 @@ void main() {
       final longDesc = List.filled(Trip.descriptionMax + 1, 'x').join();
       final res = Trip.create(
         id: 't4',
+        ownerId: 'user1', // 👈 Nuevo
         title: 'Ok',
         description: longDesc,
         createdAt: DateTime.now(),
@@ -65,6 +67,7 @@ void main() {
       final end = DateTime.utc(2025, 1, 2, 11, 59);
       final res = Trip.create(
         id: 't5',
+        ownerId: 'user1', // 👈 Nuevo
         title: 'Fechas',
         startDate: start,
         endDate: end,
@@ -77,12 +80,13 @@ void main() {
     });
 
     test('normaliza start/end/createdAt/updatedAt a UTC', () {
-      final localStart = DateTime(2025, 1, 1, 10, 0); // local time
-      final localEnd = DateTime(2025, 1, 2, 12, 0); // local time
-      final ca = DateTime(2025, 1, 1, 8, 0); // local
-      final ua = DateTime(2025, 1, 1, 9, 0); // local
+      final localStart = DateTime(2025, 1, 1, 10, 0);
+      final localEnd = DateTime(2025, 1, 2, 12, 0);
+      final ca = DateTime(2025, 1, 1, 8, 0);
+      final ua = DateTime(2025, 1, 1, 9, 0);
       final res = Trip.create(
         id: 't6',
+        ownerId: 'user1', // 👈 Nuevo
         title: 'UTC',
         startDate: localStart,
         endDate: localEnd,
@@ -100,6 +104,7 @@ void main() {
     test('admite fechas nulas (sin rango) y devuelve Ok', () {
       final res = Trip.create(
         id: 't7',
+        ownerId: 'user1', // 👈 Nuevo
         title: 'Sin fechas',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),

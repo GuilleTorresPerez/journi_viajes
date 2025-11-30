@@ -1,10 +1,10 @@
-import 'package:drift/native.dart'; // 👈 Necesario para NativeDatabase.memory()
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/use_cases/use_cases.dart';
-import 'package:journi/data/local/drift/app_database.dart'; // 👈 Importar DB
-import 'package:journi/data/local/drift/drift_user_repository.dart'; // 👈 Importar Repo Usuario
+import 'package:journi/data/local/drift/app_database.dart';
+import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'fake_geocoding_repository.dart';
@@ -28,6 +28,7 @@ void main() {
 
       final cmd = CreateTripCommand(
         id: 'id0',
+        ownerId: 'u1', // 👈 CORREGIDO: Requerido
         title: 'El Nano',
         description: 'Description',
         startDate: DateTime.now(),
@@ -39,7 +40,6 @@ void main() {
 
       expect(res, isA<Ok<Unit>>());
 
-      // Opcional: Cerrar DB al acabar
       await db.close();
     });
   });

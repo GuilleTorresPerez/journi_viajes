@@ -11,7 +11,6 @@ class InMemoryTripRepo implements TripRepository {
   final Map<String, Trip> _store = {};
   final _controller = StreamController<List<Trip>>.broadcast();
 
-  // Métricas útiles en tests
   int upsertCalls = 0;
   Trip? lastUpserted;
   Result<Trip>? upsertResultOverride;
@@ -75,30 +74,63 @@ class InMemoryTripRepo implements TripRepository {
     return const Ok(unit);
   }
 
+  // 👇 CORRECCIÓN: Firma exacta a la interfaz (TripRole role es posicional obligatorio)
   @override
-  Future<Result<Unit>> addParticipant(String tripId, String userId) async {
+  Future<Result<Unit>> addParticipant(
+      String tripId, String userId, TripRole role) async {
     final t = _store[tripId];
     if (t == null) {
       return Err([ValidationError('Trip not found')]);
     }
 
-    // Si ya existe, no hacemos nada (idempotente)
-    if (t.participantIds.contains(userId)) {
+    // Si ya existe y tiene el mismo rol, ignoramos.
+    // Si queremos actualizar el rol, deberíamos permitirlo, pero para este mock simple:
+    if (t.participants.containsKey(userId) && t.participants[userId] == role) {
       return const Ok(unit);
     }
 
-    // Creamos copia actualizada (asumiendo inmutabilidad de Trip)
-    final updated = Trip(
+    final newParticipants = Map<String, TripRole>.from(t.participants);
+    newParticipants[userId] = role; // Asignamos el rol pasado por parámetro
+
+    final updated = Trip.create(
       id: t.id,
+      ownerId: t.ownerId,
       title: t.title,
       description: t.description,
       coverImage: t.coverImage,
       startDate: t.startDate,
       endDate: t.endDate,
       createdAt: t.createdAt,
-      updatedAt: DateTime.now().toUtc(), // Actualizamos fecha
-      participantIds: [...t.participantIds, userId], // Añadimos user
+      updatedAt: DateTime.now().toUtc(),
+      participants: newParticipants,
     );
+
+    _store[tripId] = (updated as Ok<Trip>).value;
+    _emit();
+    return const Ok(unit);
+  }
+
+  @override
+  Future<Result<Unit>> removeParticipant(String tripId, String userId) async {
+    final t = _store[tripId];
+    if (t == null) return const Ok(unit);
+
+    final newParticipants = Map<String, TripRole>.from(t.participants);
+    newParticipants.remove(userId);
+
+    final updated = (Trip.create(
+      id: t.id,
+      ownerId: t.ownerId,
+      title: t.title,
+      description: t.description,
+      coverImage: t.coverImage,
+      startDate: t.startDate,
+      endDate: t.endDate,
+      createdAt: t.createdAt,
+      updatedAt: DateTime.now().toUtc(),
+      participants: newParticipants,
+    ) as Ok<Trip>)
+        .value;
 
     _store[tripId] = updated;
     _emit();
@@ -111,10 +143,6 @@ class InMemoryTripRepo implements TripRepository {
 }
 
 void main() {
-  // ... (El resto de tu archivo main() se mantiene exactamente igual)
-  // Copia aquí todo el contenido desde 'void main() {' hacia abajo
-  // que tenías en tu mensaje anterior.
-
   group('CreateTripUseCase', () {
     late InMemoryTripRepo repo;
     late CreateTripUseCase useCase;
@@ -127,7 +155,7 @@ void main() {
     tearDown(() => repo.dispose());
 
     test('falla si el título está vacío (no llama al repo)', () async {
-      final cmd = CreateTripCommand(id: 't1', title: '   ');
+      final cmd = CreateTripCommand(id: 't1', ownerId: 'u1', title: '   ');
       final res = await useCase.call(cmd);
       expect(res, isA<Err<Trip>>());
       expect(repo.upsertCalls, 0);
@@ -141,6 +169,7 @@ void main() {
 
       final cmd = CreateTripCommand(
         id: 't2',
+        ownerId: 'u1',
         title: '  Eurotrip  ',
         description: 'desc',
         coverImage: 'img.png',
@@ -157,6 +186,7 @@ void main() {
       expect(repo.upsertCalls, 1);
       expect(repo.lastUpserted, isNotNull);
       expect(trip.title, 'Eurotrip');
+      expect(trip.ownerId, 'u1');
 
       bool inWindow(DateTime d) =>
           !d.isBefore(nowBefore) && !d.isAfter(nowAfter);
@@ -172,7 +202,8 @@ void main() {
         ValidationError('fallo persistencia'),
       ]);
 
-      final cmd = CreateTripCommand(id: 't3', title: 'Título válido');
+      final cmd =
+          CreateTripCommand(id: 't3', ownerId: 'u1', title: 'Título válido');
       final res = await useCase.call(cmd);
 
       expect(res, isA<Err<Trip>>());
@@ -191,6 +222,7 @@ void main() {
 
       final created = Trip.create(
         id: 'b1',
+        ownerId: 'u1',
         title: 'Base',
         description: 'd',
         coverImage: 'c.png',
@@ -222,6 +254,7 @@ void main() {
       expect(repo.lastUpserted!.title, 'Road Trip');
 
       expect(updated.id, baseTrip.id);
+      expect(updated.ownerId, baseTrip.ownerId);
       expect(updated.createdAt.isAtSameMomentAs(baseTrip.createdAt), isTrue);
 
       expect(updated.updatedAt.isAfter(prevUpdated), isTrue);
@@ -247,6 +280,7 @@ void main() {
 
       final created = Trip.create(
         id: 'u1',
+        ownerId: 'user1',
         title: 'Vacaciones en Italia',
         description: 'Roma, Florencia y Venecia',
         coverImage: 'italia.jpg',
@@ -274,6 +308,7 @@ void main() {
         expect(repo.upsertCalls, 1);
 
         expect(updated.id, prev.id);
+        expect(updated.ownerId, prev.ownerId);
         expect(updated.title, prev.title);
         expect(updated.updatedAt.isAfter(prev.updatedAt), isTrue);
       },
@@ -353,6 +388,7 @@ void main() {
       useCase = DeleteTripUseCase(repo);
       t = (Trip.create(
         id: 'd1',
+        ownerId: 'u1',
         title: 'Borrar-me',
         createdAt: DateTime.utc(2025, 1, 1),
         updatedAt: DateTime.utc(2025, 1, 1),
@@ -386,6 +422,7 @@ void main() {
 
       final a = (Trip.create(
         id: 'a',
+        ownerId: 'u1',
         title: 'A',
         startDate: DateTime.utc(2025, 6, 1),
         endDate: DateTime.utc(2025, 6, 3),
@@ -396,6 +433,7 @@ void main() {
 
       final b = (Trip.create(
         id: 'b',
+        ownerId: 'u1',
         title: 'B',
         startDate: DateTime.utc(2025, 6, 3),
         endDate: DateTime.utc(2025, 6, 5),
@@ -406,6 +444,7 @@ void main() {
 
       final c = (Trip.create(
         id: 'c',
+        ownerId: 'u1',
         title: 'C',
         createdAt: DateTime.utc(2025, 1, 3),
         updatedAt: DateTime.utc(2025, 1, 3),

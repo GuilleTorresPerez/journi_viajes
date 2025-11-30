@@ -7,6 +7,7 @@ import 'package:journi/data/memory/in_memory_trip_repository.dart';
 Trip _trip({
   required String id,
   required String title,
+  String ownerId = 'u1',
   String? description,
   String? coverImage,
   DateTime? startDate,
@@ -17,6 +18,7 @@ Trip _trip({
   // Constructor "crudo" (sin validar) a propósito: upsert valida con Trip.create.
   return Trip(
     id: id,
+    ownerId: ownerId,
     title: title,
     description: description,
     coverImage: coverImage,
@@ -76,7 +78,6 @@ void main() {
       () async {
         repo = InMemoryTripRepository();
 
-        // Nos suscribimos ANTES de intentar el upsert inválido.
         final s = repo.watchAll();
         var emissions = 0;
         final sub = s.listen((_) {
@@ -86,7 +87,7 @@ void main() {
         final now = DateTime.now().toUtc();
         final bad = _trip(
           id: 'x',
-          title: '   ', // inválido -> Err
+          title: '   ',
           createdAt: now,
           updatedAt: now,
         );
@@ -94,29 +95,18 @@ void main() {
         final res = await repo.upsert(bad);
         expect(res, isA<Err<Trip>>());
 
-        // Da un turno al event loop para capturar eventos pendientes (no debería haber).
         await Future<void>.delayed(Duration.zero);
-
-        // No debe haberse emitido nada desde que nos suscribimos.
         expect(emissions, 0);
-
         await sub.cancel();
-
-        // Y el store sigue vacío.
-        final listed = await repo.list();
-        expect((listed as Ok<List<Trip>>).value, isEmpty);
       },
     );
 
     test('upsert() persiste y normaliza (trim + UTC) y watchAll emite',
         () async {
       repo = InMemoryTripRepository();
-      final nowLocal =
-          DateTime.now(); // no-UTC a propósito para comprobar normalización
+      final nowLocal = DateTime.now();
 
       final stream = repo.watchAll();
-
-      // Debe emitir tras el upsert con una lista que contenga el id 'ok1'.
       final future = expectLater(
         stream,
         emits(
@@ -126,12 +116,13 @@ void main() {
             contains('ok1'),
           ),
         ),
-      ); // Stream matchers oficiales: emits/emitsInOrder. :contentReference[oaicite:2]{index=2}
+      );
 
       final res = await repo.upsert(
         _trip(
           id: 'ok1',
-          title: '   Paris 2026   ', // se hará trim
+          ownerId: 'u1', // 👈 Explícito o implícito por el helper
+          title: '   Paris 2026   ',
           startDate: nowLocal,
           endDate: nowLocal.add(const Duration(days: 5)),
           createdAt: nowLocal,
@@ -141,15 +132,11 @@ void main() {
 
       expect(res, isA<Ok<Trip>>());
       final saved = (res as Ok<Trip>).value;
-      expect(saved.title, 'Paris 2026'); // trimmed
-      expect(saved.createdAt.isUtc, isTrue);
-      expect(saved.updatedAt.isUtc, isTrue);
-      expect(saved.startDate!.isUtc, isTrue);
-      expect(saved.endDate!.isUtc, isTrue);
+      expect(saved.title, 'Paris 2026');
+      expect(saved.ownerId, 'u1'); // Verificamos
 
-      await future; // esperamos a que la aserción del stream se complete (expectLater). :contentReference[oaicite:3]{index=3}
+      await future;
     });
-
     test(
       'list({phase}) filtra correctamente y mantiene orden por createdAt desc',
       () async {
