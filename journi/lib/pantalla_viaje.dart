@@ -73,6 +73,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
   final TextEditingController _textoController = TextEditingController();
 
   late int _selectedIndex;
+  String _searchQuery = "";
 
   @override
   void initState() {
@@ -83,6 +84,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
   @override
   Widget build(BuildContext context) {
     final currentTrip = widget.viajes[widget.num_viaje];
+
+
 
     return Scaffold(
       backgroundColor: Colors.teal[200],
@@ -100,144 +103,41 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           // BUSCAR / FILTRAR
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black),
-            tooltip: 'Buscar y filtrar',
+            tooltip: 'Buscar',
             onPressed: () {
+              TextEditingController searchCtrl = TextEditingController(text: _searchQuery);
+
               showDialog(
                 context: context,
                 builder: (context) {
-                  TextEditingController searchCtrl = TextEditingController();
-                  DateTime? fechaInicio;
-                  DateTime? fechaFin;
-                  String? ubicacion;
-
-                  return StatefulBuilder(
-                    builder: (context, setState) {
-                      return AlertDialog(
-                        title: const Text('Buscar y filtrar'),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              TextField(
-                                controller: searchCtrl,
-                                decoration: const InputDecoration(
-                                  labelText: 'Buscar por texto',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-
-                              // Fecha inicio
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    fechaInicio == null
-                                        ? "Inicio: —"
-                                        : "Inicio: ${fechaInicio!.day}/${fechaInicio!.month}/${fechaInicio!.year}",
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      DateTime? fecha = await showDatePicker(
-                                        context: context,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
-                                        initialDate: DateTime.now(),
-                                      );
-                                      if (fecha != null) {
-                                        setState(() => fechaInicio = fecha);
-                                      }
-                                    },
-                                    child: const Text("Elegir"),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              // Fecha fin
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    fechaFin == null
-                                        ? "Fin: —"
-                                        : "Fin: ${fechaFin!.day}/${fechaFin!.month}/${fechaFin!.year}",
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      DateTime? fecha = await showDatePicker(
-                                        context: context,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
-                                        initialDate: DateTime.now(),
-                                      );
-                                      if (fecha != null) {
-                                        setState(() => fechaFin = fecha);
-                                      }
-                                    },
-                                    child: const Text("Elegir"),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 20),
-
-                              // Ubicación
-                              DropdownButtonFormField<String>(
-                                value: ubicacion,
-                                decoration: const InputDecoration(
-                                  labelText: 'Ubicación',
-                                  border: OutlineInputBorder(),
-                                ),
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: "España",
-                                    child: Text("España"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "Francia",
-                                    child: Text("Francia"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "Italia",
-                                    child: Text("Italia"),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  setState(() => ubicacion = value);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cerrar'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Filtros aplicados:\nTexto: ${searchCtrl.text}\nInicio: $fechaInicio\nFin: $fechaFin\nUbicación: $ubicacion",
-                                  ),
-                                ),
-                              );
-                            },
-                            child: const Text('Aplicar'),
-                          ),
-                        ],
-                      );
-                    },
+                  return AlertDialog(
+                    title: const Text("Buscar por texto"),
+                    content: TextField(
+                      controller: searchCtrl,
+                      decoration: const InputDecoration(
+                        labelText: "Introduce texto a buscar",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancelar"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _searchQuery = searchCtrl.text.trim());
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Aplicar"),
+                      )
+                    ],
                   );
                 },
               );
             },
           ),
+
 
           // COMPARTIR VIAJE
           IconButton(
@@ -408,7 +308,17 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 );
               }
 
-              final entries = snapshot.data!;
+              List<Entry> entries = snapshot.data!;
+
+              if (_searchQuery.isNotEmpty) {
+                entries = entries.where((e) {
+                  if (e.type == EntryType.note && e.text != null) {
+                    return e.text!.toLowerCase().contains(_searchQuery.toLowerCase());
+                  }
+                  return false; // fotos y vídeos no se filtran
+                }).toList();
+              }
+
               return ListView.builder(
                 padding: const EdgeInsets.all(8),
                 itemCount: entries.length,
