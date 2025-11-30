@@ -122,17 +122,16 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                   MaterialPageRoute(
                     // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
                     builder: (context) => MyHomePage(
-                      title: 'JOURNI',
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.tripRepo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: userRepo,
-                      userService: userService,
-                      skipLogin: false
-                    ),
+                        title: 'JOURNI',
+                        sesionIniciada: widget.sesionIniciada,
+                        viajes: widget.viajes,
+                        tripRepo: widget.tripRepo,
+                        entryRepo: widget.entryRepo,
+                        tripService: widget.tripService,
+                        entryService: widget.entryService,
+                        userRepo: userRepo,
+                        userService: userService,
+                        skipLogin: false),
                   ),
                 );
               } else if (_selectedIndex == 2) {
