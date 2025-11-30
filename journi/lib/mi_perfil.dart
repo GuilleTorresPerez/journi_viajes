@@ -9,6 +9,7 @@ import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
 import 'domain/user.dart';
+import 'estadisticasScreen.dart';
 import 'map_screen.dart';
 
 // ignore: must_be_immutable
@@ -174,6 +175,25 @@ class _MiPerfilState extends State<MiPerfil> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                ),
+              ),
+            );
+          }
+          else if (index == 3){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EstadisticasScreen(
+                  selectedIndex: index,
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser!,
                 ),
               ),
             );
