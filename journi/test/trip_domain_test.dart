@@ -137,6 +137,24 @@ void main() {
       ));
     });
 
+    test('getRole resuelve la jerarquía de roles correctamente', () {
+      // 1. Owner es siempre Admin (incluso si no está en el mapa explícitamente, o si lo está)
+      expect(trip.getRole('owner'), TripRole.admin, 
+          reason: 'El ownerId siempre debe resolver a TripRole.admin');
+
+      // 2. Participante Admin explícito
+      expect(trip.getRole('admin_amigo'), TripRole.admin,
+          reason: 'Participante listado como admin debe devolver TripRole.admin');
+
+      // 3. Participante Viewer explícito
+      expect(trip.getRole('viewer_amigo'), TripRole.viewer,
+          reason: 'Participante listado como viewer debe devolver TripRole.viewer');
+
+      // 4. Usuario no relacionado
+      expect(trip.getRole('usuario_random'), isNull,
+          reason: 'Usuario ajeno al trip debe devolver null');
+    });
+
     test('isAdmin devuelve true para Owner y Admins', () {
       expect(trip.isAdmin('owner'), isTrue);
       expect(trip.isAdmin('admin_amigo'), isTrue);
