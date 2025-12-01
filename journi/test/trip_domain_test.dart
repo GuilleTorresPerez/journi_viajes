@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/domain/trip.dart';
 import 'package:journi/domain/trip_queries.dart';
+import 'package:journi/domain/trip_extensions.dart';
 
 // Helper para extraer el valor Ok de forma segura en los tests
 Trip _unwrap(Result<Trip> r) {

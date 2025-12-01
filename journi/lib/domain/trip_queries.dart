@@ -2,15 +2,8 @@ import 'trip.dart';
 
 enum TripPhase { planned, ongoing, finished, undated }
 
-extension TripPermissions on Trip {
-  bool isViewer(String userId) => participants[userId] == TripRole.viewer;
-
-  bool isAdmin(String userId) =>
-      participants[userId] == TripRole.admin || userId == ownerId;
-
-  /// Determina si un usuario puede editar el viaje
-  bool canEdit(String userId) => isAdmin(userId);
-}
+// ❌ BORRADA la extensión TripPermissions de aquí.
+// Ya existe en trip_extensions.dart
 
 extension TripQueries on Trip {
   bool get hasDates => startDate != null || endDate != null;
@@ -26,7 +19,6 @@ extension TripQueries on Trip {
     return TripPhase.ongoing;
   }
 
-  /// Duración en días (ceil), o null si falta alguna de las fechas.
   int? get durationDays {
     final s = startDate?.toUtc();
     final e = endDate?.toUtc();
@@ -36,7 +28,6 @@ extension TripQueries on Trip {
     return diff.inHours % 24 == 0 ? days : days + 1;
   }
 
-  /// ¿Se solapa con otro trip? (solo si ambos tienen rango completo)
   bool overlapsWith(Trip other) {
     final aStart = startDate?.toUtc();
     final aEnd = endDate?.toUtc();
@@ -45,11 +36,9 @@ extension TripQueries on Trip {
     if (aStart == null || aEnd == null || bStart == null || bEnd == null) {
       return false;
     }
-    // [aStart, aEnd] solapa [bStart, bEnd] si aStart <= bEnd && bStart <= aEnd
     return !aStart.isAfter(bEnd) && !bStart.isAfter(aEnd);
   }
 
-  /// ¿Ocurre en una fecha (UTC) concreta?
   bool occursOn(DateTime dayUtc) {
     final s = startDate?.toUtc();
     final e = endDate?.toUtc();

@@ -7,6 +7,7 @@ import 'package:journi/application/use_cases/get_trip_country_use_case.dart';
 import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/geocoding_repository.dart';
 import 'package:journi/application/use_cases/share_trip_use_case.dart';
+import 'package:journi/domain/trip_extensions.dart';
 
 /// Puerto de servicio (fachada de aplicación).
 abstract class TripService {
