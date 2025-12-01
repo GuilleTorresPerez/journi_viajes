@@ -38,7 +38,7 @@ class Pantalla_Viaje extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
-  User? currentUser;
+  final User? currentUser;
 
   Pantalla_Viaje(
       {super.key,
@@ -227,6 +227,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );
@@ -687,6 +688,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );
@@ -705,6 +707,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );
@@ -725,7 +728,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
-                      currentUser: widget.currentUser!, //loggedUser
+                      currentUser: widget.currentUser, //loggedUser
                     ),
                   ),
                 );
@@ -749,9 +752,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 );
 
                 if (loggedUser != null && mounted) {
-                  setState(() {
+                  /*setState(() {
                     widget.currentUser = loggedUser;
-                  });
+                  });*/
 
                   // Una vez logueado, lo llevamos al perfil
                   Navigator.push(

@@ -26,7 +26,7 @@ class EstadisticasScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  final User currentUser;
+  final User? currentUser;
 
   EstadisticasScreen({
     super.key,
@@ -184,6 +184,7 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );
@@ -202,6 +203,7 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );

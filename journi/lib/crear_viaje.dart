@@ -32,7 +32,7 @@ class Crear_Viaje extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
-  final User? currentUser; // 👈 AÑADIR ESTO
+  final User? currentUser;
 
   const Crear_Viaje({
     super.key,
@@ -46,7 +46,7 @@ class Crear_Viaje extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
-    this.currentUser, // 👈 AÑADIR ESTO
+    required this.currentUser,
   });
 
   @override
@@ -289,6 +289,7 @@ class _CrearViajeState extends State<Crear_Viaje> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );

@@ -146,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _sesionIniciada = false;
   User? _currentUser;
 
+
   @override
   void initState() {
     super.initState();
@@ -292,7 +293,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
         // Usamos el stream si hay datos; si no, usamos la carga inicial
           final items = snapshot.data ?? _initialTrips;
-
           if (items == null) {
             // Primer frame (o mientras resuelve list())
             return const Center(child: CircularProgressIndicator());
@@ -415,6 +415,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: _currentUser!,
                 ),
               ),
             );
@@ -433,6 +434,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: _currentUser,
                 ),
               ),
             );

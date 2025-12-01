@@ -15,6 +15,7 @@ import 'crear_viaje.dart';
 import 'data/local/drift/drift_user_repository.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
+import 'domain/user.dart';
 import 'login_screen.dart';
 import 'main.dart';
 
@@ -32,6 +33,7 @@ class MapaPaisScreen extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
+  final User? currentUser;
 
   MapaPaisScreen({
     super.key,
@@ -44,6 +46,7 @@ class MapaPaisScreen extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
+    required this.currentUser
   });
 
   @override
@@ -149,6 +152,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                       entryService: widget.entryService,
                       userRepo: userRepo,
                       userService: userService,
+                      currentUser: widget.currentUser,
                     ),
                   ),
                 );
@@ -296,6 +300,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     entryService: widget.entryService,
                     userRepo: userRepo,
                     userService: userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );
