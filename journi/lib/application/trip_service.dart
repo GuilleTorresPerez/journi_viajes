@@ -28,6 +28,10 @@ abstract class TripService {
   /// ⚠️ CAMBIO: Ahora aceptamos un rol opcional (por defecto viewer)
   Future<Result<Unit>> shareTrip(String tripId, String email,
       {TripRole role = TripRole.viewer});
+  
+  /// Obtiene el rol de un usuario en un viaje específico.
+  /// Devuelve Ok(null) si el usuario no participa en el viaje.
+  Future<Result<TripRole?>> getUserRole(String tripId, String userId);
 }
 
 /// Implementación por defecto del servicio.
@@ -126,6 +130,31 @@ class DefaultTripService implements TripService {
       {TripRole role = TripRole.viewer}) {
     // ⚠️ CAMBIO: Pasamos el argumento 'role' al caso de uso
     return _shareTripUC(tripId, email, role: role);
+  }
+
+  @override
+  Future<Result<TripRole?>> getUserRole(String tripId, String userId) async {
+    // 1. Recuperamos el viaje del repositorio
+    final result = await _repo.findById(tripId);
+
+    // 2. Manejo de errores usando programación funcional (Result monad)
+    if (result is Err<Trip?>) {
+      return Err<TripRole?>(result.errors);
+    }
+
+    final trip = (result as Ok<Trip?>).value;
+
+    // 3. Validamos existencia
+    if (trip == null) {
+      return Err<TripRole?>([
+        const ValidationError('El viaje solicitado no existe.')
+      ]);
+    }
+
+    // 4. Delegamos la lógica al Dominio (la extensión que creamos arriba)
+    final role = trip.getRole(userId);
+
+    return Ok<TripRole?>(role);
   }
 }
 

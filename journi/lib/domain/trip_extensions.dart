@@ -66,3 +66,26 @@ extension TripMutators on Trip {
         participants: participants, // 👈 FALTABA AQUÍ
       );
 }
+
+extension TripPermissions on Trip {
+  /// Determina si un usuario tiene rol de 'viewer'.
+  bool isViewer(String userId) => participants[userId] == TripRole.viewer;
+
+  /// Determina si un usuario tiene privilegios de administrador.
+  /// Regla de negocio: El creador (owner) siempre es admin.
+  bool isAdmin(String userId) =>
+      participants[userId] == TripRole.admin || userId == ownerId;
+
+  /// Determina si un usuario puede editar el viaje.
+  bool canEdit(String userId) => isAdmin(userId);
+
+  /// Devuelve el rol específico de un usuario en el viaje.
+  /// Retorna [null] si el usuario no es parte del viaje.
+  TripRole? getRole(String userId) {
+    // Prioridad 1: El dueño es Admin inmutablemente.
+    if (userId == ownerId) return TripRole.admin;
+    
+    // Prioridad 2: Buscar en la lista de participantes.
+    return participants[userId];
+  }
+}
