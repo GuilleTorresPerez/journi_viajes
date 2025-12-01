@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/domain/trip.dart';
 import 'package:journi/domain/trip_queries.dart';
+import 'package:journi/domain/trip_extensions.dart';
 
 // Helper para extraer el valor Ok de forma segura en los tests
 Trip _unwrap(Result<Trip> r) {
@@ -135,6 +136,26 @@ void main() {
           'viewer_amigo': TripRole.viewer,
         },
       ));
+    });
+
+    test('getRole resuelve la jerarquía de roles correctamente', () {
+      // 1. Owner es siempre Admin (incluso si no está en el mapa explícitamente, o si lo está)
+      expect(trip.getRole('owner'), TripRole.admin,
+          reason: 'El ownerId siempre debe resolver a TripRole.admin');
+
+      // 2. Participante Admin explícito
+      expect(trip.getRole('admin_amigo'), TripRole.admin,
+          reason:
+              'Participante listado como admin debe devolver TripRole.admin');
+
+      // 3. Participante Viewer explícito
+      expect(trip.getRole('viewer_amigo'), TripRole.viewer,
+          reason:
+              'Participante listado como viewer debe devolver TripRole.viewer');
+
+      // 4. Usuario no relacionado
+      expect(trip.getRole('usuario_random'), isNull,
+          reason: 'Usuario ajeno al trip debe devolver null');
     });
 
     test('isAdmin devuelve true para Owner y Admins', () {
