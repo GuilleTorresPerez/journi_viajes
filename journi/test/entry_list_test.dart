@@ -16,7 +16,23 @@ import 'package:journi/pantalla_viaje.dart';
 import 'fake_geocoding_repository.dart';
 
 void main() {
-  final db = AppDatabase();
+  final db =
+      AppDatabase(); // Nota: Mejor usar .forTesting(memory) aquí también si es posible
+
+  // Helper para crear trips válidos en los tests de UI
+  Trip createTestTrip() {
+    return Trip(
+        id: '1',
+        ownerId: 'u1', // 👈 CORREGIDO
+        title: 'Viaje Test',
+        startDate: DateTime(2025, 1, 1),
+        endDate: DateTime(2025, 1, 5),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        participants: {'u1': TripRole.admin} // Opcional, pero consistente
+        );
+  }
+
   testWidgets(
     'Muestra CircularProgressIndicator mientras se cargan las entradas',
     (tester) async {
@@ -24,19 +40,13 @@ void main() {
       final entryRepo = InMemoryEntryRepository();
       final geoRepo = FakeGeocodingRepository();
       final UserRepository userRepo = DriftUserRepository(db);
-      final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+      final tripService =
+          makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
       final entryService = makeEntryService(entryRepo);
       final userService = makeUserService(userRepo);
-      User? _currentUser; // 👈 NUEVO
+      User? _currentUser;
 
-      final trip = Trip(
-        id: '1',
-        title: 'Viaje Test',
-        startDate: DateTime(2025, 1, 1),
-        endDate: DateTime(2025, 1, 5),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      final trip = createTestTrip(); // 👈 Usamos el helper corregido
       tripRepo.upsert(trip);
 
       await tester.pumpWidget(
@@ -57,7 +67,6 @@ void main() {
         ),
       );
 
-      // Estado inicial del StreamBuilder
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     },
   );
@@ -66,20 +75,13 @@ void main() {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+    final userRepo = DriftUserRepository(db);
+    final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
     final entryService = makeEntryService(entryRepo);
-    final UserRepository userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
-    User? _currentUser; // 👈 NUEVO
+    User? _currentUser;
 
-    final trip = Trip(
-      id: '1',
-      title: 'Viaje Test',
-      startDate: DateTime(2025, 1, 1),
-      endDate: DateTime(2025, 1, 5),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+    final trip = createTestTrip(); // 👈 Usamos el helper corregido
     tripRepo.upsert(trip);
 
     await tester.pumpWidget(
@@ -109,23 +111,15 @@ void main() {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
-    final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
+    final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
     final userService = makeUserService(userRepo);
-    User? _currentUser; // 👈 NUEVO
+    final entryService = makeEntryService(entryRepo);
+    User? _currentUser;
 
-    final trip = Trip(
-      id: '1',
-      title: 'Viaje Test',
-      startDate: DateTime(2025, 1, 1),
-      endDate: DateTime(2025, 1, 5),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+    final trip = createTestTrip(); // 👈 Usamos el helper corregido
     tripRepo.upsert(trip);
 
-    // ✅ Crear entradas usando el método validado
     final e1 = Entry.create(
       id: 'e1',
       tripId: trip.id,
@@ -144,7 +138,6 @@ void main() {
       updatedAt: DateTime.now(),
     );
 
-    // Solo insertamos si son Ok
     if (e1 is Ok<Entry>) entryRepo.upsert(e1.value);
     if (e2 is Ok<Entry>) entryRepo.upsert(e2.value);
 
@@ -172,26 +165,18 @@ void main() {
     expect(find.textContaining('Madrid'), findsOneWidget);
   });
 
-  testWidgets('Elimina una entrada al pulsar el icono de borrar', (
-    tester,
-  ) async {
+  testWidgets('Elimina una entrada al pulsar el icono de borrar',
+      (tester) async {
     final tripRepo = InMemoryTripRepository();
     final entryRepo = InMemoryEntryRepository();
     final geoRepo = FakeGeocodingRepository();
-    final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
-    final entryService = makeEntryService(entryRepo);
     final UserRepository userRepo = DriftUserRepository(db);
+    final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
+    final entryService = makeEntryService(entryRepo);
     final userService = makeUserService(userRepo);
-    User? _currentUser; // 👈 NUEVO
+    User? _currentUser;
 
-    final trip = Trip(
-      id: '1',
-      title: 'Viaje Test',
-      startDate: DateTime(2025, 1, 1),
-      endDate: DateTime(2025, 1, 5),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+    final trip = createTestTrip(); // 👈 Usamos el helper corregido
     tripRepo.upsert(trip);
 
     final e = Entry.create(

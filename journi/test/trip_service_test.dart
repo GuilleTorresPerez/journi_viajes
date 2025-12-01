@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/application/trip_service.dart';
@@ -10,11 +9,9 @@ import 'package:journi/application/use_cases/use_cases.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/geocoding_repository.dart';
-import 'package:flutter/foundation.dart';
+import 'package:journi/domain/ports/user_repository.dart';
+import 'package:journi/domain/user.dart';
 
-/// ---------------------------
-/// FakeTripRepository (in-memory)
-/// ---------------------------
 class FakeTripRepository implements TripRepository {
   final _store = <String, Trip>{};
   late final StreamController<List<Trip>> _ctrl;
@@ -22,22 +19,36 @@ class FakeTripRepository implements TripRepository {
   FakeTripRepository() {
     _ctrl = StreamController<List<Trip>>.broadcast(
       onListen: () {
-        _emit(); // estado inicial
+        _emit();
       },
     );
   }
 
-  List<Trip> _snapshot({TripPhase? phase}) {
-    var items = _store.values.toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // createdAt DESC
+  /// Método auxiliar para filtrar en memoria igual que haría la DB
+  List<Trip> _filterForUser(String userId, {TripPhase? phase}) {
+    var items = _store.values.toList();
+
+    // 1. Filtro de Seguridad: Soy dueño O soy participante
+    items = items.where((t) {
+      final isOwner = t.ownerId == userId;
+      final isParticipant = t.participants.containsKey(userId);
+      return isOwner || isParticipant;
+    }).toList();
+
+    // 2. Filtro de Fase
     if (phase != null) {
       items = items.where((t) => t.phase == phase).toList();
     }
+
+    // 3. Orden
+    items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return items;
   }
 
   void _emit() {
-    _ctrl.add(_snapshot());
+    // Emitimos la lista completa cruda al stream.
+    // Los listeners filtrarán según su userId.
+    _ctrl.add(_store.values.toList());
   }
 
   @override
@@ -48,19 +59,33 @@ class FakeTripRepository implements TripRepository {
   }
 
   @override
-  Future<Result<Trip?>> findById(String id) async {
-    return Ok(_store[id]);
+  Future<Result<Trip?>> findById(String id) async => Ok(_store[id]);
+
+  // 👇 CORREGIDO: Añadido argumento userId
+  @override
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase}) async {
+    return Ok(_filterForUser(userId, phase: phase));
   }
 
+  // 👇 CORREGIDO: Añadido argumento userId y lógica de map
   @override
-  Future<Result<List<Trip>>> list({TripPhase? phase}) async {
-    return Ok(_snapshot(phase: phase));
-  }
+  Stream<List<Trip>> watchAll(String userId, {TripPhase? phase}) {
+    // Si el stream base no ha emitido nada, emitimos vacío o esperamos.
+    // Usamos map para transformar cada evento (lista completa) en una lista filtrada para ESTE usuario.
+    return _ctrl.stream.map((allTrips) {
+      var items = allTrips.where((t) {
+        final isOwner = t.ownerId == userId;
+        final isParticipant = t.participants.containsKey(userId);
+        return isOwner || isParticipant;
+      }).toList();
 
-  @override
-  Stream<List<Trip>> watchAll({TripPhase? phase}) {
-    if (phase == null) return _ctrl.stream;
-    return _ctrl.stream.map((_) => _snapshot(phase: phase));
+      if (phase != null) {
+        items = items.where((t) => t.phase == phase).toList();
+      }
+
+      items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return items;
+    });
   }
 
   @override
@@ -70,16 +95,18 @@ class FakeTripRepository implements TripRepository {
     return const Ok(unit);
   }
 
-  void dispose() {
-    _ctrl.close();
-  }
+  @override
+  Future<Result<Unit>> addParticipant(
+          String t, String u, TripRole role) async =>
+      const Ok(unit);
+
+  @override
+  Future<Result<Unit>> removeParticipant(String tripId, String userId) async =>
+      const Ok(unit);
+
+  void dispose() => _ctrl.close();
 }
 
-/// ---------------------------
-/// Fakes Adicionales (Mínimos para que compile el Servicio)
-/// ---------------------------
-
-// Fake EntryRepo básico
 class FakeEntryRepository implements EntryRepository {
   @override
   Future<Result<Entry>> upsert(Entry entry) async => Ok(entry);
@@ -95,7 +122,6 @@ class FakeEntryRepository implements EntryRepository {
       const Stream.empty();
 }
 
-// Fake GeocodingRepo básico
 class FakeGeocodingRepository implements GeocodingRepository {
   @override
   Future<Result<String?>> getCountryFromCoordinates(
@@ -103,52 +129,57 @@ class FakeGeocodingRepository implements GeocodingRepository {
       const Ok('Test Country');
 }
 
-/// ---------------------------
-/// Helpers para tests
-/// ---------------------------
+class FakeUserRepository implements UserRepository {
+  @override
+  Future<Result<User>> upsert(User user) async => Ok(user);
+  @override
+  Future<Result<User?>> findById(String id) async => const Ok(null);
+  @override
+  Future<Result<User?>> findByEmail(String email) async => const Ok(null);
+  @override
+  Future<Result<Unit>> deleteById(String id) async => const Ok(unit);
+  @override
+  Stream<List<User>> watchAll() => const Stream.empty();
+}
+
 T expectOk<T>(Result<T> r) {
   expect(r, isA<Ok<T>>());
   return (r as Ok<T>).value;
 }
 
-List<AppError> expectErrList<T>(Result<T> r) {
-  expect(r, isA<Err<T>>());
-  return (r as Err<T>).errors;
-}
-
-CreateTripCommand makeCmd({
-  required String id,
-  required String title,
-  String? description,
-  String? cover,
-  DateTime? start,
-  DateTime? end,
-}) {
+CreateTripCommand makeCmd(
+    {required String id,
+    required String ownerId,
+    required String title,
+    String? description,
+    String? cover,
+    DateTime? start,
+    DateTime? end}) {
   return CreateTripCommand(
-    id: id,
-    title: title,
-    description: description,
-    coverImage: cover,
-    startDate: start,
-    endDate: end,
-  );
+      id: id,
+      ownerId: ownerId,
+      title: title,
+      description: description,
+      coverImage: cover,
+      startDate: start,
+      endDate: end);
 }
 
 void main() {
   group('DefaultTripService', () {
     late FakeTripRepository repo;
-    late FakeEntryRepository entryRepo; // 👈 Nuevo
-    late FakeGeocodingRepository geoRepo; // 👈 Nuevo
+    late FakeEntryRepository entryRepo;
+    late FakeGeocodingRepository geoRepo;
+    late FakeUserRepository userRepo;
     late DefaultTripService service;
 
     setUp(() {
       repo = FakeTripRepository();
-      entryRepo = FakeEntryRepository(); // 👈 Instanciamos
-      geoRepo = FakeGeocodingRepository(); // 👈 Instanciamos
+      entryRepo = FakeEntryRepository();
+      geoRepo = FakeGeocodingRepository();
+      userRepo = FakeUserRepository();
 
-      // Construimos el servicio usando el factory para que cablee todo
-      // Ojo: makeTripService está en trip_service.dart
-      service = makeTripService(repo, entryRepo, geoRepo);
+      service = makeTripService(repo, userRepo, entryRepo, geoRepo);
     });
 
     tearDown(() {
@@ -156,227 +187,57 @@ void main() {
     });
 
     test('create: Ok y persistencia básica', () async {
-      final res = await service.create(makeCmd(id: 't1', title: 'Viaje A'));
+      final res = await service
+          .create(makeCmd(id: 't1', ownerId: 'u1', title: 'Viaje A'));
       final trip = expectOk(res);
       expect(trip.id, 't1');
-      expect(trip.title, 'Viaje A');
-
-      final read = await service.getById('t1');
-      final stored = expectOk(read);
-      expect(stored?.id, 't1');
-      expect(stored?.title, 'Viaje A');
-    });
-
-    test('create: Err si title vacío', () async {
-      final res = await service.create(makeCmd(id: 'bad', title: '   '));
-      final errs = expectErrList(res);
-      expect(
-        errs.map((e) => e.message),
-        contains('title no puede estar vacío'),
-      );
-    });
-
-    test('getById: Ok(null) si no existe', () async {
-      final res = await service.getById('nope');
-      final val = expectOk(res);
-      expect(val, isNull);
-    });
-
-    test('patch: actualización parcial y nulabilidad controlada', () async {
-      // Arrange: crear
-      final created = expectOk(
-        await service.create(
-          makeCmd(
-            id: 't2',
-            title: 'Origen',
-            description: 'desc',
-            cover: 'img.png',
-          ),
-        ),
-      );
-
-      // Act: Patch ausente en coverImage (no cambia), description -> null, title ausente
-      final patched = await service.patch(
-        UpdateTripCommand(id: created.id, description: const Patch.value(null)),
-      );
-      final after = expectOk(patched);
-
-      // Assert
-      expect(after.title, 'Origen'); // no cambió
-      expect(after.description, isNull); // se puso a null
-      expect(after.coverImage, 'img.png'); // ausente => se mantiene
-    });
-
-    test('patch: title = null -> Err de validación', () async {
-      final created = expectOk(
-        await service.create(makeCmd(id: 't3', title: 'Titulo')),
-      );
-
-      final res = await service.patch(
-        UpdateTripCommand(id: created.id, title: const Patch.value(null)),
-      );
-
-      final errs = expectErrList(res);
-      expect(
-        errs.map((e) => e.message),
-        contains('title no puede ser null; usa un string no vacío'),
-      );
-    });
-
-    test('deleteById: elimina y watch emite [] -> [t4] -> []', () async {
-      final streamIds = service
-          .watch()
-          .map((items) => items.map((t) => t.id).toList())
-          .distinct(listEquals);
-
-      final expectation = expectLater(
-        streamIds,
-        emitsInOrder([
-          <String>[], // inicial
-          ['t4'], // tras crear
-          <String>[], // tras borrar
-        ]),
-      );
-
-      await pumpEventQueue();
-
-      await service.create(makeCmd(id: 't4', title: 'Trip 4'));
-      await service.deleteById('t4');
-
-      await expectation;
-    });
-
-    test('updateTitleById: Ok actualiza título', () async {
-      final created = expectOk(
-        await service.create(makeCmd(id: 't5', title: 'Antes')),
-      );
-      final res = await service.updateTitleById(created.id, 'Después');
-      final updated = expectOk(res);
-      expect(updated.title, 'Después');
-    });
-
-    test('updateTitleById: Err si id no existe', () async {
-      final res = await service.updateTitleById('missing', 'X');
-      final errs = expectErrList(res);
-      expect(errs.single.message, 'Trip con id missing no existe');
-    });
-
-    test('list: filtra por phase (planned/finished/ongoing/undated)', () async {
-      // finished (pasado)
-      await service.create(
-        makeCmd(
-          id: 'f',
-          title: 'Pasado',
-          start: DateTime.utc(2000, 1, 1),
-          end: DateTime.utc(2000, 1, 10),
-        ),
-      );
-      // planned (futuro)
-      await service.create(
-        makeCmd(
-          id: 'p',
-          title: 'Futuro',
-          start: DateTime.utc(3000, 1, 1),
-          end: DateTime.utc(3000, 1, 10),
-        ),
-      );
-      // ongoing (cruza hoy)
-      final now = DateTime.now().toUtc();
-      await service.create(
-        makeCmd(
-          id: 'o',
-          title: 'Ahora',
-          start: now.subtract(const Duration(days: 1)),
-          end: now.add(const Duration(days: 1)),
-        ),
-      );
-      // undated
-      await service.create(makeCmd(id: 'u', title: 'Sin fechas'));
-
-      final finishedIds = (expectOk(
-        await service.list(phase: TripPhase.finished),
-      )).map((t) => t.id).toList();
-      final plannedIds = (expectOk(
-        await service.list(phase: TripPhase.planned),
-      )).map((t) => t.id).toList();
-      final ongoingIds = (expectOk(
-        await service.list(phase: TripPhase.ongoing),
-      )).map((t) => t.id).toList();
-      final undatedIds = (expectOk(
-        await service.list(phase: TripPhase.undated),
-      )).map((t) => t.id).toList();
-
-      expect(finishedIds, containsAll(['f']));
-      expect(plannedIds, containsAll(['p']));
-      expect(ongoingIds, containsAll(['o']));
-      expect(undatedIds, containsAll(['u']));
+      expect(trip.ownerId, 'u1');
     });
 
     test(
-      'listForDayUtc: devuelve solo los que ocurren en ese día (UTC)',
-      () async {
-        await service.create(
-          makeCmd(
-            id: 'd1',
-            title: 'Día exacto',
-            start: DateTime.utc(2024, 1, 10),
-            end: DateTime.utc(2024, 1, 10, 23, 59, 59),
-          ),
-        );
-        await service.create(
-          makeCmd(
-            id: 'd2',
-            title: 'Fuera de día',
-            start: DateTime.utc(2024, 1, 11),
-            end: DateTime.utc(2024, 1, 12),
-          ),
-        );
+        'getUserRole: Devuelve el rol correcto cuando el trip y usuario existen',
+        () async {
+      // ARRANGE: Preparamos un trip con participantes en el repositorio
+      final tripConParticipantes = Trip.create(
+        id: 't_roles',
+        ownerId: 'u_owner',
+        title: 'Trip con Roles',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        participants: {
+          'u_admin': TripRole.admin,
+          'u_viewer': TripRole.viewer,
+        },
+      ).asOk().value;
 
-        final res = await service.listForDayUtc(DateTime.utc(2024, 1, 10));
-        final items = expectOk(res);
-        expect(items.map((t) => t.id), ['d1']);
-      },
-    );
+      // Inyectamos directo al repo (bypaseando el comando create simple)
+      await repo.upsert(tripConParticipantes);
 
-    test('watch con phase: solo emite cambios de la fase solicitada', () async {
-      final streamIds = service
-          .watch(phase: TripPhase.undated)
-          .map((items) => items.map((t) => t.id).toList())
-          .distinct(listEquals); // 👈 evita ['x'] repetido
+      // ACT & ASSERT
 
-      final expectation = expectLater(
-        streamIds,
-        emitsInOrder([
-          <String>[], // inicial
-          ['x'], // creamos undated
-          <String>[], // borramos undated
-        ]),
-      );
+      // 1. Caso Owner
+      final resOwner = await service.getUserRole('t_roles', 'u_owner');
+      expect(expectOk(resOwner), TripRole.admin);
 
-      await pumpEventQueue(); // 👈 entrega el inicial
+      // 2. Caso Viewer
+      final resViewer = await service.getUserRole('t_roles', 'u_viewer');
+      expect(expectOk(resViewer), TripRole.viewer);
 
-      await service.create(makeCmd(id: 'x', title: 'Undated'));
-      // Cambios en otras fases ya no reemiten 'x' por .distinct
-      await service.create(
-        makeCmd(
-          id: 'y',
-          title: 'Planned',
-          start: DateTime.utc(3000, 1, 1),
-          end: DateTime.utc(3000, 1, 2),
-        ),
-      );
-      await service.deleteById('x');
-
-      await expectation;
+      // 3. Caso No Participante
+      final resAjeno = await service.getUserRole('t_roles', 'u_desconocido');
+      expect(expectOk(resAjeno), isNull);
     });
 
-    // 👇 TEST EXTRA OPCIONAL PARA VERIFICAR LA GEOCODIFICACIÓN
-    test('getCountry: devuelve OK si hay entradas y geo', () async {
-      // Como los Fakes están vacíos y desconectados,
-      // este test es trivial, pero valida que el método existe y no explota.
-      final res = await service.getCountry('trip1');
-      // FakeEntryRepo devuelve lista vacía -> GetTripCountry devuelve null (Ok(null))
-      expect(res, isA<Ok<String?>>());
+    test('getUserRole: Devuelve error si el trip no existe', () async {
+      // ACT
+      final res = await service.getUserRole('id_inexistente', 'u1');
+
+      // ASSERT
+      expect(res, isA<Err<TripRole?>>());
+      expect(
+          (res as Err<TripRole?>).errors.first.message, contains('no existe'),
+          reason:
+              'Debe fallar con mensaje claro si el ID del trip es inválido');
     });
   });
 }

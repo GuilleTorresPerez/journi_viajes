@@ -9,6 +9,7 @@ import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_entry_repository.dart';
 import 'package:journi/data/local/drift/drift_trip_repository.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
+import 'package:journi/searchTrip.dart';
 import 'application/entry_service.dart';
 import 'package:journi/application/user_service.dart';
 import 'domain/trip.dart';
@@ -24,20 +25,23 @@ import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/ports/user_repository.dart';
 
 // Dominio / aplicación
-
 import 'package:journi/login_screen.dart';
 import 'package:journi/data/external/platform_geocoding_repository.dart';
 import 'package:journi/domain/ports/geocoding_repository.dart';
 
 void main() {
   final db = AppDatabase();
+
+  // 1. Instanciamos los repositorios
   final TripRepository tripRepo = DriftTripRepository(db);
   final EntryRepository entryRepo = DriftEntryRepository(db);
   final UserRepository userRepo = DriftUserRepository(db);
-
   final GeocodingRepository geoRepo = PlatformGeocodingRepository();
 
-  final tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+  // 2. Inyectamos las dependencias.
+  // CORRECCIÓN: Añadimos userRepo como segundo argumento en makeTripService
+  final tripService = makeTripService(tripRepo, userRepo, entryRepo, geoRepo);
+
   final entryService = makeEntryService(entryRepo);
   final userService = makeUserService(userRepo);
 
@@ -90,6 +94,7 @@ class MyApp extends StatelessWidget {
         entryService: entryService,
         userRepo: userRepo,
         userService: userService,
+        skipLogin: false, // por defecto false
       ),
     );
   }
@@ -107,9 +112,11 @@ class MyHomePage extends StatefulWidget {
     required this.entryRepo,
     required this.entryService,
     required this.userRepo,
-    required this.userService, //required bool inicionSesiada,
+    required this.userService,
+    required this.skipLogin,
   });
 
+  final bool skipLogin; // nuevo flag para tests
   final String title;
   final bool sesionIniciada;
 
@@ -133,21 +140,75 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  // 🔽 snapshot inicial para cuando el stream aún no ha emitido
+  // snapshot inicial para cuando el stream aún no ha emitido
   List<Trip>? _initialTrips;
 
-  bool _sesionIniciada = false; // 👈 NUEVO
-  User? _currentUser; // 👈 NUEVO
+  bool _sesionIniciada = false;
+  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
-    _sesionIniciada = widget.sesionIniciada; // 👈 IMPORTANTE
-    _loadInitial();
+    _sesionIniciada = widget.sesionIniciada;
+    _checkSession().then((_) => _loadInitial());
+  }
+
+  Future<void> _checkSession() async {
+    if (widget.skipLogin) {
+      _currentUser = User(
+        id: "test-user",
+        name: "Test",
+        lastName: "User",
+        email: "test@test.com",
+        passwordHash: "Use",
+        passwordSalt: '',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      _sesionIniciada = true;
+    }
+    final user = await _currentUser;
+
+    if (!mounted) return;
+
+    if (user != null) {
+      setState(() {
+        _currentUser = user;
+        _sesionIniciada = true;
+      });
+    } else {
+      // Si no hay usuario, mostramos login
+      final loggedUser = await Navigator.push<User?>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LoginScreen(
+            selectedIndex: _selectedIndex,
+            sesionIniciada: _sesionIniciada,
+            viajes: widget.viajes,
+            tripRepo: widget.tripRepo,
+            entryRepo: widget.entryRepo,
+            tripService: widget.tripService,
+            entryService: widget.entryService,
+            userRepo: widget.userRepo,
+            userService: widget.userService,
+          ),
+        ),
+      );
+
+      if (loggedUser != null && mounted) {
+        setState(() {
+          _currentUser = loggedUser;
+          _sesionIniciada = true;
+        });
+      }
+    }
   }
 
   Future<void> _loadInitial() async {
-    final res = await widget.tripRepo.list();
+    // Espera hasta que _currentUser esté disponible
+    if (_currentUser == null) return;
+
+    final res = await widget.tripRepo.list(_currentUser!.id);
     if (!mounted) return;
     if (res is Ok<List<Trip>>) {
       setState(() {
@@ -196,91 +257,131 @@ class _MyHomePageState extends State<MyHomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-      ),
-      body: StreamBuilder<List<Trip>>(
-        stream: widget.tripRepo.watchAll(),
-        builder: (context, snapshot) {
-          // Usamos el stream si hay datos; si no, usamos la carga inicial
-          final items = snapshot.data ?? _initialTrips;
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.black),
+            onPressed: () async {
+              final items = widget.viajes;
 
-          if (items == null) {
-            // Primer frame (o mientras resuelve list())
-            return const Center(child: CircularProgressIndicator());
-          }
+              final selectedTrip = await showSearch<Trip?>(
+                context: context,
+                delegate: SearchTripsDelegate(items),
+              );
 
-          widget.viajes = items;
-          if (items.isEmpty) {
-            return const Center(
-              child: Text(
-                'No tienes ningún viaje registrado.',
-                style: TextStyle(fontSize: 18),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final viaje = items[index];
-
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  key: ValueKey('id$index'),
-                  leading: const Icon(Icons.flight_takeoff, color: Colors.teal),
-                  title: Text(
-                    viaje.title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+              // Opcional: si el usuario selecciona un viaje, lo abrimos
+              if (selectedTrip != null && mounted) {
+                final index = items.indexOf(selectedTrip);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => Pantalla_Viaje(
+                      selectedIndex: _selectedIndex,
+                      sesionIniciada: _sesionIniciada,
+                      viajes: items,
+                      num_viaje: index,
+                      repo: widget.tripRepo,
+                      entryRepo: widget.entryRepo,
+                      tripService: widget.tripService,
+                      entryService: widget.entryService,
+                      picker: widget.picker,
+                      userRepo: widget.userRepo,
+                      userService: widget.userService,
+                      currentUser: _currentUser,
                     ),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (viaje.startDate != null)
-                        Text(
-                          'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}',
+                );
+              }
+            },
+          ),
+        ],
+      ),
+      body: _currentUser == null
+          ? const Center(child: CircularProgressIndicator())
+          : StreamBuilder<List<Trip>>(
+              stream: widget.tripRepo.watchAll(_currentUser!.id),
+              builder: (context, snapshot) {
+                // Usamos el stream si hay datos; si no, usamos la carga inicial
+                final items = snapshot.data ?? _initialTrips;
+                if (items == null) {
+                  // Primer frame (o mientras resuelve list())
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                widget.viajes = items;
+                if (items.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No tienes ningún viaje registrado.',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final viaje = items[index];
+
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        key: ValueKey('id$index'),
+                        leading: const Icon(Icons.flight_takeoff,
+                            color: Colors.teal),
+                        title: Text(
+                          viaje.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
-                      if (viaje.endDate != null)
-                        Text(
-                          'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}',
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (viaje.startDate != null)
+                              Text(
+                                'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}',
+                              ),
+                            if (viaje.endDate != null)
+                              Text(
+                                'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}',
+                              ),
+                            const SizedBox(height: 4),
+                          ],
                         ),
-                      const SizedBox(height: 4),
-                    ],
-                  ),
-                  isThreeLine: true,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Pantalla_Viaje(
-                          selectedIndex: _selectedIndex,
-                          sesionIniciada: _sesionIniciada,
-                          viajes: items,
-                          num_viaje: index,
-                          repo: widget.tripRepo,
-                          entryRepo: widget.entryRepo,
-                          tripService: widget.tripService,
-                          entryService: widget.entryService,
-                          picker: widget.picker,
-                          userRepo: widget.userRepo,
-                          userService: widget.userService,
-                          currentUser: _currentUser, // 👈 NUEVO
-                        ),
+                        isThreeLine: true,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Pantalla_Viaje(
+                                selectedIndex: _selectedIndex,
+                                sesionIniciada: _sesionIniciada,
+                                viajes: items,
+                                num_viaje: index,
+                                repo: widget.tripRepo,
+                                entryRepo: widget.entryRepo,
+                                tripService: widget.tripService,
+                                entryService: widget.entryService,
+                                picker: widget.picker,
+                                userRepo: widget.userRepo,
+                                userService: widget.userService,
+                                currentUser: _currentUser,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
-                ),
-              );
-            },
-          );
-        },
-      ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createNewTravel,
         tooltip: 'Nuevo viaje',
@@ -325,6 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: _currentUser!,
                 ),
               ),
             );
@@ -343,6 +445,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: _currentUser,
                 ),
               ),
             );
@@ -368,7 +471,6 @@ class _MyHomePageState extends State<MyHomePage> {
           } else if (index == 4) {
             // Perfil
             if (_sesionIniciada && _currentUser != null) {
-              // Ya tenía sesión -> ir directo a MiPerfil
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -382,12 +484,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
-                    currentUser: _currentUser!, //loggedUser
+                    currentUser: _currentUser!,
                   ),
                 ),
               );
             } else {
-              // No hay sesión -> ir a Login y esperar resultado
               final loggedUser = await Navigator.push<User?>(
                 context,
                 MaterialPageRoute(
@@ -411,7 +512,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   _currentUser = loggedUser;
                 });
 
-                // Una vez logueado, lo llevamos al perfil
                 Navigator.push(
                   context,
                   MaterialPageRoute(

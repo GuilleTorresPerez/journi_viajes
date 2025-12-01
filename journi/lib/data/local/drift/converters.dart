@@ -18,3 +18,20 @@ class StringListConverter extends TypeConverter<List<String>, String> {
   @override
   String toSql(List<String> value) => const JsonEncoder().convert(value);
 }
+
+class TripRoleConverter extends TypeConverter<TripRole, String> {
+  const TripRoleConverter();
+
+  @override
+  TripRole fromSql(String fromDb) {
+    try {
+      return TripRole.values.firstWhere((e) => e.name == fromDb);
+    } catch (_) {
+      // Fallback seguro: si el rol no existe o es antiguo, lo tratamos como viewer
+      return TripRole.viewer;
+    }
+  }
+
+  @override
+  String toSql(TripRole value) => value.name;
+}

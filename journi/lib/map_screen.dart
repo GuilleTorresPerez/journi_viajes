@@ -16,6 +16,7 @@ import 'data/local/drift/drift_user_repository.dart';
 import 'domain/entry.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
+import 'domain/user.dart';
 import 'login_screen.dart';
 import 'main.dart';
 
@@ -33,19 +34,20 @@ class MapaPaisScreen extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
+  final User? currentUser;
 
-  MapaPaisScreen({
-    super.key,
-    required this.viajes,
-    required this.sesionIniciada,
-    required this.selectedIndex,
-    required this.tripRepo,
-    required this.entryRepo,
-    required this.tripService,
-    required this.entryService,
-    required this.userRepo,
-    required this.userService,
-  });
+  MapaPaisScreen(
+      {super.key,
+      required this.viajes,
+      required this.sesionIniciada,
+      required this.selectedIndex,
+      required this.tripRepo,
+      required this.entryRepo,
+      required this.tripService,
+      required this.entryService,
+      required this.userRepo,
+      required this.userService,
+      required this.currentUser});
 
   @override
   State<MapaPaisScreen> createState() => _MapaPaisScreenState();
@@ -66,7 +68,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
   }
 
   Future<void> _cargarViajes() async {
-    final res = await tripRepo.list();
+    /*final res = await tripRepo.list();
     if (res is Ok<List<Trip>>) {
       setState(() {
         _viajes = res.value;
@@ -75,7 +77,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
       setState(() {
         _viajes = [];
       });
-    }
+    }*/
   }
 
   @override
@@ -123,16 +125,16 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                   MaterialPageRoute(
                     // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
                     builder: (context) => MyHomePage(
-                      title: 'JOURNI',
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.tripRepo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: userRepo,
-                      userService: userService,
-                    ),
+                        title: 'JOURNI',
+                        sesionIniciada: widget.sesionIniciada,
+                        viajes: widget.viajes,
+                        tripRepo: widget.tripRepo,
+                        entryRepo: widget.entryRepo,
+                        tripService: widget.tripService,
+                        entryService: widget.entryService,
+                        userRepo: userRepo,
+                        userService: userService,
+                        skipLogin: false),
                   ),
                 );
               } else if (_selectedIndex == 2) {
@@ -150,6 +152,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                       entryService: widget.entryService,
                       userRepo: userRepo,
                       userService: userService,
+                      currentUser: widget.currentUser,
                     ),
                   ),
                 );
@@ -299,6 +302,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     entryService: widget.entryService,
                     userRepo: userRepo,
                     userService: userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );

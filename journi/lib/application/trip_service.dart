@@ -1,30 +1,38 @@
-import 'package:journi/domain/trip.dart';
+import 'package:journi/domain/trip.dart'; // 👈 Aquí está TripRole
 import 'package:journi/domain/trip_queries.dart';
 import 'package:journi/domain/ports/trip_repository.dart';
+import 'package:journi/domain/ports/user_repository.dart';
 import 'package:journi/application/use_cases/use_cases.dart';
 import 'package:journi/application/use_cases/get_trip_country_use_case.dart';
 import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/ports/geocoding_repository.dart';
+import 'package:journi/application/use_cases/share_trip_use_case.dart';
+import 'package:journi/domain/trip_extensions.dart';
 
 /// Puerto de servicio (fachada de aplicación).
 abstract class TripService {
   Future<Result<Trip>> create(CreateTripCommand cmd);
   Future<Result<Trip>> patch(UpdateTripCommand cmd);
-  Future<Result<Unit>> deleteById(String id); // 👈 Unit unificado
+  Future<Result<Unit>> deleteById(String id);
 
-  /// Helper que resuelve el `current` por id y delega en UpdateTripTitleUseCase.
   Future<Result<Trip>> updateTitleById(String id, String newTitle);
 
-  /// Lectura/consulta
   Future<Result<Trip?>> getById(String id);
-  Future<Result<List<Trip>>> list({TripPhase? phase});
-  Stream<List<Trip>> watch({TripPhase? phase});
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase});
+  Stream<List<Trip>> watch(String userId, {TripPhase? phase});
 
-  /// Consultas específicas
-  Future<Result<List<Trip>>> listForDayUtc(DateTime dayUtc);
+  Future<Result<List<Trip>>> listForDayUtc(String userId, DateTime dayUtc);
 
-  /// Obtiene el país del viaje basado en sus entradas.
   Future<Result<String?>> getCountry(String tripId);
+
+  /// Comparte el viaje con otro usuario por email.
+  /// ⚠️ CAMBIO: Ahora aceptamos un rol opcional (por defecto viewer)
+  Future<Result<Unit>> shareTrip(String tripId, String email,
+      {TripRole role = TripRole.viewer});
+
+  /// Obtiene el rol de un usuario en un viaje específico.
+  /// Devuelve Ok(null) si el usuario no participa en el viaje.
+  Future<Result<TripRole?>> getUserRole(String tripId, String userId);
 }
 
 /// Implementación por defecto del servicio.
@@ -37,10 +45,12 @@ class DefaultTripService implements TripService {
   final WatchTripsUseCase _watchUC;
   final ListTripsForDayUseCase _listDayUC;
   final TripRepository _repo;
-  final GetTripCountryUseCase _getCountryUC; // Nueva dependencia
+  final GetTripCountryUseCase _getCountryUC;
+  final ShareTripUseCase _shareTripUC;
 
   DefaultTripService({
     required TripRepository repo,
+    required UserRepository userRepo,
     required GetTripCountryUseCase getCountryUC,
     CreateTripUseCase? createUC,
     UpdateTripUseCase? updateUC,
@@ -57,10 +67,12 @@ class DefaultTripService implements TripService {
         _listUC = listUC ?? ListTripsUseCase(repo),
         _watchUC = watchUC ?? WatchTripsUseCase(repo),
         _listDayUC = listDayUC ?? ListTripsForDayUseCase(repo),
-        _getCountryUC = getCountryUC;
+        _getCountryUC = getCountryUC,
+        _shareTripUC = ShareTripUseCase(repo, userRepo);
 
   @override
   Future<Result<Trip>> create(CreateTripCommand cmd) {
+    // Nota: El 'cmd' ahora incluye ownerId, el servicio solo lo pasa.
     return _createUC(cmd);
   }
 
@@ -71,7 +83,6 @@ class DefaultTripService implements TripService {
 
   @override
   Future<Result<Unit>> deleteById(String id) {
-    // 👈 Unit unificado
     return _deleteUC(id);
   }
 
@@ -81,18 +92,20 @@ class DefaultTripService implements TripService {
   }
 
   @override
-  Future<Result<List<Trip>>> list({TripPhase? phase}) {
-    return _listUC(phase: phase);
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase}) {
+    // Pasamos el userId al caso de uso o directamente al repo
+    // (Idealmente actualizarías ListTripsUseCase también)
+    return _repo.list(userId, phase: phase);
   }
 
   @override
-  Stream<List<Trip>> watch({TripPhase? phase}) {
-    return _watchUC(phase: phase);
+  Stream<List<Trip>> watch(String userId, {TripPhase? phase}) {
+    return _repo.watchAll(userId, phase: phase);
   }
 
   @override
-  Future<Result<List<Trip>>> listForDayUtc(DateTime dayUtc) {
-    return _listDayUC(dayUtc);
+  Future<Result<List<Trip>>> listForDayUtc(String userId, DateTime dayUtc) {
+    return _listDayUC(userId, dayUtc);
   }
 
   @override
@@ -112,15 +125,49 @@ class DefaultTripService implements TripService {
   Future<Result<String?>> getCountry(String tripId) {
     return _getCountryUC(tripId);
   }
+
+  @override
+  Future<Result<Unit>> shareTrip(String tripId, String email,
+      {TripRole role = TripRole.viewer}) {
+    // ⚠️ CAMBIO: Pasamos el argumento 'role' al caso de uso
+    return _shareTripUC(tripId, email, role: role);
+  }
+
+  @override
+  Future<Result<TripRole?>> getUserRole(String tripId, String userId) async {
+    // 1. Recuperamos el viaje del repositorio
+    final result = await _repo.findById(tripId);
+
+    // 2. Manejo de errores usando programación funcional (Result monad)
+    if (result is Err<Trip?>) {
+      return Err<TripRole?>(result.errors);
+    }
+
+    final trip = (result as Ok<Trip?>).value;
+
+    // 3. Validamos existencia
+    if (trip == null) {
+      return Err<TripRole?>(
+          [const ValidationError('El viaje solicitado no existe.')]);
+    }
+
+    // 4. Delegamos la lógica al Dominio (la extensión que creamos arriba)
+    final role = trip.getRole(userId);
+
+    return Ok<TripRole?>(role);
+  }
 }
 
-/// Factory cómoda para DI manual:
-DefaultTripService makeTripService(TripRepository tripRepo,
-    EntryRepository entryRepo, GeocodingRepository geoRepo) {
+//// Factory cómoda para DI manual:
+DefaultTripService makeTripService(
+  TripRepository tripRepo,
+  UserRepository userRepo, // 1. Añadir argumento aquí
+  EntryRepository entryRepo,
+  GeocodingRepository geoRepo,
+) {
   return DefaultTripService(
     repo: tripRepo,
+    userRepo: userRepo, // 2. Pasarlo al constructor aquí
     getCountryUC: GetTripCountryUseCase(entryRepo, geoRepo),
-    // Aquí el resto de UseCases se pueden instanciar por defecto como tenías antes
-    // o pasarlos como parámetros si escalas la inyección de dependencias.
   );
 }

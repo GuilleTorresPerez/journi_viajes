@@ -32,7 +32,7 @@ class Crear_Viaje extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
-  final User? currentUser; // 👈 AÑADIR ESTO
+  final User? currentUser;
 
   const Crear_Viaje({
     super.key,
@@ -46,7 +46,7 @@ class Crear_Viaje extends StatefulWidget {
     required this.entryService,
     required this.userRepo,
     required this.userService,
-    this.currentUser, // 👈 AÑADIR ESTO
+    required this.currentUser,
   });
 
   @override
@@ -181,6 +181,14 @@ class _CrearViajeState extends State<Crear_Viaje> {
                   backgroundColor: Colors.white,
                   textColor: Colors.black,
                   onPressed: () async {
+                    // 1. VALIDACIÓN DE SESIÓN (Defensiva)
+                    // No podemos crear un viaje sin dueño.
+                    if (widget.currentUser == null) {
+                      _showError(
+                          'Error: Debes iniciar sesión para crear un viaje.');
+                      return;
+                    }
+
                     final titulo = _titulo.text.trim();
                     final ini = _parseDdMmYyyy(_fecha_ini.text.trim());
                     final fin = _parseDdMmYyyy(_fecha_fin.text.trim());
@@ -206,10 +214,15 @@ class _CrearViajeState extends State<Crear_Viaje> {
 
                     final nuevoId =
                         DateTime.now().millisecondsSinceEpoch.toString();
+
+                    // 2. CORRECCIÓN DEL ERROR AQUÍ
                     final cmd = CreateTripCommand(
                       id: nuevoId,
+                      ownerId: widget.currentUser!
+                          .id, // 👈 Pasamos el ID del usuario logueado
                       title: titulo,
-                      description: 'Description',
+                      description:
+                          'Description', // (Opcional: podrías añadir un campo de texto para esto)
                       startDate: ini,
                       endDate: fin,
                     );
@@ -217,7 +230,7 @@ class _CrearViajeState extends State<Crear_Viaje> {
                     // Servicio de aplicación
                     final result = await widget.tripService.create(cmd);
 
-                    if (!mounted) return; // evita usar context tras async gap
+                    if (!mounted) return;
 
                     if (result is Ok<Trip>) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -225,7 +238,7 @@ class _CrearViajeState extends State<Crear_Viaje> {
                           content: Text('Viaje creado correctamente'),
                         ),
                       );
-                      Navigator.pop(context); // vuelve a la lista
+                      Navigator.pop(context);
                     } else if (result is Err<Trip>) {
                       final errors =
                           result.errors.map((e) => e.message).join('\n');
@@ -276,6 +289,7 @@ class _CrearViajeState extends State<Crear_Viaje> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );

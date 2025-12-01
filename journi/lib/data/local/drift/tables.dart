@@ -4,6 +4,8 @@ part of 'app_database.dart';
 @DataClassName('DbTrip')
 class Trips extends Table {
   TextColumn get id => text()();
+  TextColumn get ownerId =>
+      text().references(Users, #id, onDelete: KeyAction.cascade)();
   TextColumn get title => text()();
   TextColumn get description => text().nullable()();
   TextColumn get coverImage => text().nullable()();
@@ -56,4 +58,19 @@ class Users extends Table {
 
   @override
   List<String> get customConstraints => ['UNIQUE(email)']; // email único
+}
+
+@DataClassName('DbTripParticipant')
+class TripParticipants extends Table {
+  TextColumn get tripId =>
+      text().references(Trips, #id, onDelete: KeyAction.cascade)();
+
+  TextColumn get userId =>
+      text().references(Users, #id, onDelete: KeyAction.cascade)();
+
+  // 2. NUEVO: Rol del participante (Admin/Viewer)
+  TextColumn get role => text().map(const TripRoleConverter())();
+
+  @override
+  Set<Column> get primaryKey => {tripId, userId};
 }

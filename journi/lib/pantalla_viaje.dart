@@ -12,6 +12,7 @@ import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/trip.dart' hide Ok;
 import 'package:journi/domain/user.dart';
 import 'package:journi/select_location_screen.dart';
+import 'package:video_player/video_player.dart';
 
 import 'application/shared/result.dart';
 import 'application/user_service.dart';
@@ -38,7 +39,7 @@ class Pantalla_Viaje extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
-  User? currentUser;
+  final User? currentUser;
 
   Pantalla_Viaje(
       {super.key,
@@ -60,11 +61,20 @@ class Pantalla_Viaje extends StatefulWidget {
 }
 
 class _PantallaViajeState extends State<Pantalla_Viaje> {
+  VideoPlayerController? _videoController;
+
+  Future<void> _initVideo(File file) async {
+    _videoController?.dispose();
+    _videoController = VideoPlayerController.file(file);
+    await _videoController!.initialize();
+  }
+
   final ImagePicker _picker = ImagePicker();
   //final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
   final TextEditingController _textoController = TextEditingController();
 
   late int _selectedIndex;
+  String _searchQuery = "";
 
   @override
   void initState() {
@@ -92,139 +102,36 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           // BUSCAR / FILTRAR
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black),
-            tooltip: 'Buscar y filtrar',
+            tooltip: 'Buscar',
             onPressed: () {
+              TextEditingController searchCtrl =
+                  TextEditingController(text: _searchQuery);
+
               showDialog(
                 context: context,
                 builder: (context) {
-                  TextEditingController searchCtrl = TextEditingController();
-                  DateTime? fechaInicio;
-                  DateTime? fechaFin;
-                  String? ubicacion;
-
-                  return StatefulBuilder(
-                    builder: (context, setState) {
-                      return AlertDialog(
-                        title: const Text('Buscar y filtrar'),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              TextField(
-                                controller: searchCtrl,
-                                decoration: const InputDecoration(
-                                  labelText: 'Buscar por texto',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-
-                              // Fecha inicio
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    fechaInicio == null
-                                        ? "Inicio: —"
-                                        : "Inicio: ${fechaInicio!.day}/${fechaInicio!.month}/${fechaInicio!.year}",
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      DateTime? fecha = await showDatePicker(
-                                        context: context,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
-                                        initialDate: DateTime.now(),
-                                      );
-                                      if (fecha != null) {
-                                        setState(() => fechaInicio = fecha);
-                                      }
-                                    },
-                                    child: const Text("Elegir"),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              // Fecha fin
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    fechaFin == null
-                                        ? "Fin: —"
-                                        : "Fin: ${fechaFin!.day}/${fechaFin!.month}/${fechaFin!.year}",
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      DateTime? fecha = await showDatePicker(
-                                        context: context,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
-                                        initialDate: DateTime.now(),
-                                      );
-                                      if (fecha != null) {
-                                        setState(() => fechaFin = fecha);
-                                      }
-                                    },
-                                    child: const Text("Elegir"),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 20),
-
-                              // Ubicación
-                              DropdownButtonFormField<String>(
-                                value: ubicacion,
-                                decoration: const InputDecoration(
-                                  labelText: 'Ubicación',
-                                  border: OutlineInputBorder(),
-                                ),
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: "España",
-                                    child: Text("España"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "Francia",
-                                    child: Text("Francia"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "Italia",
-                                    child: Text("Italia"),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  setState(() => ubicacion = value);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cerrar'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Filtros aplicados:\nTexto: ${searchCtrl.text}\nInicio: $fechaInicio\nFin: $fechaFin\nUbicación: $ubicacion",
-                                  ),
-                                ),
-                              );
-                            },
-                            child: const Text('Aplicar'),
-                          ),
-                        ],
-                      );
-                    },
+                  return AlertDialog(
+                    title: const Text("Buscar por texto"),
+                    content: TextField(
+                      controller: searchCtrl,
+                      decoration: const InputDecoration(
+                        labelText: "Introduce texto a buscar",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancelar"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _searchQuery = searchCtrl.text.trim());
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Aplicar"),
+                      )
+                    ],
                   );
                 },
               );
@@ -236,51 +143,66 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
             icon: const Icon(Icons.share, color: Colors.black),
             tooltip: 'Compartir viaje',
             onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (context) {
-                  TextEditingController emailCtrl = TextEditingController();
+              TextEditingController emailCtrl = TextEditingController();
 
-                  return Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          "Compartir viaje",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: emailCtrl,
-                          decoration: const InputDecoration(
-                            labelText: 'Correo de la persona',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.send),
-                          label: const Text("Enviar invitación"),
-                          onPressed: () {
-                            Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text(
+                      "Compartir viaje",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: TextField(
+                      controller: emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Correo de la persona',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final email = emailCtrl.text.trim();
+                          if (email.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Introduce un correo válido')),
+                            );
+                            return;
+                          }
+
+                          Navigator.pop(context); // cerrar diálogo
+
+                          final currentTrip = widget.viajes[widget.num_viaje];
+                          final result = await widget.tripService
+                              .shareTrip(currentTrip.id, email);
+
+                          if (result is Ok<Unit>) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Invitación enviada a $email"),
+                              ),
+                            );
+                          } else if (result is Err<Unit>) {
+                            final errorMsg =
+                                result.errors.map((e) => e.message).join(', ');
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  "Invitación enviada a ${emailCtrl.text}",
-                                ),
+                                    "Error al enviar invitación: $errorMsg"),
                               ),
                             );
-                          },
-                        ),
-                      ],
-                    ),
+                          }
+                        },
+                        child: const Text("Enviar"),
+                      ),
+                    ],
                   );
                 },
               );
@@ -291,8 +213,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.black),
             tooltip: 'Editar viaje',
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final updatedTrip = await Navigator.push<Trip?>(
                 context,
                 MaterialPageRoute(
                   builder: (context) => Editar_viaje(
@@ -306,9 +228,17 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );
+
+              if (updatedTrip != null) {
+                setState(() {
+                  widget.viajes[widget.num_viaje] =
+                      updatedTrip; // actualiza la lista local
+                });
+              }
             },
           ),
 
@@ -348,7 +278,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                             Navigator.pop(context); // cierra diálogo
                             Navigator.pop(context); // vuelve a lista
-                            setState(() {});
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -385,19 +314,45 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 );
               }
 
-              final entries = snapshot.data!;
-              return ListView.builder(
-                padding: const EdgeInsets.all(8),
-                itemCount: entries.length,
-                itemBuilder: (context, index) {
-                  final e = entries[index];
+              List<Entry> entries = snapshot.data!;
 
-                  // ---- TEXTO ----
+              if (_searchQuery.isNotEmpty) {
+                entries = entries.where((e) {
                   if (e.type == EntryType.note && e.text != null) {
-                    final fecha = e.createdAt.toLocal();
-                    final fechaFormateada =
-                        "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
-                        "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
+                    return e.text!
+                        .toLowerCase()
+                        .contains(_searchQuery.toLowerCase());
+                  }
+                  return false; // fotos y vídeos no se filtran
+                }).toList();
+              }
+
+              return Column(children: [
+                if (_searchQuery.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _searchQuery = "";
+                        });
+                      },
+                      child: const Text("Deshacer búsqueda"),
+                    ),
+                  ),
+                Expanded(
+                    child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: entries.length,
+                  itemBuilder: (context, index) {
+                    final e = entries[index];
+
+                    // ---- TEXTO ----
+                    if (e.type == EntryType.note && e.text != null) {
+                      final fecha = e.createdAt.toLocal();
+                      final fechaFormateada =
+                          "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
+                          "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
 
                     return Card(
                       color: Colors.white,
@@ -501,88 +456,142 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     );
                   }
 
-                  // ---- FOTO ----
-                  if (e.type == EntryType.photo && e.mediaUri != null) {
-                    final file = File(e.mediaUri!);
-                    final fecha = e.createdAt.toLocal();
-                    final fechaFormateada =
-                        "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
-                        "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
+                    // ---- FOTO ----
+                    if (e.type == EntryType.photo && e.mediaUri != null) {
+                      final file = File(e.mediaUri!);
+                      final fecha = e.createdAt.toLocal();
+                      final fechaFormateada =
+                          "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
+                          "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
 
-                    return Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        children: [
-                          Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: InteractiveViewer(
-                                          panEnabled: true,
-                                          child: Image.file(
-                                            file,
-                                            fit: BoxFit.contain,
+                      return Card(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          child: InteractiveViewer(
+                                            panEnabled: true,
+                                            child: Image.file(
+                                              file,
+                                              fit: BoxFit.contain,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(15),
-                                  ),
-                                  child: Image.file(
-                                    file,
-                                    height: 200,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  await widget.entryService.deleteById(e.id);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Foto eliminada'),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(15),
                                     ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(
-                              'Añadida el $fechaFormateada',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
+                                    child: Image.file(
+                                      file,
+                                      height: 200,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () async {
+                                    await widget.entryService.deleteById(e.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Foto eliminada'),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Text(
+                                'Añadida el $fechaFormateada',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                          ],
+                        ),
+                      );
+                    }
 
-                  return const SizedBox.shrink();
-                },
-              );
+                    // ---- VIDEO ----
+                    if (e.type == EntryType.video && e.mediaUri != null) {
+                      final file = File(e.mediaUri!);
+
+                      return Card(
+                        color: Colors.white,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: [
+                            FutureBuilder(
+                              future: _initVideo(file),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState !=
+                                    ConnectionState.done) {
+                                  return const SizedBox(
+                                    height: 200,
+                                    child: Center(
+                                        child: CircularProgressIndicator()),
+                                  );
+                                }
+
+                                return AspectRatio(
+                                  aspectRatio:
+                                      _videoController!.value.aspectRatio,
+                                  child: VideoPlayer(_videoController!),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.play_arrow),
+                              onPressed: () {
+                                setState(() {
+                                  _videoController!.value.isPlaying
+                                      ? _videoController!.pause()
+                                      : _videoController!.play();
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                await widget.entryService.deleteById(e.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Video eliminado')),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return const SizedBox.shrink();
+                  },
+                ))
+              ]);
             },
           ),
 
@@ -761,6 +770,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );
@@ -779,6 +789,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     entryService: widget.entryService,
                     userRepo: widget.userRepo,
                     userService: widget.userService,
+                    currentUser: widget.currentUser,
                   ),
                 ),
               );
@@ -799,7 +810,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
-                      currentUser: widget.currentUser!, //loggedUser
+                      currentUser: widget.currentUser, //loggedUser
                     ),
                   ),
                 );
@@ -823,9 +834,9 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 );
 
                 if (loggedUser != null && mounted) {
-                  setState(() {
+                  /*setState(() {
                     widget.currentUser = loggedUser;
-                  });
+                  });*/
 
                   // Una vez logueado, lo llevamos al perfil
                   Navigator.push(

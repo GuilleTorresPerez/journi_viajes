@@ -1,5 +1,8 @@
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:journi/application/shared/result.dart';
+import 'package:journi/application/use_cases/user_use_cases.dart';
 import 'package:journi/application/user_service.dart';
 import 'package:journi/crear_viaje.dart';
 import 'package:journi/data/local/drift/app_database.dart';
@@ -8,6 +11,7 @@ import 'package:journi/data/local/drift/drift_trip_repository.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
+import 'package:journi/domain/user.dart';
 import 'fake_geocoding_repository.dart';
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/entry_service.dart';
@@ -26,7 +30,7 @@ void main() {
     late DefaultEntryService entryService;
     late TripRepository tRepo;
     late EntryRepository eRepo;
-    final db = AppDatabase();
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
 
@@ -34,7 +38,12 @@ void main() {
       tripRepo = InMemoryTripRepository();
       entryRepo = InMemoryEntryRepository();
       final geoRepo = FakeGeocodingRepository();
-      tripService = makeTripService(tripRepo, entryRepo, geoRepo);
+      tripService = makeTripService(
+        tripRepo,
+        userRepo,
+        entryRepo,
+        geoRepo,
+      );
       entryService = DefaultEntryService(repo: entryRepo);
       tRepo = DriftTripRepository(db);
       eRepo = DriftEntryRepository(db);
@@ -53,6 +62,7 @@ void main() {
             entryRepo: entryRepo,
             userRepo: userRepo,
             userService: userService,
+            skipLogin: true,
           ),
         ),
       );
@@ -87,6 +97,24 @@ void main() {
     testWidgets('❌ Error: fecha de inicio posterior a fecha final', (
       WidgetTester tester,
     ) async {
+      // Crear un usuario de prueba
+      final registerCmd = RegisterUserCommand(
+        id: 'user_test_1',
+        name: 'Paula',
+        lastName: 'Sánchez',
+        email: 'paula@example.com',
+        password: '123456',
+      );
+
+// Registrar usuario usando userService
+      final result = await userService.register(registerCmd);
+
+// Verificar que se registró correctamente
+      expect(result, isA<Ok<User>>());
+
+// Recuperar el usuario registrado
+      final testUser = (result as Ok<User>).value;
+
       await tester.pumpWidget(
         MaterialApp(
           home: Crear_Viaje(
@@ -100,6 +128,7 @@ void main() {
             entryService: entryService,
             userRepo: userRepo,
             userService: userService,
+            currentUser: testUser,
           ),
         ),
       );

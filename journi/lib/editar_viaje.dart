@@ -12,6 +12,7 @@ import 'application/user_service.dart';
 import 'crear_viaje.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
+import 'domain/user.dart';
 import 'login_screen.dart';
 import 'map_screen.dart';
 
@@ -29,6 +30,7 @@ class Editar_viaje extends StatefulWidget {
   final EntryService entryService;
   final UserRepository userRepo;
   final UserService userService;
+  final User? currentUser;
 
   const Editar_viaje({
     super.key,
@@ -42,6 +44,7 @@ class Editar_viaje extends StatefulWidget {
     required this.entryService,
     required this.userService,
     required this.userRepo,
+    required this.currentUser,
   });
 
   @override
@@ -207,7 +210,7 @@ class _EditarViajeState extends State<Editar_viaje> {
                           content: Text('Viaje actualizado correctamente'),
                         ),
                       );
-                      Navigator.pop(context); // volver a la lista
+                      Navigator.pop(context, result.value); // volver a la lista
                     } else if (result is Err<Trip>) {
                       final errors =
                           result.errors.map((e) => e.message).join('\n');
@@ -256,6 +259,7 @@ class _EditarViajeState extends State<Editar_viaje> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );
@@ -274,6 +278,7 @@ class _EditarViajeState extends State<Editar_viaje> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );

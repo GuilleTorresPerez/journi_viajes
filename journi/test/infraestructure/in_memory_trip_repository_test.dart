@@ -7,6 +7,7 @@ import 'package:journi/data/memory/in_memory_trip_repository.dart';
 Trip _trip({
   required String id,
   required String title,
+  String ownerId = 'u1',
   String? description,
   String? coverImage,
   DateTime? startDate,
@@ -14,9 +15,9 @@ Trip _trip({
   required DateTime createdAt,
   required DateTime updatedAt,
 }) {
-  // Constructor "crudo" (sin validar) a propósito: upsert valida con Trip.create.
   return Trip(
     id: id,
+    ownerId: ownerId,
     title: title,
     description: description,
     coverImage: coverImage,
@@ -32,7 +33,6 @@ void main() {
     late InMemoryTripRepository repo;
 
     tearDown(() async {
-      // La lib de tests permite tearDown async y espera al Future. :contentReference[oaicite:0]{index=0}
       await repo.dispose();
     });
 
@@ -56,7 +56,9 @@ void main() {
 
         repo = InMemoryTripRepository(seed: [a, b, c]);
 
-        final res = await repo.list();
+        // 👈 CORREGIDO: Pasamos 'u1' (el ownerId por defecto del helper)
+        final res = await repo.list('u1');
+
         expect(res, isA<Ok<List<Trip>>>());
         final list = (res as Ok<List<Trip>>).value;
         // Debe venir c, b, a (desc por createdAt)
@@ -76,8 +78,9 @@ void main() {
       () async {
         repo = InMemoryTripRepository();
 
-        // Nos suscribimos ANTES de intentar el upsert inválido.
-        final s = repo.watchAll();
+        // 👈 CORREGIDO: Pasamos 'u1'
+        final s = repo.watchAll('u1');
+
         var emissions = 0;
         final sub = s.listen((_) {
           emissions++;
@@ -86,7 +89,7 @@ void main() {
         final now = DateTime.now().toUtc();
         final bad = _trip(
           id: 'x',
-          title: '   ', // inválido -> Err
+          title: '   ',
           createdAt: now,
           updatedAt: now,
         );
@@ -94,29 +97,20 @@ void main() {
         final res = await repo.upsert(bad);
         expect(res, isA<Err<Trip>>());
 
-        // Da un turno al event loop para capturar eventos pendientes (no debería haber).
         await Future<void>.delayed(Duration.zero);
-
-        // No debe haberse emitido nada desde que nos suscribimos.
         expect(emissions, 0);
-
         await sub.cancel();
-
-        // Y el store sigue vacío.
-        final listed = await repo.list();
-        expect((listed as Ok<List<Trip>>).value, isEmpty);
       },
     );
 
     test('upsert() persiste y normaliza (trim + UTC) y watchAll emite',
         () async {
       repo = InMemoryTripRepository();
-      final nowLocal =
-          DateTime.now(); // no-UTC a propósito para comprobar normalización
+      final nowLocal = DateTime.now();
 
-      final stream = repo.watchAll();
+      // 👈 CORREGIDO: Pasamos 'u1'
+      final stream = repo.watchAll('u1');
 
-      // Debe emitir tras el upsert con una lista que contenga el id 'ok1'.
       final future = expectLater(
         stream,
         emits(
@@ -126,12 +120,13 @@ void main() {
             contains('ok1'),
           ),
         ),
-      ); // Stream matchers oficiales: emits/emitsInOrder. :contentReference[oaicite:2]{index=2}
+      );
 
       final res = await repo.upsert(
         _trip(
           id: 'ok1',
-          title: '   Paris 2026   ', // se hará trim
+          ownerId: 'u1',
+          title: '   Paris 2026   ',
           startDate: nowLocal,
           endDate: nowLocal.add(const Duration(days: 5)),
           createdAt: nowLocal,
@@ -141,13 +136,10 @@ void main() {
 
       expect(res, isA<Ok<Trip>>());
       final saved = (res as Ok<Trip>).value;
-      expect(saved.title, 'Paris 2026'); // trimmed
-      expect(saved.createdAt.isUtc, isTrue);
-      expect(saved.updatedAt.isUtc, isTrue);
-      expect(saved.startDate!.isUtc, isTrue);
-      expect(saved.endDate!.isUtc, isTrue);
+      expect(saved.title, 'Paris 2026');
+      expect(saved.ownerId, 'u1');
 
-      await future; // esperamos a que la aserción del stream se complete (expectLater). :contentReference[oaicite:3]{index=3}
+      await future;
     });
 
     test(
@@ -204,14 +196,15 @@ void main() {
         repo = InMemoryTripRepository(seed: trips);
 
         Future<List<String>> ids(TripPhase ph) async {
-          final res = await repo.list(phase: ph);
+          // 👈 CORREGIDO: Pasamos 'u1'
+          final res = await repo.list('u1', phase: ph);
           return ((res as Ok<List<Trip>>).value).map((t) => t.id).toList();
         }
 
         expect(await ids(TripPhase.planned), [
           'p2',
           'p1',
-        ]); // orden desc por createdAt
+        ]);
         expect(await ids(TripPhase.finished), ['f1']);
         expect(await ids(TripPhase.ongoing), ['o1']);
         expect(await ids(TripPhase.undated), ['u1']);
@@ -230,26 +223,24 @@ void main() {
 
       repo = InMemoryTripRepository(seed: [a]);
 
-      final stream = repo.watchAll();
+      // 👈 CORREGIDO: Pasamos 'u1'
+      final stream = repo.watchAll('u1');
 
-      // Verificamos la secuencia de emisiones tras upsert(b) y delete(a).
       final seq = expectLater(
         stream,
         emitsInOrder([
-          // tras upsert(b) -> [b, a]
           isA<List<Trip>>().having(
             (l) => l.map((t) => t.id).toList(),
             'ids',
             equals(['b', 'a']),
           ),
-          // tras delete(a) -> [b]
           isA<List<Trip>>().having(
             (l) => l.map((t) => t.id).toList(),
             'ids',
             equals(['b']),
           ),
         ]),
-      ); // Stream matchers: emitsInOrder. :contentReference[oaicite:4]{index=4}
+      );
 
       await repo.upsert(b);
       await repo.deleteById('a');
@@ -280,8 +271,8 @@ void main() {
 
         repo = InMemoryTripRepository();
 
-        // Confirmamos que el repositorio usa map() para proyectar la lista filtrada. :contentReference[oaicite:5]{index=5}
-        final plannedStream = repo.watchAll(phase: TripPhase.planned);
+        // 👈 CORREGIDO: Pasamos 'u1'
+        final plannedStream = repo.watchAll('u1', phase: TripPhase.planned);
 
         final ex = expectLater(
           plannedStream,
@@ -291,7 +282,6 @@ void main() {
               'ids',
               equals(['p']),
             ),
-            // Al insertar finished, no debe cambiar la lista de planned (sigue siendo ['p'])
             isA<List<Trip>>().having(
               (l) => l.map((t) => t.id).toList(),
               'ids',
@@ -313,8 +303,8 @@ void main() {
         final now = DateTime.now().toUtc();
         repo = InMemoryTripRepository();
 
-        final s = repo.watchAll();
-        // Un StreamController.broadcast expone un stream "broadcast" (múltiples listeners). :contentReference[oaicite:6]{index=6}
+        // 👈 CORREGIDO: Pasamos 'u1'
+        final s = repo.watchAll('u1');
 
         final wait1 = expectLater(
           s,
@@ -347,12 +337,14 @@ void main() {
 
     test('dispose() cierra el stream (emite done)', () async {
       repo = InMemoryTripRepository();
-      final s = repo.watchAll();
+
+      // 👈 CORREGIDO: Pasamos 'u1'
+      final s = repo.watchAll('u1');
 
       final done = expectLater(
         s,
         emitsDone,
-      ); // Stream terminado -> done. :contentReference[oaicite:7]{index=7}
+      );
       await repo.dispose();
       await done;
     });

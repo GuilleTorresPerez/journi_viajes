@@ -18,6 +18,7 @@ class Patch<T> {
 
 class CreateTripCommand {
   final String id;
+  final String ownerId;
   final String title;
   final String? description;
   final String? coverImage;
@@ -26,6 +27,7 @@ class CreateTripCommand {
 
   CreateTripCommand({
     required this.id,
+    required this.ownerId,
     required this.title,
     this.description,
     this.coverImage,
@@ -58,8 +60,10 @@ class CreateTripUseCase {
 
   Future<Result<Trip>> call(CreateTripCommand cmd) async {
     final now = DateTime.now().toUtc();
+
     final res = Trip.create(
       id: cmd.id,
+      ownerId: cmd.ownerId,
       title: cmd.title,
       description: cmd.description,
       coverImage: cmd.coverImage,
@@ -68,12 +72,12 @@ class CreateTripUseCase {
       createdAt: now,
       updatedAt: now,
     );
+
     if (res is Err<Trip>) return res;
     return repo.upsert((res as Ok<Trip>).value);
   }
 }
 
-/// Use case: actualización parcial validada (patch).
 class UpdateTripUseCase {
   final TripRepository repo;
   UpdateTripUseCase(this.repo);
@@ -93,7 +97,6 @@ class UpdateTripUseCase {
       ]);
     }
 
-    // Calcula nuevos valores (permitiendo null si el patch lo fija a null)
     final newTitle =
         cmd.title.isSet ? (cmd.title.value ?? current.title) : current.title;
     final newDescription =
@@ -107,6 +110,7 @@ class UpdateTripUseCase {
     final nowUtc = DateTime.now().toUtc();
     final validated = Trip.create(
       id: current.id,
+      ownerId: current.ownerId,
       title: newTitle,
       description: newDescription,
       coverImage: newCoverImage,
@@ -114,13 +118,13 @@ class UpdateTripUseCase {
       endDate: newEnd,
       createdAt: current.createdAt,
       updatedAt: nowUtc,
+      participants: current.participants,
     );
     if (validated is Err<Trip>) return validated;
     return repo.upsert((validated as Ok<Trip>).value);
   }
 }
 
-/// Use case: eliminar por id (idempotente según la implementación del repo).
 class DeleteTripUseCase {
   final TripRepository repo;
   DeleteTripUseCase(this.repo);
@@ -154,31 +158,36 @@ class ListTripsUseCase {
   final TripRepository repo;
   ListTripsUseCase(this.repo);
 
-  /// Devuelve todos los trips, o solo los de una fase concreta.
-  /// Delegamos el orden a la implementación del repo (en memoria: createdAt DESC).
-  Future<Result<List<Trip>>> call({TripPhase? phase}) {
-    return repo.list(phase: phase);
+  // 👇 ACEPTAR userId
+  Future<Result<List<Trip>>> call(String userId, {TripPhase? phase}) {
+    return repo.list(userId, phase: phase);
   }
 }
 
-/// Observa trips en tiempo real (ideal para usar con StreamBuilder en Flutter).
+/// Observa trips en tiempo real.
 class WatchTripsUseCase {
   final TripRepository repo;
   WatchTripsUseCase(this.repo);
 
-  /// Emite cambios en la colección (filtrable por fase).
-  Stream<List<Trip>> call({TripPhase? phase}) => repo.watchAll(phase: phase);
+  // 👇 ACEPTAR userId
+  Stream<List<Trip>> call(String userId, {TripPhase? phase}) {
+    return repo.watchAll(userId, phase: phase);
+  }
 }
 
-/// Listado por día concreto (UTC). Útil para vistas de calendario.
-/// Usa Trip.occursOn(dayUtc) definido en trip_queries.dart.
+/// Listado por día concreto (UTC).
 class ListTripsForDayUseCase {
   final TripRepository repo;
   ListTripsForDayUseCase(this.repo);
 
-  Future<Result<List<Trip>>> call(DateTime dayUtc) async {
-    final res = await repo.list();
+  // 👇 ACEPTAR userId
+  Future<Result<List<Trip>>> call(String userId, DateTime dayUtc) async {
+    // Obtenemos la lista filtrada por USUARIO primero
+    final res = await repo.list(userId);
+
     if (res is Err<List<Trip>>) return res;
+
+    // Luego filtramos por FECHA en memoria
     final items = (res as Ok<List<Trip>>)
         .value
         .where((t) => t.occursOn(dayUtc.toUtc()))

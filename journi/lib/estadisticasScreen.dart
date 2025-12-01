@@ -12,6 +12,8 @@ import 'domain/user.dart';
 import 'map_screen.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import 'mi_perfil.dart';
+
 // ignore: must_be_immutable
 class EstadisticasScreen extends StatefulWidget {
   int selectedIndex;
@@ -24,7 +26,7 @@ class EstadisticasScreen extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  final User currentUser;
+  final User? currentUser;
 
   EstadisticasScreen({
     super.key,
@@ -182,6 +184,7 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );
@@ -200,6 +203,7 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );
@@ -219,6 +223,24 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                   userRepo: widget.userRepo,
                   userService: widget.userService,
                   currentUser: widget.currentUser,
+                ),
+              ),
+            );
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MiPerfil(
+                  selectedIndex: index,
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser!,
                 ),
               ),
             );

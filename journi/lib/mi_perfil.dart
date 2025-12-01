@@ -9,6 +9,7 @@ import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
 import 'domain/user.dart';
+import 'estadisticasScreen.dart';
 import 'map_screen.dart';
 
 // ignore: must_be_immutable
@@ -23,7 +24,7 @@ class MiPerfil extends StatefulWidget {
   final UserRepository userRepo;
   final UserService userService;
 
-  final User currentUser;
+  final User? currentUser;
 
   MiPerfil({
     super.key,
@@ -75,7 +76,7 @@ class _MiPerfilState extends State<MiPerfil> {
 
               // NOMBRE COMPLETO
               Text(
-                "${widget.currentUser.name} ${widget.currentUser.lastName}",
+                "${widget.currentUser?.name} ${widget.currentUser?.lastName}",
                 style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -101,19 +102,19 @@ class _MiPerfilState extends State<MiPerfil> {
 
               // FILA ID
               _buildDataRow(
-                  Icons.perm_identity, "ID", widget.currentUser.id.toString()),
+                  Icons.perm_identity, "ID", widget.currentUser!.id.toString()),
 
               const SizedBox(height: 12),
 
               // FILA EMAIL
               _buildDataRow(
-                  Icons.email_outlined, "Email", widget.currentUser.email),
+                  Icons.email_outlined, "Email", widget.currentUser!.email),
 
               const SizedBox(height: 12),
 
               // FILA FECHA CREACIÓN
               _buildDataRow(Icons.calendar_month, "Usuario desde",
-                  widget.currentUser.createdAt.toString().substring(0, 10)),
+                  widget.currentUser!.createdAt.toString().substring(0, 10)),
 
               const SizedBox(height: 40),
             ],
@@ -157,6 +158,7 @@ class _MiPerfilState extends State<MiPerfil> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
               ),
             );
@@ -174,6 +176,25 @@ class _MiPerfilState extends State<MiPerfil> {
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser,
+                ),
+              ),
+            );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EstadisticasScreen(
+                  selectedIndex: index,
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser!,
                 ),
               ),
             );
