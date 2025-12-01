@@ -32,7 +32,7 @@ void main() {
   Trip createTrip(String id, String title) {
     return Trip(
       id: id,
-      ownerId: 'u1', // 👈 CORREGIDO
+      ownerId: 'test-user',
       title: title,
       startDate: DateTime(2025, 1, 1),
       endDate: DateTime(2025, 1, 5),
