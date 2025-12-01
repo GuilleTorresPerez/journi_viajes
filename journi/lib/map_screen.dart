@@ -238,8 +238,10 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              OpcionesViajeScreen(viaje: viaje, entryService: widget.entryService, entryRepo: widget.entryRepo),
+                          builder: (context) => OpcionesViajeScreen(
+                              viaje: viaje,
+                              entryService: widget.entryService,
+                              entryRepo: widget.entryRepo),
                         ),
                       );
                     },
@@ -354,7 +356,12 @@ class OpcionesViajeScreen extends StatelessWidget {
   final EntryService entryService;
   final EntryRepository entryRepo;
 
-  const OpcionesViajeScreen({Key? key, required this.viaje, required this.entryRepo, required this.entryService}) : super(key: key);
+  const OpcionesViajeScreen(
+      {Key? key,
+      required this.viaje,
+      required this.entryRepo,
+      required this.entryService})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -407,7 +414,11 @@ class OpcionesViajeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => LineaTemporalScreen(viaje: viaje, entryRepo: entryRepo, entryService: entryService,),
+                    builder: (context) => LineaTemporalScreen(
+                      viaje: viaje,
+                      entryRepo: entryRepo,
+                      entryService: entryService,
+                    ),
                   ),
                 );
               },
@@ -541,7 +552,6 @@ class _MapaDetalleScreenState extends State<MapaDetalleScreen> {
     );
   }
 
-
   Future<void> _obtenerUbicacion() async {
     bool permiso = await Geolocator.isLocationServiceEnabled();
     if (!permiso) return;
@@ -604,11 +614,15 @@ class LineaTemporalScreen extends StatefulWidget {
   final EntryService entryService;
   final EntryRepository entryRepo;
 
-  const LineaTemporalScreen({Key? key, required this.viaje, required this.entryService, required this.entryRepo}) : super(key: key);
+  const LineaTemporalScreen(
+      {Key? key,
+      required this.viaje,
+      required this.entryService,
+      required this.entryRepo})
+      : super(key: key);
 
   @override
   State<LineaTemporalScreen> createState() => _LineaTemporalScreenState();
-
 }
 
 class _LineaTemporalScreenState extends State<LineaTemporalScreen> {
@@ -644,34 +658,34 @@ class _LineaTemporalScreenState extends State<LineaTemporalScreen> {
       body: entradas == null
           ? const Center(child: CircularProgressIndicator())
           : entradas!.isEmpty
-          ? const Center(
-        child: Text(
-          'Este viaje no tiene eventos.',
-          style: TextStyle(fontSize: 18),
-        ),
-      )
-          : ListView.builder(
-        itemCount: entradas!.length,
-        itemBuilder: (context, index) {
-          final e = entradas![index];
-          return Card(
-            margin: const EdgeInsets.all(12),
-            child: ListTile(
-              leading: const Icon(Icons.event, color: Colors.teal),
-                title: Text(
-                  e.text ?? "(${e.type.name})",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              ? const Center(
+                  child: Text(
+                    'Este viaje no tiene eventos.',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: entradas!.length,
+                  itemBuilder: (context, index) {
+                    final e = entradas![index];
+                    return Card(
+                      margin: const EdgeInsets.all(12),
+                      child: ListTile(
+                        leading: const Icon(Icons.event, color: Colors.teal),
+                        title: Text(
+                          e.text ?? "(${e.type.name})",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          e.createdAt.toLocal().toString().split(" ")[0] ?? '',
+                        ),
+                        onTap: () {
+                          // Puedes abrir detalles si quieres
+                        },
+                      ),
+                    );
+                  },
                 ),
-              subtitle: Text(
-                e.createdAt.toLocal().toString().split(" ")[0] ?? '',
-              ),
-              onTap: () {
-                // Puedes abrir detalles si quieres
-              },
-            ),
-          );
-        },
-      ),
     );
   }
 }
@@ -789,7 +803,8 @@ class TimelineList extends StatelessWidget {
         final isLast = index == entries.length - 1;
 
         // título seguro (evita nulls)
-        final title = e.type == EntryType.note ? (e.text ?? '') : _titleForType(e.type);
+        final title =
+            e.type == EntryType.note ? (e.text ?? '') : _titleForType(e.type);
 
         // subtítulo opcional (fecha u otra cosa)
         final subtitle = e.createdAt != null
@@ -802,16 +817,20 @@ class TimelineList extends StatelessWidget {
           onTap: () => onTapEntry?.call(e),
           child: Card(
             elevation: 1,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(title,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   if (subtitle != null) ...[
                     const SizedBox(height: 6),
-                    Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                    Text(subtitle,
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 13)),
                   ],
                   // puedes añadir aquí una línea o imagen preview si quieres
                 ],
@@ -835,4 +854,3 @@ class TimelineList extends StatelessWidget {
     }
   }
 }
-

@@ -24,14 +24,13 @@ class SelectLocationScreen extends StatefulWidget {
   final Entry entry;
   final EntryService entryService;
   final EntryRepository entryRepo;
-  const SelectLocationScreen({
-    super.key,
-    this.initialPosition,
-    this.initialName,
-    required this.entry,
-    required this.entryRepo,
-    required this.entryService
-  });
+  const SelectLocationScreen(
+      {super.key,
+      this.initialPosition,
+      this.initialName,
+      required this.entry,
+      required this.entryRepo,
+      required this.entryService});
 
   @override
   State<SelectLocationScreen> createState() => _SelectLocationScreenState();
@@ -60,16 +59,12 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
       _selected = _center;
 
       // Cargar el nombre guardado (o el initialName si tú lo usas)
-      _nameController.text =
-          widget.initialName ??
-              widget.entry.text ??
-              '';
+      _nameController.text = widget.initialName ?? widget.entry.text ?? '';
 
       // Mover el mapa tras construir widgets
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _mapController.move(_center, 14.0);
       });
-
     }
     // Caso 2: NO hay ubicación guardada → usar initialPosition o Madrid
     else {
@@ -166,14 +161,12 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
     // 2. Crear nueva versión validada del Entry
     final updatedResult = widget.entry.copyValidated(
       location: newLocation,
-      tags: [tag],        // Reemplaza tags con solo esta ubicación
+      tags: [tag], // Reemplaza tags con solo esta ubicación
     );
 
     // 3. Manejar errores de validación
     if (updatedResult is Err<Entry>) {
-      final errors = updatedResult.errors
-          .map((e) => e.message)
-          .join("\n");
+      final errors = updatedResult.errors.map((e) => e.message).join("\n");
 
       _showError("Error al actualizar:\n$errors");
       return;

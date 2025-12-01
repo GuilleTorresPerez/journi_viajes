@@ -437,7 +437,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Texto añadido')),
+                                      const SnackBar(
+                                          content: Text('Texto añadido')),
                                     );
                                   },
                                   child: const Text('Aceptar'),
@@ -448,31 +449,33 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         },
                         leading: const Icon(Icons.notes, color: Colors.teal),
                         title: Text(e.text!),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Añadido el $fechaFormateada'),
-                              if (e.tags.isNotEmpty)
-                                Text(
-                                  e.tags.join(', '),
-                                  style: const TextStyle(
-                                    color: Colors.teal,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Añadido el $fechaFormateada'),
+                            if (e.tags.isNotEmpty)
+                              Text(
+                                e.tags.join(', '),
+                                style: const TextStyle(
+                                  color: Colors.teal,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                            ],
-                          ),
+                              ),
+                          ],
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.location_on, color: Colors.teal),
+                              icon: const Icon(Icons.location_on,
+                                  color: Colors.teal),
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => SelectLocationScreen(
-                                      initialName: e.tags.isNotEmpty ? e.tags.first : '',
+                                      initialName:
+                                          e.tags.isNotEmpty ? e.tags.first : '',
                                       entry: e,
                                       entryRepo: widget.entryRepo,
                                       entryService: widget.entryService,
@@ -482,11 +485,13 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                               },
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline, color: Colors.red),
+                              icon: const Icon(Icons.delete_outline,
+                                  color: Colors.red),
                               onPressed: () async {
                                 await widget.entryService.deleteById(e.id);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Texto eliminado')),
+                                  const SnackBar(
+                                      content: Text('Texto eliminado')),
                                 );
                               },
                             ),
