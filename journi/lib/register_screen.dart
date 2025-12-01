@@ -12,6 +12,8 @@ import 'package:journi/application/use_cases/user_use_cases.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/domain/user.dart';
 
+import 'main.dart';
+
 // ignore: must_be_immutable
 class RegisterScreen extends StatefulWidget {
   final bool sesionIniciada;
@@ -97,22 +99,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(content: Text('Usuario registrado correctamente')),
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => LoginScreen(
-            selectedIndex: widget.selectedIndex,
-            sesionIniciada: widget.sesionIniciada,
-            viajes: widget.viajes,
-            tripRepo: widget.tripRepo,
-            entryRepo: widget.entryRepo,
-            tripService: widget.tripService,
-            entryService: widget.entryService,
-            userRepo: widget.userRepo,
-            userService: widget.userService,
-          ),
-        ),
-      );
+      if (result is Ok<User>) {
+        final user = result.value;
+        Navigator.pop(context, user);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuario registrado correctamente')),
+        );
+      }
     } else {
       final msg = result.errorsOrEmpty.isNotEmpty
           ? result.errorsOrEmpty.first.message

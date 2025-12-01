@@ -197,8 +197,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
               Center(
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
+                  onTap: () async {
+                    final registeredUser = await Navigator.push<User?>(
                       context,
                       MaterialPageRoute(
                         builder: (_) => RegisterScreen(
@@ -214,6 +214,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     );
+
+                  // Si RegisterScreen devolvió un usuario, lo enviamos a Home
+                    if (registeredUser != null && mounted) {
+                      Navigator.pop(context, registeredUser);
+                    }
+
                   },
                   child: const Text(
                     'Aun no tengo cuenta creada',

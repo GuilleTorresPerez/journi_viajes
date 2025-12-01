@@ -270,7 +270,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                             Navigator.pop(context); // cierra diálogo
                             Navigator.pop(context); // vuelve a lista
-                            setState(() {});
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
