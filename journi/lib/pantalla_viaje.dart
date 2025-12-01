@@ -230,14 +230,14 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     currentUser: widget.currentUser,
                   ),
                 ),
-
               );
 
-                if (updatedTrip != null) {
-                  setState(() {
-                    widget.viajes[widget.num_viaje] = updatedTrip; // actualiza la lista local
-                  });
-                }
+              if (updatedTrip != null) {
+                setState(() {
+                  widget.viajes[widget.num_viaje] =
+                      updatedTrip; // actualiza la lista local
+                });
+              }
             },
           ),
 

@@ -146,7 +146,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _sesionIniciada = false;
   User? _currentUser;
 
-
   @override
   void initState() {
     super.initState();
@@ -209,7 +208,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
-
 
   void _createNewTravel() {
     Navigator.push(
@@ -285,92 +283,93 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-        body: _currentUser == null
-            ? const Center(child: CircularProgressIndicator())
-            : StreamBuilder<List<Trip>>(
-          stream: widget.tripRepo.watchAll(_currentUser!.id),
-          builder: (context, snapshot) {
+      body: _currentUser == null
+          ? const Center(child: CircularProgressIndicator())
+          : StreamBuilder<List<Trip>>(
+              stream: widget.tripRepo.watchAll(_currentUser!.id),
+              builder: (context, snapshot) {
+                // Usamos el stream si hay datos; si no, usamos la carga inicial
+                final items = snapshot.data ?? _initialTrips;
+                if (items == null) {
+                  // Primer frame (o mientras resuelve list())
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-        // Usamos el stream si hay datos; si no, usamos la carga inicial
-          final items = snapshot.data ?? _initialTrips;
-          if (items == null) {
-            // Primer frame (o mientras resuelve list())
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          widget.viajes = items;
-          if (items.isEmpty) {
-            return const Center(
-              child: Text(
-                'No tienes ningún viaje registrado.',
-                style: TextStyle(fontSize: 18),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final viaje = items[index];
-
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  key: ValueKey('id$index'),
-                  leading: const Icon(Icons.flight_takeoff, color: Colors.teal),
-                  title: Text(
-                    viaje.title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                widget.viajes = items;
+                if (items.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No tienes ningún viaje registrado.',
+                      style: TextStyle(fontSize: 18),
                     ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (viaje.startDate != null)
-                        Text(
-                          'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}',
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final viaje = items[index];
+
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        key: ValueKey('id$index'),
+                        leading: const Icon(Icons.flight_takeoff,
+                            color: Colors.teal),
+                        title: Text(
+                          viaje.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
-                      if (viaje.endDate != null)
-                        Text(
-                          'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}',
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (viaje.startDate != null)
+                              Text(
+                                'Inicio: ${viaje.startDate!.toLocal().toString().split(' ')[0]}',
+                              ),
+                            if (viaje.endDate != null)
+                              Text(
+                                'Fin: ${viaje.endDate!.toLocal().toString().split(' ')[0]}',
+                              ),
+                            const SizedBox(height: 4),
+                          ],
                         ),
-                      const SizedBox(height: 4),
-                    ],
-                  ),
-                  isThreeLine: true,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Pantalla_Viaje(
-                          selectedIndex: _selectedIndex,
-                          sesionIniciada: _sesionIniciada,
-                          viajes: items,
-                          num_viaje: index,
-                          repo: widget.tripRepo,
-                          entryRepo: widget.entryRepo,
-                          tripService: widget.tripService,
-                          entryService: widget.entryService,
-                          picker: widget.picker,
-                          userRepo: widget.userRepo,
-                          userService: widget.userService,
-                          currentUser: _currentUser,
-                        ),
+                        isThreeLine: true,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Pantalla_Viaje(
+                                selectedIndex: _selectedIndex,
+                                sesionIniciada: _sesionIniciada,
+                                viajes: items,
+                                num_viaje: index,
+                                repo: widget.tripRepo,
+                                entryRepo: widget.entryRepo,
+                                tripService: widget.tripService,
+                                entryService: widget.entryService,
+                                picker: widget.picker,
+                                userRepo: widget.userRepo,
+                                userService: widget.userService,
+                                currentUser: _currentUser,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
-                ),
-              );
-            },
-          );
-        },
-      ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createNewTravel,
         tooltip: 'Nuevo viaje',

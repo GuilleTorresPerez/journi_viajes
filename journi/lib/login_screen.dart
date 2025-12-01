@@ -215,11 +215,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     );
 
-                  // Si RegisterScreen devolvió un usuario, lo enviamos a Home
+                    // Si RegisterScreen devolvió un usuario, lo enviamos a Home
                     if (registeredUser != null && mounted) {
                       Navigator.pop(context, registeredUser);
                     }
-
                   },
                   child: const Text(
                     'Aun no tengo cuenta creada',

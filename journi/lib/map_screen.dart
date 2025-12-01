@@ -35,19 +35,18 @@ class MapaPaisScreen extends StatefulWidget {
   final UserService userService;
   final User? currentUser;
 
-  MapaPaisScreen({
-    super.key,
-    required this.viajes,
-    required this.sesionIniciada,
-    required this.selectedIndex,
-    required this.tripRepo,
-    required this.entryRepo,
-    required this.tripService,
-    required this.entryService,
-    required this.userRepo,
-    required this.userService,
-    required this.currentUser
-  });
+  MapaPaisScreen(
+      {super.key,
+      required this.viajes,
+      required this.sesionIniciada,
+      required this.selectedIndex,
+      required this.tripRepo,
+      required this.entryRepo,
+      required this.tripService,
+      required this.entryService,
+      required this.userRepo,
+      required this.userService,
+      required this.currentUser});
 
   @override
   State<MapaPaisScreen> createState() => _MapaPaisScreenState();
