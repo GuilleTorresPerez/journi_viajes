@@ -1,11 +1,13 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:journi/application/use_cases/user_use_cases.dart';
 import 'package:journi/application/user_service.dart';
 import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
+import 'package:journi/domain/user.dart';
 import 'fake_geocoding_repository.dart';
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/entry_service.dart';
@@ -40,8 +42,9 @@ void main() {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     final userRepo = DriftUserRepository(db);
     final userService = makeUserService(userRepo);
+    var result;
 
-    setUp(() {
+    setUp(() async {
       tripRepo = InMemoryTripRepository();
       entryRepo = InMemoryEntryRepository();
       final geoRepo = FakeGeocodingRepository();
@@ -52,6 +55,19 @@ void main() {
         geoRepo,
       );
       entryService = DefaultEntryService(repo: entryRepo);
+
+      // 🔑 Generar un id aleatorio/simple para el usuario
+      final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+
+      final cmd = RegisterUserCommand(
+        id: generatedId,
+        name: 'nombre',
+        lastName: 'apellidos',
+        email: 'email@gmail.com',
+        password: 'password',
+      );
+
+     result = await userService.register(cmd);
     });
 
     testWidgets('✅ Eliminar viaje correctamente', (WidgetTester tester) async {

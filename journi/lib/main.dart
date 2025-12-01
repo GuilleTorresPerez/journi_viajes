@@ -154,7 +154,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _checkSession() async {
-    if (widget.skipLogin) return; // Saltamos login automático en tests
+    if (widget.skipLogin) {
+        _currentUser = User(
+          id: "test-user",
+          name: "Test",
+          lastName: "User",
+          email: "test@test.com", passwordHash: "Use", passwordSalt: '', createdAt: DateTime.now(), updatedAt: DateTime.now(),
+        );
+        _sesionIniciada = true;
+
+
+    }
     final user = await _currentUser;
 
     if (!mounted) return;
