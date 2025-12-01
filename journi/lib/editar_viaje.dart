@@ -210,7 +210,7 @@ class _EditarViajeState extends State<Editar_viaje> {
                           content: Text('Viaje actualizado correctamente'),
                         ),
                       );
-                      Navigator.pop(context); // volver a la lista
+                      Navigator.pop(context, result.value); // volver a la lista
                     } else if (result is Err<Trip>) {
                       final errors =
                           result.errors.map((e) => e.message).join('\n');

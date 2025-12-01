@@ -212,8 +212,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.black),
             tooltip: 'Editar viaje',
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final updatedTrip = await Navigator.push<Trip?>(
                 context,
                 MaterialPageRoute(
                   builder: (context) => Editar_viaje(
@@ -230,7 +230,14 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     currentUser: widget.currentUser,
                   ),
                 ),
+
               );
+
+                if (updatedTrip != null) {
+                  setState(() {
+                    widget.viajes[widget.num_viaje] = updatedTrip; // actualiza la lista local
+                  });
+                }
             },
           ),
 
