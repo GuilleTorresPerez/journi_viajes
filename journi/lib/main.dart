@@ -150,8 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _sesionIniciada = widget.sesionIniciada;
-    _checkSession();
-    _loadInitial();
+    _checkSession().then((_) => _loadInitial());
   }
 
   Future<void> _checkSession() async {
@@ -194,7 +193,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadInitial() async {
-    final res = await widget.tripRepo.list();
+    // Espera hasta que _currentUser esté disponible
+    if (_currentUser == null) return;
+
+    final res = await widget.tripRepo.list(_currentUser!.id);
     if (!mounted) return;
     if (res is Ok<List<Trip>>) {
       setState(() {
@@ -206,6 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+
 
   void _createNewTravel() {
     Navigator.push(
@@ -281,10 +284,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: StreamBuilder<List<Trip>>(
-        stream: widget.tripRepo.watchAll(),
-        builder: (context, snapshot) {
-          // Usamos el stream si hay datos; si no, usamos la carga inicial
+        body: _currentUser == null
+            ? const Center(child: CircularProgressIndicator())
+            : StreamBuilder<List<Trip>>(
+          stream: widget.tripRepo.watchAll(_currentUser!.id),
+          builder: (context, snapshot) {
+
+        // Usamos el stream si hay datos; si no, usamos la carga inicial
           final items = snapshot.data ?? _initialTrips;
 
           if (items == null) {
