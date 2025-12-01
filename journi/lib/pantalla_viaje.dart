@@ -396,6 +396,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
                         "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
 
+<<<<<<< Updated upstream
                     return Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
@@ -410,6 +411,128 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           icon: const Icon(
                             Icons.delete_outline,
                             color: Colors.red,
+=======
+              return Column(children: [
+                if (_searchQuery.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _searchQuery = "";
+                        });
+                      },
+                      child: const Text("Deshacer búsqueda"),
+                    ),
+                  ),
+                Expanded(
+                    child: ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: entries.length,
+                  itemBuilder: (context, index) {
+                    final e = entries[index];
+
+                    // ---- TEXTO ----
+                    if (e.type == EntryType.note && e.text != null) {
+                      final fecha = e.createdAt.toLocal();
+                      final fechaFormateada =
+                          "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
+                          "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
+
+                      return Card(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: ListTile(
+                          leading: const Icon(Icons.notes, color: Colors.teal),
+                          title: Text(e.text!),
+                          subtitle: Text('Añadido el $fechaFormateada'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // ✏️ BOTÓN EDITAR
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.grey),
+                                onPressed: () async {
+                                  // controlador con el texto actual
+                                  final controller = TextEditingController(text: e.text ?? '');
+
+                                  await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('Editar texto'),
+                                        content: TextField(
+                                          controller: controller,
+                                          maxLines: 5,
+                                          decoration: const InputDecoration(
+                                            border: OutlineInputBorder(),
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              final nuevoTexto = controller.text.trim();
+                                              if (nuevoTexto.isEmpty) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text('El texto no puede estar vacío'),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              // borramos la entrada antigua
+                                              await widget.entryService.deleteById(e.id);
+
+                                              // creamos una nueva con el texto actualizado
+                                              final cmd = CreateEntryCommand(
+                                                id: UniqueKey().toString(),
+                                                tripId: currentTrip.id,
+                                                type: EntryType.note,
+                                                text: nuevoTexto,
+                                              );
+                                              await widget.entryService.create(cmd);
+
+                                              if (context.mounted) {
+                                                Navigator.pop(context); // cerrar diálogo
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text('Texto actualizado'),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: const Text('Guardar'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+
+                              // 🗑️ BOTÓN ELIMINAR
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () async {
+                                  await widget.entryService.deleteById(e.id);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Texto eliminado')),
+                                  );
+                                },
+                              ),
+                            ],
+>>>>>>> Stashed changes
                           ),
                           onPressed: () async {
                             await widget.entryService.deleteById(e.id);
