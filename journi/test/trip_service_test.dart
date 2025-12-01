@@ -194,7 +194,9 @@ void main() {
       expect(trip.ownerId, 'u1');
     });
 
-    test('getUserRole: Devuelve el rol correcto cuando el trip y usuario existen', () async {
+    test(
+        'getUserRole: Devuelve el rol correcto cuando el trip y usuario existen',
+        () async {
       // ARRANGE: Preparamos un trip con participantes en el repositorio
       final tripConParticipantes = Trip.create(
         id: 't_roles',
@@ -212,7 +214,7 @@ void main() {
       await repo.upsert(tripConParticipantes);
 
       // ACT & ASSERT
-      
+
       // 1. Caso Owner
       final resOwner = await service.getUserRole('t_roles', 'u_owner');
       expect(expectOk(resOwner), TripRole.admin);
@@ -233,10 +235,9 @@ void main() {
       // ASSERT
       expect(res, isA<Err<TripRole?>>());
       expect(
-        (res as Err<TripRole?>).errors.first.message, 
-        contains('no existe'),
-        reason: 'Debe fallar con mensaje claro si el ID del trip es inválido'
-      );
+          (res as Err<TripRole?>).errors.first.message, contains('no existe'),
+          reason:
+              'Debe fallar con mensaje claro si el ID del trip es inválido');
     });
   });
 }

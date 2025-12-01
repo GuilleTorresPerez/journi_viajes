@@ -84,7 +84,7 @@ extension TripPermissions on Trip {
   TripRole? getRole(String userId) {
     // Prioridad 1: El dueño es Admin inmutablemente.
     if (userId == ownerId) return TripRole.admin;
-    
+
     // Prioridad 2: Buscar en la lista de participantes.
     return participants[userId];
   }

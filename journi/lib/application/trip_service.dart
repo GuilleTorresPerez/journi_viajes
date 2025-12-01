@@ -29,7 +29,7 @@ abstract class TripService {
   /// ⚠️ CAMBIO: Ahora aceptamos un rol opcional (por defecto viewer)
   Future<Result<Unit>> shareTrip(String tripId, String email,
       {TripRole role = TripRole.viewer});
-  
+
   /// Obtiene el rol de un usuario en un viaje específico.
   /// Devuelve Ok(null) si el usuario no participa en el viaje.
   Future<Result<TripRole?>> getUserRole(String tripId, String userId);
@@ -147,9 +147,8 @@ class DefaultTripService implements TripService {
 
     // 3. Validamos existencia
     if (trip == null) {
-      return Err<TripRole?>([
-        const ValidationError('El viaje solicitado no existe.')
-      ]);
+      return Err<TripRole?>(
+          [const ValidationError('El viaje solicitado no existe.')]);
     }
 
     // 4. Delegamos la lógica al Dominio (la extensión que creamos arriba)
