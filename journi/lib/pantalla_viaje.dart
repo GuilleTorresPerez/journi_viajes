@@ -354,107 +354,111 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           "${fecha.day.toString().padLeft(2, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.year} "
                           "${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}";
 
-                    return Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Introduce un texto'),
-                              content: TextField(
-                                controller: _textoController,
-                                maxLines: 5,
-                                decoration: const InputDecoration(
-                                  hintText: 'Escribe aquí...',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancelar'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    final texto = _textoController.text.trim();
-                                    if (texto.isEmpty) return;
-
-                                    final cmd = UpdateEntryCommand(
-                                      id: e.id,
-                                      text: texto,
-                                    );
-                                    await widget.entryService.update(cmd);
-
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Texto añadido')),
-                                    );
-                                  },
-                                  child: const Text('Aceptar'),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        leading: const Icon(Icons.notes, color: Colors.teal),
-                        title: Text(e.text!),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Añadido el $fechaFormateada'),
-                            if (e.tags.isNotEmpty)
-                              Text(
-                                e.tags.join(', '),
-                                style: const TextStyle(
-                                  color: Colors.teal,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                          ],
+                      return Card(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.location_on,
-                                  color: Colors.teal),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SelectLocationScreen(
-                                      initialName:
-                                          e.tags.isNotEmpty ? e.tags.first : '',
-                                      entry: e,
-                                      entryRepo: widget.entryRepo,
-                                      entryService: widget.entryService,
-                                    ),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: ListTile(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Introduce un texto'),
+                                content: TextField(
+                                  controller: _textoController,
+                                  maxLines: 5,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Escribe aquí...',
+                                    border: OutlineInputBorder(),
                                   ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline,
-                                  color: Colors.red),
-                              onPressed: () async {
-                                await widget.entryService.deleteById(e.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Texto eliminado')),
-                                );
-                              },
-                            ),
-                          ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final texto =
+                                          _textoController.text.trim();
+                                      if (texto.isEmpty) return;
+
+                                      final cmd = UpdateEntryCommand(
+                                        id: e.id,
+                                        text: texto,
+                                      );
+                                      await widget.entryService.update(cmd);
+
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Texto añadido')),
+                                      );
+                                    },
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          leading: const Icon(Icons.notes, color: Colors.teal),
+                          title: Text(e.text!),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Añadido el $fechaFormateada'),
+                              if (e.tags.isNotEmpty)
+                                Text(
+                                  e.tags.join(', '),
+                                  style: const TextStyle(
+                                    color: Colors.teal,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.location_on,
+                                    color: Colors.teal),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          SelectLocationScreen(
+                                        initialName: e.tags.isNotEmpty
+                                            ? e.tags.first
+                                            : '',
+                                        entry: e,
+                                        entryRepo: widget.entryRepo,
+                                        entryService: widget.entryService,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline,
+                                    color: Colors.red),
+                                onPressed: () async {
+                                  await widget.entryService.deleteById(e.id);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Texto eliminado')),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
 
                     // ---- FOTO ----
                     if (e.type == EntryType.photo && e.mediaUri != null) {
