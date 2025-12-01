@@ -81,7 +81,7 @@ void main() {
   //       await tester.pumpWidget(MaterialApp(
   //         home: MyHomePage(
   //           title: 'JOURNI',
-  //           inicionSesiada: false,
+  //           sesionIniciada: false,
   //           tripService: tripService,
   //           entryService: entryService,
   //           tripRepo: tripRepo,

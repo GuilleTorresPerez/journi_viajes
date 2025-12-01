@@ -4,6 +4,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 
+import 'application/entry_service.dart';
+import 'application/shared/result.dart';
+import 'application/use_cases/entry_use_cases.dart';
+import 'domain/entry.dart';
+import 'domain/ports/entry_repository.dart';
+
 /// Lo que devolvemos al guardar
 class SelectedLocation {
   final String name;
@@ -15,11 +21,16 @@ class SelectedLocation {
 class SelectLocationScreen extends StatefulWidget {
   final String? initialName;
   final LatLng? initialPosition;
-
+  final Entry entry;
+  final EntryService entryService;
+  final EntryRepository entryRepo;
   const SelectLocationScreen({
     super.key,
     this.initialPosition,
     this.initialName,
+    required this.entry,
+    required this.entryRepo,
+    required this.entryService
   });
 
   @override
@@ -42,6 +53,36 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
     _center = widget.initialPosition ?? LatLng(40.4168, -3.7038);
     _selected = widget.initialPosition;
     _nameController.text = widget.initialName ?? '';
+
+    if (widget.entry.location != null) {
+      final loc = widget.entry.location!;
+      _center = LatLng(loc.lat, loc.lon);
+      _selected = _center;
+
+      // Cargar el nombre guardado (o el initialName si tú lo usas)
+      _nameController.text =
+          widget.initialName ??
+              widget.entry.text ??
+              '';
+
+      // Mover el mapa tras construir widgets
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _mapController.move(_center, 14.0);
+      });
+
+    }
+    // Caso 2: NO hay ubicación guardada → usar initialPosition o Madrid
+    else {
+      _center = widget.initialPosition ?? LatLng(40.4168, -3.7038);
+      _selected = widget.initialPosition;
+      _nameController.text = widget.initialName ?? '';
+
+      if (widget.initialPosition != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _mapController.move(widget.initialPosition!, 14.0);
+        });
+      }
+    }
   }
 
   /// 🔍 Buscar dirección en Nominatim (OpenStreetMap)
@@ -89,7 +130,23 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
     }
   }
 
-  void _saveLocation() {
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _saveLocation() async {
     if (_selected == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Selecciona una ubicación primero')),
@@ -98,13 +155,52 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
     }
 
     final name = _nameController.text.trim();
-    Navigator.pop(
-      context,
-      SelectedLocation(
-        name: name.isEmpty ? 'Ubicación sin nombre' : name,
-        position: _selected!,
+    final tag = name.isEmpty ? 'Ubicación sin nombre' : name;
+
+    // 1. Crear nuevo objeto location del dominio
+    final newLocation = EntryLocation(
+      lat: _selected!.latitude,
+      lon: _selected!.longitude,
+    );
+
+    // 2. Crear nueva versión validada del Entry
+    final updatedResult = widget.entry.copyValidated(
+      location: newLocation,
+      tags: [tag],        // Reemplaza tags con solo esta ubicación
+    );
+
+    // 3. Manejar errores de validación
+    if (updatedResult is Err<Entry>) {
+      final errors = updatedResult.errors
+          .map((e) => e.message)
+          .join("\n");
+
+      _showError("Error al actualizar:\n$errors");
+      return;
+    }
+
+    final updatedEntry = (updatedResult as Ok<Entry>).value;
+
+    // 4. Persistir con update() — NO usar create()
+    final saveResult = await widget.entryService.update(
+      UpdateEntryCommand(
+        id: updatedEntry.id,
+        text: updatedEntry.text,
+        location: updatedEntry.location,
+        tags: updatedEntry.tags,
+        updatedAt: DateTime.now(),
       ),
     );
+
+    // 5. Comprobar si falló
+    if (saveResult is Err<Entry>) {
+      final errors = saveResult.errors.map((e) => e.message).join("\n");
+      _showError("Error al guardar:\n$errors");
+      return;
+    }
+
+    // 6. Todo OK → volver
+    Navigator.pop(context, true);
   }
 
   @override

@@ -11,6 +11,7 @@ import 'package:journi/domain/ports/trip_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/domain/trip.dart' hide Ok;
 import 'package:journi/domain/user.dart';
+import 'package:journi/select_location_screen.dart';
 
 import 'application/shared/result.dart';
 import 'application/user_service.dart';
@@ -405,20 +406,91 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       ),
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: ListTile(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Introduce un texto'),
+                              content: TextField(
+                                controller: _textoController,
+                                maxLines: 5,
+                                decoration: const InputDecoration(
+                                  hintText: 'Escribe aquí...',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancelar'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    final texto = _textoController.text.trim();
+                                    if (texto.isEmpty) return;
+
+                                    final cmd = UpdateEntryCommand(
+                                      id: e.id,
+                                      text: texto,
+                                    );
+                                    await widget.entryService.update(cmd);
+
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Texto añadido')),
+                                    );
+                                  },
+                                  child: const Text('Aceptar'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                         leading: const Icon(Icons.notes, color: Colors.teal),
                         title: Text(e.text!),
-                        subtitle: Text('Añadido el $fechaFormateada'),
-                        trailing: IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Añadido el $fechaFormateada'),
+                              if (e.tags.isNotEmpty)
+                                Text(
+                                  e.tags.join(', '),
+                                  style: const TextStyle(
+                                    color: Colors.teal,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
                           ),
-                          onPressed: () async {
-                            await widget.entryService.deleteById(e.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Texto eliminado')),
-                            );
-                          },
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.location_on, color: Colors.teal),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SelectLocationScreen(
+                                      initialName: e.tags.isNotEmpty ? e.tags.first : '',
+                                      entry: e,
+                                      entryRepo: widget.entryRepo,
+                                      entryService: widget.entryService,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline, color: Colors.red),
+                              onPressed: () async {
+                                await widget.entryService.deleteById(e.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Texto eliminado')),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     );
