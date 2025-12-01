@@ -65,7 +65,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
   }
 
   Future<void> _cargarViajes() async {
-    final res = await tripRepo.list();
+    /*final res = await tripRepo.list();
     if (res is Ok<List<Trip>>) {
       setState(() {
         _viajes = res.value;
@@ -74,7 +74,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
       setState(() {
         _viajes = [];
       });
-    }
+    }*/
   }
 
   @override
