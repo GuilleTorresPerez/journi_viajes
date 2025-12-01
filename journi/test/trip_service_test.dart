@@ -24,14 +24,33 @@ class FakeTripRepository implements TripRepository {
     );
   }
 
-  List<Trip> _snapshot({TripPhase? phase}) {
-    var items = _store.values.toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    if (phase != null) items = items.where((t) => t.phase == phase).toList();
+  /// Método auxiliar para filtrar en memoria igual que haría la DB
+  List<Trip> _filterForUser(String userId, {TripPhase? phase}) {
+    var items = _store.values.toList();
+
+    // 1. Filtro de Seguridad: Soy dueño O soy participante
+    items = items.where((t) {
+      final isOwner = t.ownerId == userId;
+      final isParticipant = t.participants.containsKey(userId);
+      return isOwner || isParticipant;
+    }).toList();
+
+    // 2. Filtro de Fase
+    if (phase != null) {
+      items = items.where((t) => t.phase == phase).toList();
+    }
+
+    // 3. Orden
+    items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return items;
   }
 
-  void _emit() => _ctrl.add(_snapshot());
+  void _emit() {
+    // Emitimos la lista completa cruda al stream.
+    // Los listeners filtrarán según su userId.
+    _ctrl.add(_store.values.toList());
+  }
+
   @override
   Future<Result<Trip>> upsert(Trip trip) async {
     _store[trip.id] = trip;
@@ -41,13 +60,32 @@ class FakeTripRepository implements TripRepository {
 
   @override
   Future<Result<Trip?>> findById(String id) async => Ok(_store[id]);
+
+  // 👇 CORREGIDO: Añadido argumento userId
   @override
-  Future<Result<List<Trip>>> list({TripPhase? phase}) async =>
-      Ok(_snapshot(phase: phase));
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase}) async {
+    return Ok(_filterForUser(userId, phase: phase));
+  }
+
+  // 👇 CORREGIDO: Añadido argumento userId y lógica de map
   @override
-  Stream<List<Trip>> watchAll({TripPhase? phase}) {
-    if (phase == null) return _ctrl.stream;
-    return _ctrl.stream.map((_) => _snapshot(phase: phase));
+  Stream<List<Trip>> watchAll(String userId, {TripPhase? phase}) {
+    // Si el stream base no ha emitido nada, emitimos vacío o esperamos.
+    // Usamos map para transformar cada evento (lista completa) en una lista filtrada para ESTE usuario.
+    return _ctrl.stream.map((allTrips) {
+      var items = allTrips.where((t) {
+        final isOwner = t.ownerId == userId;
+        final isParticipant = t.participants.containsKey(userId);
+        return isOwner || isParticipant;
+      }).toList();
+
+      if (phase != null) {
+        items = items.where((t) => t.phase == phase).toList();
+      }
+
+      items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return items;
+    });
   }
 
   @override
@@ -57,7 +95,6 @@ class FakeTripRepository implements TripRepository {
     return const Ok(unit);
   }
 
-  // 👇 CORRECCIÓN: Firma exacta a la interfaz (posicional, no named)
   @override
   Future<Result<Unit>> addParticipant(
           String t, String u, TripRole role) async =>

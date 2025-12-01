@@ -26,6 +26,9 @@ class InMemoryTripRepo implements TripRepository {
   }
 
   void _emit() {
+    // Nota: En un entorno real, _emit debería filtrar por usuario también si
+    // tuviéramos múltiples streams activos. Para test simple, emitimos todo
+    // y dejamos que watchAll filtre.
     _controller.add(
       _store.values.toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
@@ -49,22 +52,42 @@ class InMemoryTripRepo implements TripRepository {
     return Ok(_store[id]);
   }
 
+  // 👇 CORRECCIÓN 1: Añadido userId y lógica de filtrado
   @override
-  Future<Result<List<Trip>>> list({TripPhase? phase}) async {
-    var items = _store.values.toList();
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase}) async {
+    // 1. Filtramos por propiedad (Owner o Participante)
+    var items = _store.values.where((t) {
+      final isOwner = t.ownerId == userId;
+      final isParticipant = t.participants.containsKey(userId);
+      return isOwner || isParticipant;
+    }).toList();
+
+    // 2. Filtramos por fase
     if (phase != null) {
       items = items.where((t) => t.phase == phase).toList();
     }
+
+    // 3. Ordenamos
     items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return Ok(items);
   }
 
+  // 👇 CORRECCIÓN 2: Añadido userId y lógica de filtrado
   @override
-  Stream<List<Trip>> watchAll({TripPhase? phase}) {
-    if (phase == null) return _controller.stream;
-    return _controller.stream.map(
-      (all) => all.where((t) => t.phase == phase).toList(),
-    );
+  Stream<List<Trip>> watchAll(String userId, {TripPhase? phase}) {
+    // Filtramos el stream base
+    return _controller.stream.map((allTrips) {
+      var userTrips = allTrips.where((t) {
+        final isOwner = t.ownerId == userId;
+        final isParticipant = t.participants.containsKey(userId);
+        return isOwner || isParticipant;
+      }).toList();
+
+      if (phase != null) {
+        userTrips = userTrips.where((t) => t.phase == phase).toList();
+      }
+      return userTrips;
+    });
   }
 
   @override
@@ -74,7 +97,6 @@ class InMemoryTripRepo implements TripRepository {
     return const Ok(unit);
   }
 
-  // 👇 CORRECCIÓN: Firma exacta a la interfaz (TripRole role es posicional obligatorio)
   @override
   Future<Result<Unit>> addParticipant(
       String tripId, String userId, TripRole role) async {
@@ -83,14 +105,12 @@ class InMemoryTripRepo implements TripRepository {
       return Err([ValidationError('Trip not found')]);
     }
 
-    // Si ya existe y tiene el mismo rol, ignoramos.
-    // Si queremos actualizar el rol, deberíamos permitirlo, pero para este mock simple:
     if (t.participants.containsKey(userId) && t.participants[userId] == role) {
       return const Ok(unit);
     }
 
     final newParticipants = Map<String, TripRole>.from(t.participants);
-    newParticipants[userId] = role; // Asignamos el rol pasado por parámetro
+    newParticipants[userId] = role;
 
     final updated = Trip.create(
       id: t.id,
@@ -459,7 +479,9 @@ void main() {
     tearDown(() => repo.dispose());
 
     test('filtra por día UTC usando occursOn', () async {
-      final res = await useCase.call(DateTime.utc(2025, 6, 3));
+      // 👇 CORRECCIÓN 3: Pasamos 'u1' como argumento, porque el Caso de Uso ahora lo requiere
+      final res = await useCase.call('u1', DateTime.utc(2025, 6, 3));
+
       expect(res, isA<Ok<List<Trip>>>());
       final list = (res as Ok<List<Trip>>).value;
 

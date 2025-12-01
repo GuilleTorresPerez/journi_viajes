@@ -133,20 +133,32 @@ class DriftTripRepository implements TripRepository {
   }
 
   @override
-  Future<Result<List<Trip>>> list({TripPhase? phase}) async {
-    // 1. Obtener todos los trips
-    final rows = await (_db.select(_db.trips)
-          ..orderBy([(t) => d.OrderingTerm.desc(t.createdAt)]))
-        .get();
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase}) async {
+    // 1. Construir la query base
+    final query = _db.select(_db.trips);
 
-    // 2. Hidratar con participantes (Cuidado con N+1 queries si son muchos datos.
-    // Para una app personal es aceptable. Para optimizar, hacer un JOIN global y agrupar en memoria).
+    // 2. Aplicar el filtro de Seguridad (Owner O Participante)
+    // SQL Equivalente:
+    // WHERE owner_id = 'userId'
+    // OR id IN (SELECT trip_id FROM trip_participants WHERE user_id = 'userId')
+    query.where((t) {
+      // Subconsulta para ver si soy participante
+      final isParticipant = d.existsQuery(_db.select(_db.tripParticipants)
+        ..where((tp) => tp.tripId.equalsExp(t.id) & tp.userId.equals(userId)));
+
+      return t.ownerId.equals(userId) | isParticipant;
+    });
+
+    // 3. Ordenar
+    query.orderBy([(t) => d.OrderingTerm.desc(t.createdAt)]);
+
+    final rows = await query.get();
+
+    // 4. Hidratar (igual que antes)
     final List<Trip> results = [];
-
     for (final row in rows) {
       final participants = await _getParticipants(row.id);
       final trip = _toDomain(row, participants);
-
       if (phase != null && trip.phase != phase) continue;
       results.add(trip);
     }
@@ -155,12 +167,19 @@ class DriftTripRepository implements TripRepository {
   }
 
   @override
-  Stream<List<Trip>> watchAll({TripPhase? phase}) {
-    final q = (_db.select(_db.trips)
-      ..orderBy([(t) => d.OrderingTerm.desc(t.createdAt)]));
+  Stream<List<Trip>> watchAll(String userId, {TripPhase? phase}) {
+    // Repetimos la lógica de la query para el stream
+    final query = _db.select(_db.trips);
 
-    // Usamos asyncMap para poder hacer queries asíncronas (fetch participants) dentro del stream
-    return q.watch().asyncMap((rows) async {
+    query.where((t) {
+      final isParticipant = d.existsQuery(_db.select(_db.tripParticipants)
+        ..where((tp) => tp.tripId.equalsExp(t.id) & tp.userId.equals(userId)));
+      return t.ownerId.equals(userId) | isParticipant;
+    });
+
+    query.orderBy([(t) => d.OrderingTerm.desc(t.createdAt)]);
+
+    return query.watch().asyncMap((rows) async {
       final List<Trip> items = [];
       for (final row in rows) {
         final participants = await _getParticipants(row.id);

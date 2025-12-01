@@ -20,6 +20,7 @@ class InMemoryTripRepository implements TripRepository {
     _controller.add(items);
   }
 
+  /// Helper interno para filtrar por fase y ordenar.
   List<Trip> _filtered(TripPhase? phase) {
     var items = _store.values.toList();
     if (phase != null) {
@@ -29,12 +30,16 @@ class InMemoryTripRepository implements TripRepository {
     return items;
   }
 
+  /// Helper de seguridad: ¿El usuario puede ver este viaje?
+  bool _hasAccess(Trip t, String userId) {
+    return t.ownerId == userId || t.participants.containsKey(userId);
+  }
+
   @override
   Future<Result<Trip>> upsert(Trip trip) async {
-    // 1. Corrección: Añadimos ownerId y usamos el mapa 'participants'
     final res = Trip.create(
       id: trip.id,
-      ownerId: trip.ownerId, // 👈 Obligatorio ahora
+      ownerId: trip.ownerId,
       title: trip.title,
       description: trip.description,
       coverImage: trip.coverImage,
@@ -42,7 +47,7 @@ class InMemoryTripRepository implements TripRepository {
       endDate: trip.endDate,
       createdAt: trip.createdAt,
       updatedAt: trip.updatedAt,
-      participants: trip.participants, // 👈 Pasamos el mapa, no una lista
+      participants: trip.participants,
     );
 
     if (res is Err<Trip>) return res;
@@ -55,15 +60,32 @@ class InMemoryTripRepository implements TripRepository {
   @override
   Future<Result<Trip?>> findById(String id) async => Ok(_store[id]);
 
+  // 👇 CORREGIDO: Aceptamos userId y filtramos
   @override
-  Future<Result<List<Trip>>> list({TripPhase? phase}) async =>
-      Ok(_filtered(phase));
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase}) async {
+    // 1. Obtenemos lista base (filtrada por fase y ordenada)
+    final baseList = _filtered(phase);
 
+    // 2. Filtramos por seguridad (Solo mis viajes o compartidos conmigo)
+    final userTrips = baseList.where((t) => _hasAccess(t, userId)).toList();
+
+    return Ok(userTrips);
+  }
+
+  // 👇 CORREGIDO: Aceptamos userId y filtramos
   @override
-  Stream<List<Trip>> watchAll({TripPhase? phase}) {
+  Stream<List<Trip>> watchAll(String userId, {TripPhase? phase}) {
     final base = _controller.stream;
-    if (phase == null) return base;
-    return base.map((items) => items.where((t) => t.phase == phase).toList());
+
+    return base.map((items) {
+      // 1. Filtrar por fase si es necesario
+      var filtered =
+          phase != null ? items.where((t) => t.phase == phase) : items;
+
+      // 2. Filtrar por seguridad (userId)
+      // Convertimos a lista para materializar el iterable
+      return filtered.where((t) => _hasAccess(t, userId)).toList();
+    });
   }
 
   @override
@@ -73,7 +95,6 @@ class InMemoryTripRepository implements TripRepository {
     return const Ok(unit);
   }
 
-  // 👇 Corrección: Firma actualizada con 'TripRole'
   @override
   Future<Result<Unit>> addParticipant(
       String tripId, String userId, TripRole role) async {
@@ -83,18 +104,14 @@ class InMemoryTripRepository implements TripRepository {
       return Err([ValidationError('Trip con id $tripId no encontrado')]);
     }
 
-    // 2. Lógica actualizada para Map<String, TripRole>
-    // Creamos una copia mutable del mapa actual
     final newParticipants =
         Map<String, TripRole>.from(currentTrip.participants);
 
-    // Insertamos o actualizamos el rol del usuario
     newParticipants[userId] = role;
 
-    // Reconstruimos el Trip
     final updatedRes = Trip.create(
       id: currentTrip.id,
-      ownerId: currentTrip.ownerId, // 👈 No olvidar mantener el owner
+      ownerId: currentTrip.ownerId,
       title: currentTrip.title,
       description: currentTrip.description,
       coverImage: currentTrip.coverImage,
@@ -102,7 +119,7 @@ class InMemoryTripRepository implements TripRepository {
       endDate: currentTrip.endDate,
       createdAt: currentTrip.createdAt,
       updatedAt: DateTime.now().toUtc(),
-      participants: newParticipants, // 👈 Pasamos el nuevo mapa
+      participants: newParticipants,
     );
 
     if (updatedRes is Err<Trip>) {
@@ -115,7 +132,6 @@ class InMemoryTripRepository implements TripRepository {
     return const Ok(unit);
   }
 
-  // 👇 Corrección: Implementación del método faltante
   @override
   Future<Result<Unit>> removeParticipant(String tripId, String userId) async {
     final currentTrip = _store[tripId];
@@ -123,14 +139,13 @@ class InMemoryTripRepository implements TripRepository {
       return Err([ValidationError('Trip con id $tripId no encontrado')]);
     }
 
-    // Si es el dueño, no deberíamos permitir borrarlo (regla de negocio opcional, pero recomendada)
     if (currentTrip.ownerId == userId) {
       return Err(
           [ValidationError('No se puede eliminar al propietario del viaje')]);
     }
 
     if (!currentTrip.participants.containsKey(userId)) {
-      return const Ok(unit); // No estaba, operación idempotente
+      return const Ok(unit);
     }
 
     final newParticipants =

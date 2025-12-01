@@ -17,10 +17,10 @@ abstract class TripService {
   Future<Result<Trip>> updateTitleById(String id, String newTitle);
 
   Future<Result<Trip?>> getById(String id);
-  Future<Result<List<Trip>>> list({TripPhase? phase});
-  Stream<List<Trip>> watch({TripPhase? phase});
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase});
+  Stream<List<Trip>> watch(String userId, {TripPhase? phase});
 
-  Future<Result<List<Trip>>> listForDayUtc(DateTime dayUtc);
+  Future<Result<List<Trip>>> listForDayUtc(String userId, DateTime dayUtc);
 
   Future<Result<String?>> getCountry(String tripId);
 
@@ -87,18 +87,20 @@ class DefaultTripService implements TripService {
   }
 
   @override
-  Future<Result<List<Trip>>> list({TripPhase? phase}) {
-    return _listUC(phase: phase);
+  Future<Result<List<Trip>>> list(String userId, {TripPhase? phase}) {
+    // Pasamos el userId al caso de uso o directamente al repo
+    // (Idealmente actualizarías ListTripsUseCase también)
+    return _repo.list(userId, phase: phase);
   }
 
   @override
-  Stream<List<Trip>> watch({TripPhase? phase}) {
-    return _watchUC(phase: phase);
+  Stream<List<Trip>> watch(String userId, {TripPhase? phase}) {
+    return _repo.watchAll(userId, phase: phase);
   }
 
   @override
-  Future<Result<List<Trip>>> listForDayUtc(DateTime dayUtc) {
-    return _listDayUC(dayUtc);
+  Future<Result<List<Trip>>> listForDayUtc(String userId, DateTime dayUtc) {
+    return _listDayUC(userId, dayUtc);
   }
 
   @override
