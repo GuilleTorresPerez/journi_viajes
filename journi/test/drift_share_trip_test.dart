@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart'; // Necesario para InsertMode
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/shared/result.dart';
@@ -18,6 +19,7 @@ void main() {
     await db.close();
   });
 
+  // Helper para crear usuarios
   Future<void> createDummyUser(String id, String email) async {
     await db.into(db.users).insert(
           UsersCompanion.insert(
@@ -30,14 +32,21 @@ void main() {
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           ),
+          // 👇 IMPORTANTE: Si el usuario ya existe (ej. owner_1), lo ignoramos para no fallar
+          mode: InsertMode.insertOrIgnore,
         );
   }
 
+  // Helper para crear viajes
   Future<void> createDummyTrip(String id) async {
+    // 👇 CORRECCIÓN CRUCIAL:
+    // Primero creamos al dueño para satisfacer la Foreign Key de la DB
+    await createDummyUser('owner_1', 'owner@journi.app');
+
     await tripRepo.upsert(
       (Trip.create(
         id: id,
-        ownerId: 'owner_1', // 👈 CORREGIDO: ownerId requerido
+        ownerId: 'owner_1', // Ahora 'owner_1' ya existe en la tabla users
         title: 'Drift Trip',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -50,21 +59,26 @@ void main() {
     test('addParticipant inserta fila en TripParticipants', () async {
       const tripId = 't1';
       const userId = 'u1';
+
+      // 1. Crea viaje (y su dueño 'owner_1' internamente)
       await createDummyTrip(tripId);
+      // 2. Crea el usuario que vamos a invitar
       await createDummyUser(userId, 'user@test.com');
 
-      // 👈 CORREGIDO: Se añade TripRole.viewer como 3er argumento
+      // 3. Añadir participante
       final res =
           await tripRepo.addParticipant(tripId, userId, TripRole.viewer);
 
       expect(res, isA<Ok<Unit>>());
 
+      // Verificamos
       final relations = await db.select(db.tripParticipants).get();
-      expect(relations.length, 1); // El owner (admin) + el nuevo (viewer) = 2?
-      // NOTA: upsert() en el repo inserta al owner. addParticipant añade otro.
-      // Dependiendo de tu implementación de createDummyTrip, verifica si el owner se guarda en DB.
-      // Si DriftTripRepository.upsert guarda al owner, aquí habrá 2 filas.
-      // Ajusta la expectativa si es necesario, pero el error de compilación se resuelve con el argumento extra.
+
+      // Debería haber al menos 1 relación (la que acabamos de añadir)
+      // Filtramos para asegurarnos que 'u1' está ahí
+      final userRelation = relations.where((r) => r.userId == userId);
+      expect(userRelation.length, 1,
+          reason: 'El usuario u1 debería estar en participantes');
     });
 
     test('addParticipant es idempotente (no falla si se repite)', () async {
@@ -73,12 +87,18 @@ void main() {
       await createDummyTrip(tripId);
       await createDummyUser(userId, 'user@test.com');
 
-      // 👈 CORREGIDO: argumentos extra
       await tripRepo.addParticipant(tripId, userId, TripRole.viewer);
+
+      // Repetimos
       final res =
           await tripRepo.addParticipant(tripId, userId, TripRole.viewer);
 
       expect(res, isA<Ok<Unit>>());
+
+      // Aseguramos que no se duplicó la fila
+      final relations = await db.select(db.tripParticipants).get();
+      final userRelations = relations.where((r) => r.userId == userId);
+      expect(userRelations.length, 1);
     });
 
     test('Borrar un viaje borra en cascada los participantes', () async {
@@ -86,12 +106,12 @@ void main() {
       const userId = 'u1';
       await createDummyTrip(tripId);
       await createDummyUser(userId, 'user@test.com');
-
-      // 👈 CORREGIDO: argumento extra
       await tripRepo.addParticipant(tripId, userId, TripRole.viewer);
 
+      // Borramos el viaje
       await tripRepo.deleteById(tripId);
 
+      // Verificamos que no queden relaciones
       final relations = await db.select(db.tripParticipants).get();
       expect(relations.isEmpty, isTrue, reason: 'Cascade delete falló');
     });
