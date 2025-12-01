@@ -67,7 +67,7 @@ void main() {
         password: 'password',
       );
 
-     result = await userService.register(cmd);
+      result = await userService.register(cmd);
     });
 
     testWidgets('✅ Eliminar viaje correctamente', (WidgetTester tester) async {
