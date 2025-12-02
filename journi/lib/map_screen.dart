@@ -8,6 +8,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'PhotoViewerScreen.dart';
 import 'application/entry_service.dart';
 import 'application/trip_service.dart';
 import 'application/user_service.dart';
@@ -741,20 +742,17 @@ class _MapaDetalleScreenState extends State<MapaDetalleScreen> {
   }
 }
 
-//
-// 🔹 Pantalla para la línea temporal
-//
 class LineaTemporalScreen extends StatefulWidget {
   final Trip viaje;
   final EntryService entryService;
   final EntryRepository entryRepo;
 
-  const LineaTemporalScreen(
-      {Key? key,
-      required this.viaje,
-      required this.entryService,
-      required this.entryRepo})
-      : super(key: key);
+  const LineaTemporalScreen({
+    Key? key,
+    required this.viaje,
+    required this.entryService,
+    required this.entryRepo,
+  }) : super(key: key);
 
   @override
   State<LineaTemporalScreen> createState() => _LineaTemporalScreenState();
@@ -787,47 +785,32 @@ class _LineaTemporalScreenState extends State<LineaTemporalScreen> {
         title: Text('Línea temporal: ${widget.viaje.title}'),
         backgroundColor: Colors.teal,
       ),
-
-      // TODO: Mostrar todas las entradas en orden de creación, con la info necesaria
-      // TODO: En caso de que no haya entradas, mostramos lo que hay ahora mismo
       body: entradas == null
           ? const Center(child: CircularProgressIndicator())
           : entradas!.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Este viaje no tiene eventos.',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: entradas!.length,
-                  itemBuilder: (context, index) {
-                    final e = entradas![index];
-                    return Card(
-                      margin: const EdgeInsets.all(12),
-                      child: ListTile(
-                        leading: const Icon(Icons.event, color: Colors.teal),
-                        title: Text(
-                          e.text ?? "(${e.type.name})",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          e.createdAt.toLocal().toString().split(" ")[0] ?? '',
-                        ),
-                        onTap: () {
-                          // Puedes abrir detalles si quieres
-                        },
-                      ),
-                    );
-                  },
-                ),
+          ? const Center(
+        child: Text(
+          'Este viaje no tiene eventos.',
+          style: TextStyle(fontSize: 18),
+        ),
+      )
+          : TimelineList(
+        entries: entradas!,
+        onTapEntry: (e) {
+          if (e.type == EntryType.photo && e.mediaUri != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PhotoViewerScreen(uri: e.mediaUri!),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 }
 
-// WIDGET AUXILIAR PARA LA LÍNEA TEMPORAL
-
-/// Widget reutilizable: un tile de la timeline
 class TimelineTile extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
@@ -837,82 +820,98 @@ class TimelineTile extends StatelessWidget {
   final double lineWidth;
   final double dotSize;
   final VoidCallback? onTap;
+  final Animation<double> animation;
 
   const TimelineTile({
     Key? key,
     required this.child,
+    required this.animation,
     this.isFirst = false,
     this.isLast = false,
     this.lineColor = Colors.grey,
     this.dotColor = Colors.teal,
-    this.lineWidth = 2.0,
-    this.dotSize = 12.0,
+    this.lineWidth = 3.0,
+    this.dotSize = 16.0,
     this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // ancho fijo para la columna de timeline
-    const double leftWidth = 40.0;
+    const double leftWidth = 50.0;
 
-    return InkWell(
-      onTap: onTap,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // columna izquierda: línea y punto
-          SizedBox(
-            width: leftWidth,
-            child: Column(
-              children: [
-                // linea superior (oculta si es el primer elemento)
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    width: lineWidth,
-                    color: isFirst ? Colors.transparent : lineColor,
-                    margin: EdgeInsets.only(top: 4),
-                  ),
-                ),
+    return FadeTransition(
+      opacity: animation,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0.2, 0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: InkWell(
+          onTap: onTap,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: leftWidth,
+                child: Column(
+                  children: [
+                    // Línea superior
+                    SizedBox(
+                      height: 30,
+                      child: Center(
+                        child: Container(
+                          width: lineWidth,
+                          height: double.infinity,
+                          color: isFirst ? Colors.transparent : lineColor,
+                        ),
+                      ),
+                    ),
 
-                // el punto (círculo)
-                Container(
-                  width: dotSize,
-                  height: dotSize,
-                  decoration: BoxDecoration(
-                    color: dotColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+                    // Punto
+                    Container(
+                      width: dotSize,
+                      height: dotSize,
+                      decoration: BoxDecoration(
+                        color: dotColor,
+                        shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
 
-                // linea inferior (oculta si es el último elemento)
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    width: lineWidth,
-                    color: isLast ? Colors.transparent : lineColor,
-                    margin: EdgeInsets.only(bottom: 4),
-                  ),
+                    // Línea inferior
+                    SizedBox(
+                      height: 30,
+                      child: Center(
+                        child: Container(
+                          width: lineWidth,
+                          height: double.infinity,
+                          color: isLast ? Colors.transparent : lineColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(width: 12),
+
+              Expanded(child: child),
+            ],
           ),
-
-          // espacio entre la línea y el contenido
-          const SizedBox(width: 12),
-
-          // contenido derecho
-          Expanded(
-            child: child,
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-/// Lista de timeline basada en una lista de entradas
-class TimelineList extends StatelessWidget {
+
+class TimelineList extends StatefulWidget {
   final List<Entry> entries;
   final void Function(Entry entry)? onTapEntry;
 
@@ -923,69 +922,133 @@ class TimelineList extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    if (entries.isEmpty) {
-      return const Center(child: Text('Este viaje no tiene eventos.'));
-    }
+  State<TimelineList> createState() => _TimelineListState();
+}
 
+class _TimelineListState extends State<TimelineList>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      itemCount: entries.length,
+      itemCount: widget.entries.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
-        final e = entries[index];
+        final e = widget.entries[index];
+
         final isFirst = index == 0;
-        final isLast = index == entries.length - 1;
+        final isLast = index == widget.entries.length - 1;
 
-        // título seguro (evita nulls)
-        final title =
-            e.type == EntryType.note ? (e.text ?? '') : _titleForType(e.type);
-
-        // subtítulo opcional (fecha u otra cosa)
-        final subtitle = e.createdAt != null
-            ? e.createdAt!.toLocal().toString().split(' ')[0]
-            : null;
+        final animation = CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            (index / widget.entries.length),
+            1.0,
+            curve: Curves.easeOut,
+          ),
+        );
 
         return TimelineTile(
           isFirst: isFirst,
           isLast: isLast,
-          onTap: () => onTapEntry?.call(e),
-          child: Card(
-            elevation: 1,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 6),
-                    Text(subtitle,
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 13)),
-                  ],
-                  // puedes añadir aquí una línea o imagen preview si quieres
-                ],
-              ),
-            ),
-          ),
+          animation: animation,
+          dotColor: _colorForType(e.type),
+          child: _buildCard(e),
+          onTap: () => widget.onTapEntry?.call(e),
         );
       },
     );
   }
 
+  Widget _buildCard(Entry e) {
+    return Card(
+      elevation: 2,
+      shadowColor: Colors.black38,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            Icon(
+              _iconForType(e.type),
+              color: _colorForType(e.type),
+              size: 28,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    e.text ?? _titleForType(e.type),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    e.createdAt.toLocal().toString().split(' ')[0],
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _iconForType(EntryType type) {
+    switch (type) {
+      case EntryType.photo:
+        return Icons.photo;
+      case EntryType.video:
+        return Icons.videocam;
+      case EntryType.note:
+      default:
+        return Icons.edit_note;
+    }
+  }
+
+  Color _colorForType(EntryType type) {
+    switch (type) {
+      case EntryType.photo:
+        return Colors.orange;
+      case EntryType.video:
+        return Colors.redAccent;
+      case EntryType.note:
+      default:
+        return Colors.blueAccent;
+    }
+  }
+
   String _titleForType(EntryType type) {
     switch (type) {
       case EntryType.photo:
-        return '📷 Fotografía';
+        return 'Fotografía';
       case EntryType.video:
-        return '🎥 Vídeo';
+        return 'Vídeo';
       case EntryType.note:
       default:
-        return 'Entrada';
+        return 'Nota';
     }
   }
 }
+
+
