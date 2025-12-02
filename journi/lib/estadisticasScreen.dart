@@ -161,7 +161,7 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                         },
 
                         icon: const Icon(Icons.add),
-                        label: const Text('+ Crear viaje'),
+                        label: const Text('Crear viaje'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orangeAccent,
                           shape: RoundedRectangleBorder(
@@ -343,7 +343,7 @@ Widget _buildBarChart({required List<Trip> viajes}) {
   if (viajes.isEmpty) {
     return const Center(
       child: Text(
-        "Aún no tienes viajes",
+        "Aún no tienes viajes registrados.",
         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
     );
@@ -380,20 +380,26 @@ Widget _buildBarChart({required List<Trip> viajes}) {
 
   return BarChart(
     BarChartData(
-      maxY: maxDays + 2, // espacio extra arriba
+      maxY: maxDays + 2,
       borderData: FlBorderData(show: false),
-
+      gridData: FlGridData(
+        show: true,                // activamos las líneas de la cuadrícula
+        drawHorizontalLine: true,  // solo horizontales
+        drawVerticalLine: false,   // quitamos las verticales
+        horizontalInterval: (maxDays / 5).ceilToDouble(), // espacio entre líneas
+        getDrawingHorizontalLine: (value) => FlLine(
+          color: Colors.black12,   // color de la línea
+          strokeWidth: 1,          // grosor
+        ),
+      ),
       barGroups: barGroups,
-
       titlesData: FlTitlesData(
-        // EJE X
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
             getTitlesWidget: (value, _) {
               int index = value.toInt();
               if (index < 0 || index >= labels.length) return const Text("");
-
               return Padding(
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(
@@ -404,34 +410,28 @@ Widget _buildBarChart({required List<Trip> viajes}) {
             },
           ),
         ),
-
-        // APAGAR EJE DERECHO
         rightTitles: AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
-
-        // EJE IZQUIERDO CORREGIDO
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 35,
-
-            // INTERVALOS PARA EVITAR SOLAPES
             interval: (maxDays / 5).ceilToDouble(),
-
             getTitlesWidget: (value, _) => Text("${value.toInt()}"),
           ),
         ),
       ),
     ),
   );
+
 }
 
 Widget _buildPieChart({required List<Trip> viajes}) {
   if (viajes.isEmpty) {
     return const Center(
       child: Text(
-        "Aún no tienes viajes",
+        "Aún no tienes viajes registrados.",
         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
     );
