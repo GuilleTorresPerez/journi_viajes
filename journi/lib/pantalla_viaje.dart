@@ -362,49 +362,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         ),
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Introduce un texto'),
-                                content: TextField(
-                                  controller: _textoController,
-                                  maxLines: 5,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Escribe aquí...',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Cancelar'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      final texto =
-                                          _textoController.text.trim();
-                                      if (texto.isEmpty) return;
-
-                                      final cmd = UpdateEntryCommand(
-                                        id: e.id,
-                                        text: texto,
-                                      );
-                                      await widget.entryService.update(cmd);
-
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Texto añadido')),
-                                      );
-                                    },
-                                    child: const Text('Aceptar'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
                           leading: const Icon(Icons.notes, color: Colors.teal),
                           title: Text(e.text!),
                           subtitle: Column(
@@ -424,18 +381,15 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              // Botón de ubicación
                               IconButton(
-                                icon: const Icon(Icons.location_on,
-                                    color: Colors.teal),
+                                icon: const Icon(Icons.location_on, color: Colors.teal),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          SelectLocationScreen(
-                                        initialName: e.tags.isNotEmpty
-                                            ? e.tags.first
-                                            : '',
+                                      builder: (context) => SelectLocationScreen(
+                                        initialName: e.tags.isNotEmpty ? e.tags.first : '',
                                         entry: e,
                                         entryRepo: widget.entryRepo,
                                         entryService: widget.entryService,
@@ -444,14 +398,58 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                   );
                                 },
                               ),
+                              // Botón de editar texto con lápiz
                               IconButton(
-                                icon: const Icon(Icons.delete_outline,
-                                    color: Colors.red),
+                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  _textoController.text = e.text!;
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Modifica el texto'),
+                                      content: TextField(
+                                        controller: _textoController,
+                                        maxLines: 5,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Escribe aquí...',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            final texto = _textoController.text.trim();
+                                            if (texto.isEmpty) return;
+
+                                            final cmd = UpdateEntryCommand(
+                                              id: e.id,
+                                              text: texto,
+                                            );
+                                            await widget.entryService.update(cmd);
+
+                                            Navigator.pop(context);
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Texto actualizado')),
+                                            );
+                                          },
+                                          child: const Text('Aceptar'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              // Botón de eliminar
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, color: Colors.red),
                                 onPressed: () async {
                                   await widget.entryService.deleteById(e.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Texto eliminado')),
+                                    const SnackBar(content: Text('Texto eliminado')),
                                   );
                                 },
                               ),
@@ -459,6 +457,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           ),
                         ),
                       );
+
                     }
 
                     // ---- FOTO ----
