@@ -394,6 +394,9 @@ Widget _buildBarChart({required List<Trip> viajes}) {
       ),
       barGroups: barGroups,
       titlesData: FlTitlesData(
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // <--- ocultamos los números de arriba
+        ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
