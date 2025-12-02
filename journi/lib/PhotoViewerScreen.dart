@@ -19,12 +19,12 @@ class PhotoViewerScreen extends StatelessWidget {
       body: Center(
         child: file.existsSync()
             ? InteractiveViewer(
-          child: Image.file(file, fit: BoxFit.contain),
-        )
+                child: Image.file(file, fit: BoxFit.contain),
+              )
             : const Text(
-          "No se pudo cargar la imagen",
-          style: TextStyle(color: Colors.white),
-        ),
+                "No se pudo cargar la imagen",
+                style: TextStyle(color: Colors.white),
+              ),
       ),
     );
   }

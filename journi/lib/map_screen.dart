@@ -788,25 +788,25 @@ class _LineaTemporalScreenState extends State<LineaTemporalScreen> {
       body: entradas == null
           ? const Center(child: CircularProgressIndicator())
           : entradas!.isEmpty
-          ? const Center(
-        child: Text(
-          'Este viaje no tiene eventos.',
-          style: TextStyle(fontSize: 18),
-        ),
-      )
-          : TimelineList(
-        entries: entradas!,
-        onTapEntry: (e) {
-          if (e.type == EntryType.photo && e.mediaUri != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => PhotoViewerScreen(uri: e.mediaUri!),
-              ),
-            );
-          }
-        },
-      ),
+              ? const Center(
+                  child: Text(
+                    'Este viaje no tiene eventos.',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                )
+              : TimelineList(
+                  entries: entradas!,
+                  onTapEntry: (e) {
+                    if (e.type == EntryType.photo && e.mediaUri != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PhotoViewerScreen(uri: e.mediaUri!),
+                        ),
+                      );
+                    }
+                  },
+                ),
     );
   }
 }
@@ -898,9 +898,7 @@ class TimelineTile extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(child: child),
             ],
           ),
@@ -909,7 +907,6 @@ class TimelineTile extends StatelessWidget {
     );
   }
 }
-
 
 class TimelineList extends StatefulWidget {
   final List<Entry> entries;
@@ -1050,5 +1047,3 @@ class _TimelineListState extends State<TimelineList>
     }
   }
 }
-
-
