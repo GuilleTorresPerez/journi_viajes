@@ -95,7 +95,6 @@ class MyApp extends StatelessWidget {
         userRepo: userRepo,
         userService: userService,
         skipLogin: false, // por defecto false
-
       ),
     );
   }
@@ -103,20 +102,19 @@ class MyApp extends StatelessWidget {
 
 // ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
-  MyHomePage({
-    super.key,
-    required this.title,
-    required this.sesionIniciada,
-    required this.viajes,
-    required this.tripRepo,
-    required this.tripService,
-    required this.entryRepo,
-    required this.entryService,
-    required this.userRepo,
-    required this.userService,
-    required this.skipLogin,
-    this.currentUser
-  });
+  MyHomePage(
+      {super.key,
+      required this.title,
+      required this.sesionIniciada,
+      required this.viajes,
+      required this.tripRepo,
+      required this.tripService,
+      required this.entryRepo,
+      required this.entryService,
+      required this.userRepo,
+      required this.userService,
+      required this.skipLogin,
+      this.currentUser});
 
   final bool skipLogin; // nuevo flag para tests
   final String title;

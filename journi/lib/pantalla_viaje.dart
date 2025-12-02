@@ -798,8 +798,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 ),
               );
-            }
-            else if (_selectedIndex == 3) {
+            } else if (_selectedIndex == 3) {
               // Estadisticas
               Navigator.push(
                 context,
@@ -818,8 +817,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 ),
               );
-            }
-            else if (_selectedIndex == 4) {
+            } else if (_selectedIndex == 4) {
               // Perfil
               if (widget.sesionIniciada && widget.currentUser != null) {
                 Navigator.push(

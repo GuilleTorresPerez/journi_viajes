@@ -134,8 +134,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                         userRepo: widget.userRepo,
                         userService: userService,
                         skipLogin: false,
-                        currentUser: widget.currentUser
-                    ),
+                        currentUser: widget.currentUser),
                   ),
                 );
               } else if (_selectedIndex == 2) {
@@ -195,9 +194,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     ),
                   ),
                 );
-              }
-
-              else if (index == 4) {
+              } else if (index == 4) {
                 // Perfil
                 if (widget.sesionIniciada && widget.currentUser != null) {
                   Navigator.push(
@@ -355,7 +352,6 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                     userRepo: widget.userRepo,
                     userService: userService,
                     currentUser: widget.currentUser,
-
                   ),
                 ),
               );
@@ -416,9 +412,7 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                   ),
                 ),
               );
-            }
-
-            else if (index == 4) {
+            } else if (index == 4) {
               // Perfil
               if (widget.sesionIniciada && widget.currentUser != null) {
                 Navigator.push(
