@@ -238,7 +238,7 @@ class _CrearViajeState extends State<Crear_Viaje> {
                           content: Text('Viaje creado correctamente'),
                         ),
                       );
-                      Navigator.pop(context);
+                      Navigator.pop(context, result.value);
                     } else if (result is Err<Trip>) {
                       final errors =
                           result.errors.map((e) => e.message).join('\n');

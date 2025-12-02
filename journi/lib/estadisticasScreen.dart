@@ -49,6 +49,13 @@ class EstadisticasScreen extends StatefulWidget {
 class _EstadisticasState extends State<EstadisticasScreen> {
   @override
   Widget build(BuildContext context) {
+    final paisesVisitados = widget.viajes
+        .map((trip) => trip.title) // o trip.pais según tu modelo
+        .toSet()
+        .length;
+
+    final bool noHayViajes = widget.viajes.isEmpty;
+
     return Scaffold(
       backgroundColor: Colors.teal[200],
       appBar: AppBar(
@@ -60,34 +67,47 @@ class _EstadisticasState extends State<EstadisticasScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Mensaje dinámico de países visitados
-            Builder(
-              builder: (_) {
-                final paisesVisitados = widget.viajes
-                    .map((trip) => trip.title) // o trip.pais según tu modelo
-                    .toSet()
-                    .length;
-
-                return Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.teal[100],
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+            // Mensaje dinámico de países visitados o sin viajes
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.teal[100],
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
                     ),
-                    child: RichText(
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                        children: [
-                          const TextSpan(
+                        children: widget.viajes.isEmpty
+                            ? const [
+                          TextSpan(
+                            text: "🌍 Todavía no tienes ningún viaje registrado.\n",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.teal,
+                            ),
+                          ),
+                          TextSpan(
+                            text: "¿Quieres crear uno?",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ]
+                            : [
+                          TextSpan(
                             text: "🌍 ¡Enhorabuena!\n",
                             style: TextStyle(
                               fontSize: 20,
@@ -96,7 +116,7 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                             ),
                           ),
                           TextSpan(
-                            text: "Has visitado $paisesVisitados países",
+                            text: "Has realizado ${widget.viajes.map((t) => t.title).toSet().length} viajes",
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black87,
@@ -109,10 +129,51 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                         ],
                       ),
                     ),
-                  ),
-                );
-              },
+                    const SizedBox(height: 16),
+                    // Mostrar botón solo si no hay viajes
+                    if (widget.viajes.isEmpty)
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final Trip? nuevoViaje = await Navigator.push<Trip>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Crear_Viaje(
+                                selectedIndex: widget.selectedIndex,
+                                sesionIniciada: widget.sesionIniciada,
+                                viajes: widget.viajes,
+                                num_viaje: -1,
+                                repo: widget.tripRepo,
+                                entryRepo: widget.entryRepo,
+                                tripService: widget.tripService,
+                                entryService: widget.entryService,
+                                userRepo: widget.userRepo,
+                                userService: widget.userService,
+                                currentUser: widget.currentUser,
+                              ),
+                            ),
+                          );
+                          //  Agregamos el viaje a la lista y reconstruimos
+                          if (nuevoViaje != null) {
+                            setState(() {
+                              widget.viajes.add(nuevoViaje);
+                            });
+                          }
+                        },
+
+                        icon: const Icon(Icons.add),
+                        label: const Text('+ Crear viaje'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orangeAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
+
 
             const SizedBox(height: 20),
 
@@ -125,26 +186,50 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                 color: Colors.teal[900],
               ),
             ),
+
             const SizedBox(height: 20),
 
-            // ---------- GRAFICA 1: DIAS POR VIAJE -------------
             _buildChartCard(
               title: "Duración de cada viaje (días)",
               chart: _buildBarChart(viajes: widget.viajes),
             ),
-
             const SizedBox(height: 20),
-
-            // ---------- GRAFICA 2: DESTINOS VISITADOS ----------
             _buildChartCard(
               title: "Destinos visitados",
               chart: _buildPieChart(viajes: widget.viajes),
             ),
-
             const SizedBox(height: 30),
           ],
         ),
       ),
+      // Solo mostrar botón si no hay viajes
+      floatingActionButton: noHayViajes
+          ? FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Crear_Viaje(
+                selectedIndex: widget.selectedIndex,
+                sesionIniciada: widget.sesionIniciada,
+                viajes: widget.viajes,
+                num_viaje: -1,
+                repo: widget.tripRepo,
+                entryRepo: widget.entryRepo,
+                tripService: widget.tripService,
+                entryService: widget.entryService,
+                userRepo: widget.userRepo,
+                userService: widget.userService,
+                currentUser: widget.currentUser,
+              ),
+            ),
+          );
+        },
+        label: const Text('+ Crear viaje'),
+        icon: const Icon(Icons.add),
+        backgroundColor: Colors.orangeAccent,
+      )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.selectedIndex,
         backgroundColor: const Color(0xFFEDE5D0),
