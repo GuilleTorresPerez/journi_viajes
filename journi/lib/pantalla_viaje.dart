@@ -19,6 +19,7 @@ import 'application/user_service.dart';
 import 'crear_viaje.dart';
 import 'domain/ports/user_repository.dart';
 import 'editar_viaje.dart';
+import 'estadisticasScreen.dart';
 import 'map_screen.dart';
 //import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
@@ -765,7 +766,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => MapaPaisScreen(
-                    selectedIndex: widget.selectedIndex,
+                    selectedIndex: _selectedIndex,
                     viajes: widget.viajes,
                     sesionIniciada: widget.sesionIniciada,
                     tripRepo: widget.repo,
@@ -778,12 +779,12 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 ),
               );
-            } else if (widget.selectedIndex == 2) {
+            } else if (_selectedIndex == 2) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => Crear_Viaje(
-                    selectedIndex: widget.selectedIndex,
+                    selectedIndex: _selectedIndex,
                     viajes: widget.viajes,
                     sesionIniciada: widget.sesionIniciada,
                     num_viaje: -1,
@@ -797,10 +798,30 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 ),
               );
-            } else if (_selectedIndex == 4) {
+            }
+            else if (_selectedIndex == 3) {
+              // Estadisticas
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EstadisticasScreen(
+                    selectedIndex: _selectedIndex,
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                    currentUser: widget.currentUser!,
+                  ),
+                ),
+              );
+            }
+            else if (_selectedIndex == 4) {
               // Perfil
               if (widget.sesionIniciada && widget.currentUser != null) {
-                // Ya tenía sesión -> ir directo a MiPerfil
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -814,12 +835,11 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
-                      currentUser: widget.currentUser, //loggedUser
+                      currentUser: widget.currentUser!,
                     ),
                   ),
                 );
               } else {
-                // No hay sesión -> ir a Login y esperar resultado
                 final loggedUser = await Navigator.push<User?>(
                   context,
                   MaterialPageRoute(
@@ -837,18 +857,18 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 );
 
+                bool _sesionIniciada = false;
                 if (loggedUser != null && mounted) {
-                  /*setState(() {
-                    widget.currentUser = loggedUser;
-                  });*/
+                  setState(() {
+                    _sesionIniciada = true;
+                  });
 
-                  // Una vez logueado, lo llevamos al perfil
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => MiPerfil(
                         selectedIndex: _selectedIndex,
-                        sesionIniciada: true,
+                        sesionIniciada: _sesionIniciada,
                         viajes: widget.viajes,
                         tripRepo: widget.repo,
                         entryRepo: widget.entryRepo,

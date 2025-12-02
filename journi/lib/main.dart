@@ -95,6 +95,7 @@ class MyApp extends StatelessWidget {
         userRepo: userRepo,
         userService: userService,
         skipLogin: false, // por defecto false
+
       ),
     );
   }
@@ -114,6 +115,7 @@ class MyHomePage extends StatefulWidget {
     required this.userRepo,
     required this.userService,
     required this.skipLogin,
+    this.currentUser
   });
 
   final bool skipLogin; // nuevo flag para tests
@@ -132,6 +134,7 @@ class MyHomePage extends StatefulWidget {
 
   final UserRepository userRepo;
   final UserService userService;
+  User? currentUser;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -149,6 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _currentUser = widget.currentUser;
     _sesionIniciada = widget.sesionIniciada;
     _checkSession().then((_) => _loadInitial());
   }
