@@ -202,34 +202,6 @@ class _EstadisticasState extends State<EstadisticasScreen> {
           ],
         ),
       ),
-      // Solo mostrar botón si no hay viajes
-      floatingActionButton: noHayViajes
-          ? FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Crear_Viaje(
-                selectedIndex: widget.selectedIndex,
-                sesionIniciada: widget.sesionIniciada,
-                viajes: widget.viajes,
-                num_viaje: -1,
-                repo: widget.tripRepo,
-                entryRepo: widget.entryRepo,
-                tripService: widget.tripService,
-                entryService: widget.entryService,
-                userRepo: widget.userRepo,
-                userService: widget.userService,
-                currentUser: widget.currentUser,
-              ),
-            ),
-          );
-        },
-        label: const Text('+ Crear viaje'),
-        icon: const Icon(Icons.add),
-        backgroundColor: Colors.orangeAccent,
-      )
-          : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.selectedIndex,
         backgroundColor: const Color(0xFFEDE5D0),
