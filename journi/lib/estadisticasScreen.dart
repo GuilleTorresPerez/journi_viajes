@@ -70,7 +70,8 @@ class _EstadisticasState extends State<EstadisticasScreen> {
             // Mensaje dinámico de países visitados o sin viajes
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                 decoration: BoxDecoration(
                   color: Colors.teal[100],
                   borderRadius: BorderRadius.circular(16),
@@ -90,43 +91,45 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                       text: TextSpan(
                         children: widget.viajes.isEmpty
                             ? const [
-                          TextSpan(
-                            text: "🌍 Todavía no tienes ningún viaje registrado.\n",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal,
-                            ),
-                          ),
-                          TextSpan(
-                            text: "¿Quieres crear uno?",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ]
+                                TextSpan(
+                                  text:
+                                      "🌍 Todavía no tienes ningún viaje registrado.\n",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.teal,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "¿Quieres crear uno?",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ]
                             : [
-                          TextSpan(
-                            text: "🌍 ¡Enhorabuena!\n",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal,
-                            ),
-                          ),
-                          TextSpan(
-                            text: "Has realizado ${widget.viajes.map((t) => t.title).toSet().length} viajes",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const TextSpan(
-                            text: " ✈️✨",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ],
+                                TextSpan(
+                                  text: "🌍 ¡Enhorabuena!\n",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.teal,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text:
+                                      "Has realizado ${widget.viajes.map((t) => t.title).toSet().length} viajes",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: " ✈️✨",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -159,7 +162,6 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                             });
                           }
                         },
-
                         icon: const Icon(Icons.add),
                         label: const Text('Crear viaje'),
                         style: ElevatedButton.styleFrom(
@@ -173,7 +175,6 @@ class _EstadisticasState extends State<EstadisticasScreen> {
                 ),
               ),
             ),
-
 
             const SizedBox(height: 20),
 
@@ -383,19 +384,21 @@ Widget _buildBarChart({required List<Trip> viajes}) {
       maxY: maxDays + 2,
       borderData: FlBorderData(show: false),
       gridData: FlGridData(
-        show: true,                // activamos las líneas de la cuadrícula
-        drawHorizontalLine: true,  // solo horizontales
-        drawVerticalLine: false,   // quitamos las verticales
-        horizontalInterval: (maxDays / 5).ceilToDouble(), // espacio entre líneas
+        show: true, // activamos las líneas de la cuadrícula
+        drawHorizontalLine: true, // solo horizontales
+        drawVerticalLine: false, // quitamos las verticales
+        horizontalInterval:
+            (maxDays / 5).ceilToDouble(), // espacio entre líneas
         getDrawingHorizontalLine: (value) => FlLine(
-          color: Colors.black12,   // color de la línea
-          strokeWidth: 1,          // grosor
+          color: Colors.black12, // color de la línea
+          strokeWidth: 1, // grosor
         ),
       ),
       barGroups: barGroups,
       titlesData: FlTitlesData(
         topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false), // <--- ocultamos los números de arriba
+          sideTitles: SideTitles(
+              showTitles: false), // <--- ocultamos los números de arriba
         ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
@@ -427,7 +430,6 @@ Widget _buildBarChart({required List<Trip> viajes}) {
       ),
     ),
   );
-
 }
 
 Widget _buildPieChart({required List<Trip> viajes}) {

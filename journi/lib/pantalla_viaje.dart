@@ -383,13 +383,17 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             children: [
                               // Botón de ubicación
                               IconButton(
-                                icon: const Icon(Icons.location_on, color: Colors.teal),
+                                icon: const Icon(Icons.location_on,
+                                    color: Colors.teal),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => SelectLocationScreen(
-                                        initialName: e.tags.isNotEmpty ? e.tags.first : '',
+                                      builder: (context) =>
+                                          SelectLocationScreen(
+                                        initialName: e.tags.isNotEmpty
+                                            ? e.tags.first
+                                            : '',
                                         entry: e,
                                         entryRepo: widget.entryRepo,
                                         entryService: widget.entryService,
@@ -400,7 +404,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                               ),
                               // Botón de editar texto con lápiz
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.blue),
                                 onPressed: () {
                                   _textoController.text = e.text!;
                                   showDialog(
@@ -417,23 +422,29 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed: () => Navigator.pop(context),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
                                           child: const Text('Cancelar'),
                                         ),
                                         TextButton(
                                           onPressed: () async {
-                                            final texto = _textoController.text.trim();
+                                            final texto =
+                                                _textoController.text.trim();
                                             if (texto.isEmpty) return;
 
                                             final cmd = UpdateEntryCommand(
                                               id: e.id,
                                               text: texto,
                                             );
-                                            await widget.entryService.update(cmd);
+                                            await widget.entryService
+                                                .update(cmd);
 
                                             Navigator.pop(context);
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Texto actualizado')),
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Texto actualizado')),
                                             );
                                           },
                                           child: const Text('Aceptar'),
@@ -445,11 +456,13 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                               ),
                               // Botón de eliminar
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                icon: const Icon(Icons.delete_outline,
+                                    color: Colors.red),
                                 onPressed: () async {
                                   await widget.entryService.deleteById(e.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Texto eliminado')),
+                                    const SnackBar(
+                                        content: Text('Texto eliminado')),
                                   );
                                 },
                               ),
@@ -457,7 +470,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           ),
                         ),
                       );
-
                     }
 
                     // ---- FOTO ----
