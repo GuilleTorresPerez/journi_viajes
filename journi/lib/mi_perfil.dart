@@ -124,8 +124,10 @@ class _MiPerfilState extends State<MiPerfil> {
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[400],
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text(
@@ -153,7 +155,7 @@ class _MiPerfilState extends State<MiPerfil> {
                         currentUser: null,
                       ),
                     ),
-                        (route) => false, // borra todo el stack
+                    (route) => false, // borra todo el stack
                   );
                 },
               ),
