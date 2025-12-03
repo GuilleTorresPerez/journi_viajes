@@ -528,40 +528,48 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                     ),
                                   ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.location_on,
-                                      color: Colors.teal),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            SelectLocationScreen(
-                                          initialName: e.tags.isNotEmpty
-                                              ? e.tags.first
-                                              : '',
-                                          entry: e,
-                                          entryRepo: widget.entryRepo,
-                                          entryService: widget.entryService,
+                                Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Column(children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.location_on,
+                                            color: Colors.teal),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SelectLocationScreen(
+                                                initialName: e.tags.isNotEmpty
+                                                    ? e.tags.first
+                                                    : '',
+                                                entry: e,
+                                                entryRepo: widget.entryRepo,
+                                                entryService:
+                                                    widget.entryService,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
                                         ),
+                                        onPressed: () async {
+                                          await widget.entryService
+                                              .deleteById(e.id);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Foto eliminada'),
+                                            ),
+                                          );
+                                        },
                                       ),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () async {
-                                    await widget.entryService.deleteById(e.id);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Foto eliminada'),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                    ]))
                               ],
                             ),
                             Padding(

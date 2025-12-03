@@ -186,7 +186,25 @@ class _MiPerfilState extends State<MiPerfil> {
           setState(() => widget.selectedIndex = index);
 
           if (index == 0) {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
+                builder: (context) => MyHomePage(
+                  title: 'JOURNI',
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  skipLogin: false,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser,
+                ),
+              ),
+            );
           } else if (index == 2) {
             Navigator.push(
               context,

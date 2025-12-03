@@ -15,6 +15,7 @@ import 'domain/trip.dart';
 import 'domain/user.dart';
 import 'estadisticasScreen.dart';
 import 'login_screen.dart';
+import 'main.dart';
 import 'map_screen.dart';
 import 'mi_perfil.dart';
 
@@ -245,7 +246,25 @@ class _EditarViajeState extends State<Editar_viaje> {
         onTap: (int inIndex) async {
           setState(() => _selectedIndex = inIndex);
           if (_selectedIndex == 0) {
-            Navigator.pop(context); // volver a la Home existente
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
+                builder: (context) => MyHomePage(
+                  title: 'JOURNI',
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  skipLogin: false,
+                  tripRepo: widget.repo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser,
+                ),
+              ),
+            );
           } else if (_selectedIndex == 2) {
             Navigator.push(
               context,

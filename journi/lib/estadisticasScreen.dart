@@ -9,6 +9,7 @@ import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
 import 'domain/user.dart';
+import 'main.dart';
 import 'map_screen.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -224,7 +225,25 @@ class _EstadisticasState extends State<EstadisticasScreen> {
           setState(() => widget.selectedIndex = index);
 
           if (index == 0) {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
+                builder: (context) => MyHomePage(
+                  title: 'JOURNI',
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  skipLogin: false,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser,
+                ),
+              ),
+            );
           }
           if (index == 2) {
             // Nuevo viaje

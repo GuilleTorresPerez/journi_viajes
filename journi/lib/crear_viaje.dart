@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'estadisticasScreen.dart';
+import 'main.dart';
 import 'mi_perfil.dart';
 import 'domain/user.dart';
 
@@ -277,8 +278,25 @@ class _CrearViajeState extends State<Crear_Viaje> {
               _selectedIndex = inIndex; // muta el estado, no el widget
             });
             if (_selectedIndex == 0) {
-              Navigator.pop(
-                  context); // vuelve a Mis viajes sin perder el estado
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
+                  builder: (context) => MyHomePage(
+                    title: 'JOURNI',
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    skipLogin: false,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                    currentUser: widget.currentUser,
+                  ),
+                ),
+              );
             } else if (_selectedIndex == 1) {
               // Ir al mapa
               Navigator.push(
