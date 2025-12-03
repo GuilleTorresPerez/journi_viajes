@@ -10,12 +10,14 @@ import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
 import 'domain/user.dart';
 import 'estadisticasScreen.dart';
+import 'login_screen.dart';
+import 'main.dart';
 import 'map_screen.dart';
 
 // ignore: must_be_immutable
 class MiPerfil extends StatefulWidget {
   int selectedIndex;
-  final bool sesionIniciada;
+  late final bool sesionIniciada;
   List<Trip> viajes;
   final TripRepository tripRepo;
   final EntryRepository entryRepo;
@@ -115,6 +117,46 @@ class _MiPerfilState extends State<MiPerfil> {
               // FILA FECHA CREACIÓN
               _buildDataRow(Icons.calendar_month, "Usuario desde",
                   widget.currentUser!.createdAt.toString().substring(0, 10)),
+
+              const SizedBox(height: 40),
+
+              // BOTÓN DE CERRAR SESIÓN (solo en front)
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[400],
+                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.logout, color: Colors.white),
+                label: const Text(
+                  "Cerrar sesión",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+                onPressed: () {
+                  // CIERRE DE SESIÓN EN FRONT
+
+                  // Ir a login y borrar historial de navegación
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MyHomePage(
+                        title: 'JOURNI',
+                        sesionIniciada: false,
+                        viajes: [],
+                        tripRepo: widget.tripRepo,
+                        entryRepo: widget.entryRepo,
+                        tripService: widget.tripService,
+                        entryService: widget.entryService,
+                        userRepo: widget.userRepo,
+                        userService: widget.userService,
+                        skipLogin: false,
+                        currentUser: null,
+                      ),
+                    ),
+                        (route) => false, // borra todo el stack
+                  );
+                },
+              ),
 
               const SizedBox(height: 40),
             ],
