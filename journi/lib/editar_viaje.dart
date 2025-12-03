@@ -13,8 +13,10 @@ import 'crear_viaje.dart';
 import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
 import 'domain/user.dart';
+import 'estadisticasScreen.dart';
 import 'login_screen.dart';
 import 'map_screen.dart';
+import 'mi_perfil.dart';
 
 class Editar_viaje extends StatefulWidget {
   // ❗ Los campos del widget deben ser inmutables (final)
@@ -240,7 +242,7 @@ class _EditarViajeState extends State<Editar_viaje> {
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],
-        onTap: (int inIndex) {
+        onTap: (int inIndex) async {
           setState(() => _selectedIndex = inIndex);
           if (_selectedIndex == 0) {
             Navigator.pop(context); // volver a la Home existente
@@ -282,25 +284,88 @@ class _EditarViajeState extends State<Editar_viaje> {
                 ),
               ),
             );
-          } else if (_selectedIndex == 4) {
-            //mi perfil
-            inIndex = 0;
+          } else if (_selectedIndex == 3) {
+            // Estadisticas
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => LoginScreen(
-                  selectedIndex: 0,
-                  viajes: widget.viajes,
+                builder: (context) => EstadisticasScreen(
+                  selectedIndex: _selectedIndex,
                   sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
                   tripRepo: widget.repo,
                   entryRepo: widget.entryRepo,
                   tripService: widget.tripService,
                   entryService: widget.entryService,
                   userRepo: widget.userRepo,
                   userService: widget.userService,
+                  currentUser: widget.currentUser!,
                 ),
               ),
             );
+          } else if (_selectedIndex == 4) {
+            // Perfil
+            if (widget.sesionIniciada && widget.currentUser != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MiPerfil(
+                    selectedIndex: _selectedIndex,
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                    currentUser: widget.currentUser!,
+                  ),
+                ),
+              );
+            } else {
+              final loggedUser = await Navigator.push<User?>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginScreen(
+                    selectedIndex: _selectedIndex,
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                  ),
+                ),
+              );
+
+              bool _sesionIniciada = false;
+              if (loggedUser != null && mounted) {
+                setState(() {
+                  _sesionIniciada = true;
+                });
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MiPerfil(
+                      selectedIndex: _selectedIndex,
+                      sesionIniciada: _sesionIniciada,
+                      viajes: widget.viajes,
+                      tripRepo: widget.repo,
+                      entryRepo: widget.entryRepo,
+                      tripService: widget.tripService,
+                      entryService: widget.entryService,
+                      userRepo: widget.userRepo,
+                      userService: widget.userService,
+                      currentUser: loggedUser,
+                    ),
+                  ),
+                );
+              }
+            }
           }
         },
       ),

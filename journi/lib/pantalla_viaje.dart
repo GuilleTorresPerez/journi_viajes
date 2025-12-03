@@ -63,6 +63,7 @@ class Pantalla_Viaje extends StatefulWidget {
 
 class _PantallaViajeState extends State<Pantalla_Viaje> {
   VideoPlayerController? _videoController;
+  String? _currentVideoPath;
 
   Future<void> _initVideo(File file) async {
     _videoController?.dispose();
@@ -81,6 +82,24 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedIndex; // snapshot inicial
+  }
+
+  void _loadVideo(String path) async {
+    if (_currentVideoPath == path) return; // ya está cargado
+
+    _videoController?.dispose();
+
+    _videoController = VideoPlayerController.file(File(path));
+    _currentVideoPath = path;
+
+    await _videoController!.initialize();
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -362,6 +381,49 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         ),
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Introduce un texto'),
+                                content: TextField(
+                                  controller: _textoController,
+                                  maxLines: 5,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Escribe aquí...',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final texto =
+                                          _textoController.text.trim();
+                                      if (texto.isEmpty) return;
+
+                                      final cmd = UpdateEntryCommand(
+                                        id: e.id,
+                                        text: texto,
+                                      );
+                                      await widget.entryService.update(cmd);
+
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Texto añadido')),
+                                      );
+                                    },
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                           leading: const Icon(Icons.notes, color: Colors.teal),
                           title: Text(e.text!),
                           subtitle: Column(
@@ -381,7 +443,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Botón de ubicación
                               IconButton(
                                 icon: const Icon(Icons.location_on,
                                     color: Colors.teal),
@@ -402,59 +463,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                   );
                                 },
                               ),
-                              // Botón de editar texto con lápiz
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () {
-                                  _textoController.text = e.text!;
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Modifica el texto'),
-                                      content: TextField(
-                                        controller: _textoController,
-                                        maxLines: 5,
-                                        decoration: const InputDecoration(
-                                          hintText: 'Escribe aquí...',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text('Cancelar'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () async {
-                                            final texto =
-                                                _textoController.text.trim();
-                                            if (texto.isEmpty) return;
-
-                                            final cmd = UpdateEntryCommand(
-                                              id: e.id,
-                                              text: texto,
-                                            );
-                                            await widget.entryService
-                                                .update(cmd);
-
-                                            Navigator.pop(context);
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                  content: Text(
-                                                      'Texto actualizado')),
-                                            );
-                                          },
-                                          child: const Text('Aceptar'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                              // Botón de eliminar
                               IconButton(
                                 icon: const Icon(Icons.delete_outline,
                                     color: Colors.red),
@@ -521,6 +529,26 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                   ),
                                 ),
                                 IconButton(
+                                  icon: const Icon(Icons.location_on,
+                                      color: Colors.teal),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            SelectLocationScreen(
+                                          initialName: e.tags.isNotEmpty
+                                              ? e.tags.first
+                                              : '',
+                                          entry: e,
+                                          entryRepo: widget.entryRepo,
+                                          entryService: widget.entryService,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                IconButton(
                                   icon: const Icon(
                                     Icons.delete,
                                     color: Colors.red,
@@ -557,28 +585,35 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
                       return Card(
                         color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: Column(
                           children: [
-                            FutureBuilder(
-                              future: _initVideo(file),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState !=
-                                    ConnectionState.done) {
-                                  return const SizedBox(
-                                    height: 200,
-                                    child: Center(
-                                        child: CircularProgressIndicator()),
-                                  );
-                                }
-
-                                return AspectRatio(
-                                  aspectRatio:
-                                      _videoController!.value.aspectRatio,
-                                  child: VideoPlayer(_videoController!),
-                                );
+                            // ← Bloque corregido aquí
+                            GestureDetector(
+                              onTap: () {
+                                _loadVideo(e.mediaUri!);
                               },
+                              child: _currentVideoPath == e.mediaUri &&
+                                      _videoController != null &&
+                                      _videoController!.value.isInitialized
+                                  ? AspectRatio(
+                                      aspectRatio:
+                                          _videoController!.value.aspectRatio,
+                                      child: VideoPlayer(_videoController!),
+                                    )
+                                  : Container(
+                                      height: 200,
+                                      color: Colors.black12,
+                                      child: const Center(
+                                        child: Icon(Icons.play_circle_fill,
+                                            size: 60),
+                                      ),
+                                    ),
                             ),
+
                             IconButton(
                               icon: const Icon(Icons.play_arrow),
                               onPressed: () {
@@ -587,6 +622,24 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                       ? _videoController!.pause()
                                       : _videoController!.play();
                                 });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.location_on,
+                                  color: Colors.teal),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SelectLocationScreen(
+                                      initialName:
+                                          e.tags.isNotEmpty ? e.tags.first : '',
+                                      entry: e,
+                                      entryRepo: widget.entryRepo,
+                                      entryService: widget.entryService,
+                                    ),
+                                  ),
+                                );
                               },
                             ),
                             IconButton(
