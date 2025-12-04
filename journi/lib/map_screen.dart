@@ -666,6 +666,19 @@ class _MapaDetalleScreenState extends State<MapaDetalleScreen> {
               itemBuilder: (context, index) {
                 final e = entradas[index];
                 return ListTile(
+                  onTap: () {
+                    if (e.mediaUri != null && e.mediaUri!.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PhotoViewerScreen(uri: e.mediaUri!),
+                        ),
+                      );
+                    }
+                  },
+                  leading: (e.mediaUri != null && e.mediaUri!.isNotEmpty)
+                      ? const Icon(Icons.photo, color: Colors.blue)
+                      : const Icon(Icons.notes),
                   title: Text(
                     e.text ?? "(${e.type.name})",
                     style: const TextStyle(fontWeight: FontWeight.bold),
