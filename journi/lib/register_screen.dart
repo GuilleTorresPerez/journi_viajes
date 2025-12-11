@@ -187,9 +187,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Apellidos
                 _buildInput(
-                    key: const Key('apellidosField'),
-                    _apellidosController,
-                    'Apellidos'),
+                  _apellidosController,
+                  'Apellidos',
+                  key: const Key('apellidosField'),
+                ),
                 const SizedBox(height: 16),
 
                 // Correo electrónico
@@ -203,10 +204,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Contraseña
                 _buildInput(
-                    key: const Key('passwordField'),
-                    _passwordController,
-                    'Contraseña',
-                    obscureText: true),
+                  _passwordController,
+                  'Contraseña',
+                  key: const Key('passwordField'),
+                  obscureText: true,
+                ),
 
                 const SizedBox(height: 8),
 
