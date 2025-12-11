@@ -178,15 +178,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 40),
 
                 // Nombre
-                _buildInput(_nombreController, 'Nombre'),
+                _buildInput(
+                  _nombreController,
+                  'Nombre',
+                  key: const Key('nombreField'),
+                ),
                 const SizedBox(height: 16),
 
                 // Apellidos
-                _buildInput(_apellidosController, 'Apellidos'),
+                _buildInput(
+                    key: const Key('apellidosField'),
+                    _apellidosController,
+                    'Apellidos'
+                ),
                 const SizedBox(height: 16),
 
                 // Correo electrónico
                 _buildInput(
+                  key: const Key('emailField'),
                   _emailController,
                   'Correo electronico',
                   keyboardType: TextInputType.emailAddress,
@@ -194,14 +203,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
 
                 // Contraseña
-                _buildInput(_passwordController, 'Contraseña',
-                    obscureText: true),
+                _buildInput(
+                    key: const Key('passwordField'),
+                    _passwordController,
+                    'Contraseña',
+                    obscureText: true
+                ),
 
                 const SizedBox(height: 8),
 
                 // Texto "Ya tengo una cuenta creada" clicable
                 Center(
                   child: GestureDetector(
+                    key: const Key('yaTengoCuentaButton'),
                     onTap: _onYaTengoCuenta,
                     child: const Text(
                       'Ya tengo una cuenta creada',
@@ -220,6 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
+                    key: const Key('guardarButton'),
                     onPressed: _onGuardar,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF4B54C), // naranja
@@ -249,11 +264,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildInput(
-    TextEditingController controller,
-    String hintText, {
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
+      TextEditingController controller,
+      String hintText, {
+        Key? key,
+        bool obscureText = false,
+        TextInputType keyboardType = TextInputType.text,
+      }) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFEDE5D0),
