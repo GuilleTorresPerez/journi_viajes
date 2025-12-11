@@ -97,9 +97,11 @@ void main() {
     );
 
     await tester.tap(find.byKey(const Key('guardarButton')));
-    await tester.pump();
+    await tester.pump(); // deja que showSnackBar se dispare
 
-    expect(find.text('Falta algún campo'), findsOneWidget);
+    expect(find.text('Usuario registrado correctamente'), findsOneWidget);
+
+    await tester.pumpAndSettle(); // ahora sí permitimos el pop
   });
 
   // ------------------------------------------------------------
