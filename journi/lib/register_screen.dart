@@ -189,8 +189,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _buildInput(
                     key: const Key('apellidosField'),
                     _apellidosController,
-                    'Apellidos'
-                ),
+                    'Apellidos'),
                 const SizedBox(height: 16),
 
                 // Correo electrónico
@@ -207,8 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     key: const Key('passwordField'),
                     _passwordController,
                     'Contraseña',
-                    obscureText: true
-                ),
+                    obscureText: true),
 
                 const SizedBox(height: 8),
 
@@ -264,12 +262,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildInput(
-      TextEditingController controller,
-      String hintText, {
-        Key? key,
-        bool obscureText = false,
-        TextInputType keyboardType = TextInputType.text,
-      }) {
+    TextEditingController controller,
+    String hintText, {
+    Key? key,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFEDE5D0),
