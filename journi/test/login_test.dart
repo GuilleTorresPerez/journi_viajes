@@ -126,7 +126,7 @@ void main() {
     await tester.tap(find.byKey(const Key('entrarButton')));
     await tester.pump(); // mostrar snackbar
 
-    expect(find.text('Credenciales incorrectas'), findsOneWidget);
+    expect(find.text('Credenciales inválidas'), findsOneWidget);
   });
 
   // ------------------------------------------------------------
