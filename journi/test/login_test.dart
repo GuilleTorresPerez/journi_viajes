@@ -60,7 +60,8 @@ void main() {
   // ------------------------------------------------------------
   // 🚀 TEST 1 — Login correcto
   // ------------------------------------------------------------
-  testWidgets("✅ Login correcto con usuario válido", (WidgetTester tester) async {
+  testWidgets("✅ Login correcto con usuario válido",
+      (WidgetTester tester) async {
     await createTestUser();
 
     await tester.pumpWidget(
@@ -71,7 +72,8 @@ void main() {
           selectedIndex: 0,
           tripRepo: tripRepo,
           entryRepo: entryRepo,
-          tripService: makeTripService(tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+          tripService: makeTripService(
+              tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
           entryService: makeEntryService(entryRepo),
           userRepo: userRepo,
           userService: userService,
@@ -80,8 +82,10 @@ void main() {
     );
 
     // Introducir email y password correctos
-    await tester.enterText(find.byKey(const Key('usuarioTextField')), 'paula@gmail.com');
-    await tester.enterText(find.byKey(const Key('passwordTextField')), 'paula123');
+    await tester.enterText(
+        find.byKey(const Key('usuarioTextField')), 'paula@gmail.com');
+    await tester.enterText(
+        find.byKey(const Key('passwordTextField')), 'paula123');
 
     // Pulsar botón Entrar
     await tester.tap(find.byKey(const Key('entrarButton')));
@@ -105,7 +109,8 @@ void main() {
           selectedIndex: 0,
           tripRepo: tripRepo,
           entryRepo: entryRepo,
-          tripService: makeTripService(tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+          tripService: makeTripService(
+              tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
           entryService: makeEntryService(entryRepo),
           userRepo: userRepo,
           userService: userService,
@@ -113,8 +118,10 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byKey(const Key('usuarioTextField')), 'paula@gmail.com');
-    await tester.enterText(find.byKey(const Key('passwordTextField')), 'wrongpass');
+    await tester.enterText(
+        find.byKey(const Key('usuarioTextField')), 'paula@gmail.com');
+    await tester.enterText(
+        find.byKey(const Key('passwordTextField')), 'wrongpass');
 
     await tester.tap(find.byKey(const Key('entrarButton')));
     await tester.pump(); // mostrar snackbar
@@ -125,7 +132,8 @@ void main() {
   // ------------------------------------------------------------
   // ❌ TEST 3 — Email con formato inválido
   // ------------------------------------------------------------
-  testWidgets("❌ Error: email en formato incorrecto", (WidgetTester tester) async {
+  testWidgets("❌ Error: email en formato incorrecto",
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: LoginScreen(
@@ -134,7 +142,8 @@ void main() {
           selectedIndex: 0,
           tripRepo: tripRepo,
           entryRepo: entryRepo,
-          tripService: makeTripService(tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+          tripService: makeTripService(
+              tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
           entryService: makeEntryService(entryRepo),
           userRepo: userRepo,
           userService: userService,
@@ -142,14 +151,16 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byKey(const Key('usuarioTextField')), 'incorrecto');
+    await tester.enterText(
+        find.byKey(const Key('usuarioTextField')), 'incorrecto');
     await tester.enterText(find.byKey(const Key('passwordTextField')), '123');
 
     await tester.tap(find.byKey(const Key('entrarButton')));
     await tester.pump();
 
     expect(
-      find.text('El correo introducido no sigue el formato correcto. Inténtelo de nuevo'),
+      find.text(
+          'El correo introducido no sigue el formato correcto. Inténtelo de nuevo'),
       findsOneWidget,
     );
   });
@@ -166,7 +177,8 @@ void main() {
           selectedIndex: 0,
           tripRepo: tripRepo,
           entryRepo: entryRepo,
-          tripService: makeTripService(tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+          tripService: makeTripService(
+              tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
           entryService: makeEntryService(entryRepo),
           userRepo: userRepo,
           userService: userService,
