@@ -43,18 +43,18 @@ void main() {
 
   // 📌 Crear usuario válido para tests
   Future<void> createTestUser() async {
-    final user = User.create(
-      id: "u1",
-      name: "Paula",
-      lastName: "Tester",
-      email: "paula@gmail.com",
-      passwordHash: "paula123",
-      passwordSalt: "",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+    // 🔑 Generar un id aleatorio/simple para el usuario
+    final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+
+    final cmd = RegisterUserCommand(
+      id: generatedId,
+      name: "nombre",
+      lastName: "apellidos",
+      email: "email@gmail.com",
+      password: "password",
     );
 
-    await userRepo.upsert(user.asOk().value);
+    final result = await userService.register(cmd);
   }
 
   // ------------------------------------------------------------
@@ -83,9 +83,9 @@ void main() {
 
     // Introducir email y password correctos
     await tester.enterText(
-        find.byKey(const Key('usuarioTextField')), 'paula@gmail.com');
+        find.byKey(const Key('usuarioTextField')), 'email@gmail.com');
     await tester.enterText(
-        find.byKey(const Key('passwordTextField')), 'paula123');
+        find.byKey(const Key('passwordTextField')), 'password');
 
     // Pulsar botón Entrar
     await tester.tap(find.byKey(const Key('entrarButton')));
