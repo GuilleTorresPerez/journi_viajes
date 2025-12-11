@@ -264,12 +264,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildInput(
-      TextEditingController controller,
-      String hintText, {
-        Key? key,
-        bool obscureText = false,
-        TextInputType keyboardType = TextInputType.text,
-      }) {
+    TextEditingController controller,
+    String hintText, {
+    Key? key,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return TextField(
       key: key, // ← OBLIGATORIO AQUÍ
       controller: controller,
@@ -281,5 +281,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
 }
