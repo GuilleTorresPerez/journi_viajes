@@ -152,6 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
+                  key: const Key('usuarioTextField'),
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
@@ -170,6 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
+                  key: const Key('passwordTextField'),
                   controller: _passwordController,
                   obscureText: _obscureText,
                   decoration: InputDecoration(
@@ -233,6 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                  key: const Key('entrarButton'),
                   onPressed: _onEntrar,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF4B54C), // naranja
