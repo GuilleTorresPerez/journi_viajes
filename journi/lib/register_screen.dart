@@ -264,27 +264,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildInput(
-    TextEditingController controller,
-    String hintText, {
-    Key? key,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFEDE5D0),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hintText,
-        ),
+      TextEditingController controller,
+      String hintText, {
+        Key? key,
+        bool obscureText = false,
+        TextInputType keyboardType = TextInputType.text,
+      }) {
+    return TextField(
+      key: key, // ← OBLIGATORIO AQUÍ
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        hintText: hintText,
+        border: OutlineInputBorder(),
       ),
     );
   }
+
 }
