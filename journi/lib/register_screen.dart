@@ -195,9 +195,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Correo electrónico
                 _buildInput(
-                  key: const Key('emailField'),
                   _emailController,
                   'Correo electronico',
+                  key: const Key('emailField'),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
