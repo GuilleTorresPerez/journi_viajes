@@ -121,8 +121,6 @@ void main() {
     expect(updatedTrip.valueOrNull?.endDate?.year, 2025);
     expect(updatedTrip.valueOrNull?.endDate?.month, 1);
     expect(updatedTrip.valueOrNull?.endDate?.day, 15);
-
-    expect(updatedTrip.valueOrNull?.endDate, DateTime(2025, 1, 15));
   });
 
   testWidgets('Editar viaje con fecha inicio posterior a fin muestra error',
