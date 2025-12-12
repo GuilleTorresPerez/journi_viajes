@@ -16,6 +16,7 @@ import 'package:journi/main.dart';
 import 'fake_geocoding_repository.dart';
 
 void main() {
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late AppDatabase db;
@@ -37,6 +38,7 @@ void main() {
   });
 
   tearDown(() async {
+    await db.beforeClose();
     await db.close();
   });
 
@@ -98,7 +100,6 @@ void main() {
         ),
       ));
 
-      await tester.pump(const Duration(milliseconds: 100));
 
       // Simulamos filtro por fecha
       final filtroStart = DateTime(2025, 1, 1);
@@ -111,8 +112,8 @@ void main() {
               v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))))
           .toList();
 
-      await tester.pump(Duration(milliseconds: 100));
-      await tester.pumpAndSettle(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 50));
+
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Viaje Enero');
     });
@@ -254,8 +255,8 @@ void main() {
               v.title == locationFilter)
           .toList();
 
-      await tester.pump(Duration(milliseconds: 100));
-      await tester.pumpAndSettle(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 50));
+
 
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Barcelona');
