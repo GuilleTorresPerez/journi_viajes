@@ -216,6 +216,7 @@ class _EditarViajeState extends State<Editar_viaje> {
                     if (result is Ok<Trip>) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
+                          key: Key('snackbar_ok'),
                           content: Text('Viaje actualizado correctamente'),
                         ),
                       );

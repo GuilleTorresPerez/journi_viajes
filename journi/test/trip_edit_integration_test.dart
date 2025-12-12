@@ -107,7 +107,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verificar SnackBar de éxito
-    expect(find.text('Viaje actualizado correctamente'), findsOneWidget);
+    expect(find.byKey(const Key('snackbar_ok')), findsOneWidget);
 
     // Verificar cambios en repo
     final updatedTrip = await tripRepo.findById("1");
