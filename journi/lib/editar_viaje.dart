@@ -215,11 +215,13 @@ class _EditarViajeState extends State<Editar_viaje> {
 
                     if (result is Ok<Trip>) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          key: Key('snackbar_ok'),
-                          content: Text('Viaje actualizado correctamente'),
+                        SnackBar(
+                          key: const Key('snackbar_ok'),
+                          duration: const Duration(seconds: 5),
+                          content: const Text('Viaje actualizado correctamente'),
                         ),
                       );
+
                       await Future.delayed(const Duration(milliseconds: 300));
                       if (!mounted) return;
                       Navigator.pop(context, result.value); // volver a la lista

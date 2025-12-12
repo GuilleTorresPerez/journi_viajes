@@ -104,11 +104,12 @@ void main() {
         find.byKey(const Key('fechaFinField')), '15-01-2025');
 
     await tester.tap(find.byKey(const Key('guardarButton')));
-    await tester.pump(); // dispara el onPressed
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump();  // procesa onPressed
+    await tester.pump();  // procesa async
+    await tester.pump(const Duration(seconds: 1)); // deja aparecer el snackbar
 
-    // Verificar SnackBar de éxito
-    expect(find.byKey(const Key('snackbar_ok')), findsOneWidget);
+    expect(find.text('Viaje actualizado correctamente'), findsOneWidget);
+
 
     // Verificar cambios en repo
     final updatedTrip = await tripRepo.findById("1");
