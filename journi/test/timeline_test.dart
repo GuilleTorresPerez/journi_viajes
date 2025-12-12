@@ -59,11 +59,12 @@ void main() {
       expect(find.byType(TimelineTile), findsNWidgets(entries.length));
 
       for (final e in entries) {
-        final text = e.text ?? (e.type == EntryType.photo
-            ? 'Fotografía'
-            : e.type == EntryType.video
-            ? 'Vídeo'
-            : 'Nota');
+        final text = e.text ??
+            (e.type == EntryType.photo
+                ? 'Fotografía'
+                : e.type == EntryType.video
+                    ? 'Vídeo'
+                    : 'Nota');
         expect(find.text(text), findsOneWidget);
       }
 
@@ -76,7 +77,8 @@ void main() {
     testWidgets('onTapEntry se dispara correctamente', (tester) async {
       Entry? tappedEntry;
 
-      await tester.pumpWidget(_wrapTimeline(entries, onTap: (e) => tappedEntry = e));
+      await tester
+          .pumpWidget(_wrapTimeline(entries, onTap: (e) => tappedEntry = e));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Primera nota'));
