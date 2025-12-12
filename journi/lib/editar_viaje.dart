@@ -219,6 +219,8 @@ class _EditarViajeState extends State<Editar_viaje> {
                           content: Text('Viaje actualizado correctamente'),
                         ),
                       );
+                      await Future.delayed(const Duration(milliseconds: 300));
+                      if (!mounted) return;
                       Navigator.pop(context, result.value); // volver a la lista
                     } else if (result is Err<Trip>) {
                       final errors =
