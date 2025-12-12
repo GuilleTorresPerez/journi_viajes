@@ -10,7 +10,13 @@ void main() {
 
   testWidgets('Muestra los pins de las entradas en el mapa', (tester) async {
     // Crear un viaje de prueba
-    final viaje = Trip(id: 'trip1', title: 'Viaje Test', ownerId: '', createdAt: DateTime(2024, 1, 1), updatedAt: DateTime(2024, 1, 1),);
+    final viaje = Trip(
+      id: 'trip1',
+      title: 'Viaje Test',
+      ownerId: '',
+      createdAt: DateTime(2024, 1, 1),
+      updatedAt: DateTime(2024, 1, 1),
+    );
 
     // Crear entradas de prueba con ubicación
     final entradas = [
@@ -37,7 +43,8 @@ void main() {
         tripId: 'trip1',
         type: EntryType.video,
         mediaUri: 'video.mp4',
-        location: const EntryLocation(lat: 10, lon: 10), // misma ubicación que la primera
+        location: const EntryLocation(
+            lat: 10, lon: 10), // misma ubicación que la primera
         createdAt: DateTime(2024, 1, 3),
         updatedAt: DateTime(2024, 1, 3),
       ).valueOrNull!,
