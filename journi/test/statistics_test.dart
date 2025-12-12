@@ -20,7 +20,6 @@ import 'package:journi/application/user_service.dart';
 
 import 'fake_geocoding_repository.dart';
 
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -43,7 +42,6 @@ void main() {
   tearDown(() async {
     await db.close();
   });
-
 
   Widget _wrap(EstadisticasScreen screen) {
     return MaterialApp(home: screen);
@@ -68,88 +66,94 @@ void main() {
 
   group('EstadisticasScreen Tests', () {
     testWidgets('Muestra mensaje de que no hay viajes y botón Crear viaje',
-            (tester) async {
+        (tester) async {
       User? user = await createTestUser();
-          final screen = EstadisticasScreen(
-            selectedIndex: 3,
-            sesionIniciada: true,
-            viajes: [],
-            tripRepo: tripRepo,
-            entryRepo: entryRepo,
-            tripService: makeTripService(
-                tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
-            entryService: makeEntryService(entryRepo),
-            userRepo: userRepo,
-            userService: userService,
-            currentUser: user,
-          );
+      final screen = EstadisticasScreen(
+        selectedIndex: 3,
+        sesionIniciada: true,
+        viajes: [],
+        tripRepo: tripRepo,
+        entryRepo: entryRepo,
+        tripService: makeTripService(
+            tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+        entryService: makeEntryService(entryRepo),
+        userRepo: userRepo,
+        userService: userService,
+        currentUser: user,
+      );
 
-          await tester.pumpWidget(_wrap(screen));
+      await tester.pumpWidget(_wrap(screen));
 
-          // Mensajes principales
-          expect(
-            find.text("🌍 Todavía no tienes ningún viaje registrado.\n"),
-            findsOneWidget,
-          );
-          expect(find.text("¿Quieres crear uno?"), findsOneWidget);
+      // Mensajes principales
+      expect(
+        find.text("🌍 Todavía no tienes ningún viaje registrado.\n"),
+        findsOneWidget,
+      );
+      expect(find.text("¿Quieres crear uno?"), findsOneWidget);
 
-          // Botón crear viaje visible
-          expect(find.text("Crear viaje"), findsOneWidget);
-        });
+      // Botón crear viaje visible
+      expect(find.text("Crear viaje"), findsOneWidget);
+    });
 
     testWidgets('Muestra estadísticas correctamente cuando hay viajes',
-            (tester) async {
-          final viajes = [
-            Trip(
-              id: "1",
-              title: "Italia",
-              description: "Roma",
-              startDate: DateTime(2024, 1, 10),
-              endDate: DateTime(2024, 1, 15), ownerId: '', createdAt: DateTime(2024, 1, 15), updatedAt: DateTime(2024, 1, 15),
-            ),
-            Trip(
-              id: "2",
-              title: "Francia",
-              description: "París",
-              startDate: DateTime(2024, 2, 5),
-              endDate: DateTime(2024, 1, 15), ownerId: '', createdAt: DateTime(2024, 1, 15), updatedAt: DateTime(2024, 1, 15),
-            ),
-          ];
+        (tester) async {
+      final viajes = [
+        Trip(
+          id: "1",
+          title: "Italia",
+          description: "Roma",
+          startDate: DateTime(2024, 1, 10),
+          endDate: DateTime(2024, 1, 15),
+          ownerId: '',
+          createdAt: DateTime(2024, 1, 15),
+          updatedAt: DateTime(2024, 1, 15),
+        ),
+        Trip(
+          id: "2",
+          title: "Francia",
+          description: "París",
+          startDate: DateTime(2024, 2, 5),
+          endDate: DateTime(2024, 1, 15),
+          ownerId: '',
+          createdAt: DateTime(2024, 1, 15),
+          updatedAt: DateTime(2024, 1, 15),
+        ),
+      ];
 
-          User? user = await createTestUser();
+      User? user = await createTestUser();
 
-          final screen = EstadisticasScreen(
-            selectedIndex: 3,
-            sesionIniciada: true,
-            viajes: viajes,
-            tripRepo: tripRepo,
-            entryRepo: entryRepo,
-            tripService: makeTripService(
-                tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
-            entryService: makeEntryService(entryRepo),
-            userRepo: userRepo,
-            userService: userService,
-            currentUser: user,
-          );
+      final screen = EstadisticasScreen(
+        selectedIndex: 3,
+        sesionIniciada: true,
+        viajes: viajes,
+        tripRepo: tripRepo,
+        entryRepo: entryRepo,
+        tripService: makeTripService(
+            tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+        entryService: makeEntryService(entryRepo),
+        userRepo: userRepo,
+        userService: userService,
+        currentUser: user,
+      );
 
-          await tester.pumpWidget(_wrap(screen));
+      await tester.pumpWidget(_wrap(screen));
 
-          // Mensaje de éxito visible
-          expect(find.textContaining("¡Enhorabuena!"), findsOneWidget);
-          expect(find.textContaining("Has realizado 2 viajes"), findsOneWidget);
+      // Mensaje de éxito visible
+      expect(find.textContaining("¡Enhorabuena!"), findsOneWidget);
+      expect(find.textContaining("Has realizado 2 viajes"), findsOneWidget);
 
-          // Título de la sección
-          expect(find.text("Resumen de tus viajes"), findsOneWidget);
+      // Título de la sección
+      expect(find.text("Resumen de tus viajes"), findsOneWidget);
 
-          // Tarjeta de duración
-          expect(find.text("Duración de cada viaje (días)"), findsOneWidget);
+      // Tarjeta de duración
+      expect(find.text("Duración de cada viaje (días)"), findsOneWidget);
 
-          // Tarjeta de destinos
-          expect(find.text("Destinos visitados"), findsOneWidget);
+      // Tarjeta de destinos
+      expect(find.text("Destinos visitados"), findsOneWidget);
 
-          // Asegurar que las gráficas están presentes (solo validar que aparecen contenedores y SizedBox)
-          expect(find.byType(SizedBox), findsWidgets);
-          expect(find.byType(Container), findsWidgets);
-        });
+      // Asegurar que las gráficas están presentes (solo validar que aparecen contenedores y SizedBox)
+      expect(find.byType(SizedBox), findsWidgets);
+      expect(find.byType(Container), findsWidgets);
+    });
   });
 }
