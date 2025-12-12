@@ -137,7 +137,11 @@ class _EditarViajeState extends State<Editar_viaje> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                InputField(controller: _titulo, hintText: 'Titulo del viaje'),
+                InputField(
+                    key: const Key('tituloField'),
+                    controller: _titulo,
+                    hintText: 'Titulo del viaje'
+                ),
                 const SizedBox(height: 10),
               ],
             ),
@@ -146,6 +150,7 @@ class _EditarViajeState extends State<Editar_viaje> {
               children: [
                 const SizedBox(height: 10),
                 InputField(
+                  key: const Key('fechaIniField'),
                   controller: _fechaIni,
                   hintText: 'Fecha de inicio de viaje (DD-MM-YYYY)',
                 ),
@@ -157,6 +162,7 @@ class _EditarViajeState extends State<Editar_viaje> {
               children: [
                 const SizedBox(height: 10),
                 InputField(
+                  key: const Key('fechaFinField'),
                   controller: _fechaFin,
                   hintText: 'Fecha de fin de viaje (DD-MM-YYYY)',
                 ),
