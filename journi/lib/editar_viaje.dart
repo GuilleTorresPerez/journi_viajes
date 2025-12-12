@@ -214,13 +214,19 @@ class _EditarViajeState extends State<Editar_viaje> {
                       return; // evita usar context tras async si desmonta
 
                     if (result is Ok<Trip>) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Viaje actualizado correctamente'),
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          content: Text("Viaje actualizado correctamente"),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, result.value),
+                              child: const Text("OK"),
+                            ),
+                          ],
                         ),
                       );
-                      await Future.delayed(const Duration(milliseconds: 300));
-                      if (!mounted) return;
+
                       Navigator.pop(context, result.value); // volver a la lista
                     } else if (result is Err<Trip>) {
                       final errors =
