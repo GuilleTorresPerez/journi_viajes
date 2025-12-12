@@ -40,7 +40,6 @@ void main() {
   });
 
   group('🔍 MyHomePage - Filtros de viajes', () {
-
     testWidgets('✅ Filtrar viajes por fecha correctamente', (tester) async {
       addTearDown(() async {
         await tester.pumpWidget(Container());
@@ -90,16 +89,21 @@ void main() {
           entryService: makeEntryService(entryRepo),
           userRepo: userRepo,
           userService: userService,
-          skipLogin: true,  ),    ));
+          skipLogin: true,
+        ),
+      ));
 
       await tester.pump(const Duration(milliseconds: 50));
 
       final filtroStart = DateTime(2025, 1, 1);
       final filtroEnd = DateTime(2025, 1, 20);
 
-      final filtered = viajes.where((v) =>
-      v.startDate!.isAfter(filtroStart.subtract(const Duration(days: 1))) &&
-          v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1)))).toList();
+      final filtered = viajes
+          .where((v) =>
+              v.startDate!
+                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
+              v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))))
+          .toList();
 
       expect(filtered.length, 1);
       expect(filtered.first.title, 'Viaje Enero');
@@ -141,16 +145,18 @@ void main() {
 
       await tester.pumpWidget(MaterialApp(
         home: MyHomePage(
-        title: 'JOURNI',
-        sesionIniciada: true,
-        viajes: viajes,
-        tripRepo: tripRepo,
-        entryRepo: entryRepo,
-        tripService: tripService,
-        entryService: makeEntryService(entryRepo),
-        userRepo: userRepo,
-        userService: userService,
-        skipLogin: true,  ),    ));
+          title: 'JOURNI',
+          sesionIniciada: true,
+          viajes: viajes,
+          tripRepo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: tripService,
+          entryService: makeEntryService(entryRepo),
+          userRepo: userRepo,
+          userService: userService,
+          skipLogin: true,
+        ),
+      ));
 
       await tester.pump(const Duration(milliseconds: 50));
 
@@ -161,65 +167,70 @@ void main() {
     });
 
     testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
-            (tester) async {
-          addTearDown(() async {
-            await tester.pumpWidget(Container());
-          });
+        (tester) async {
+      addTearDown(() async {
+        await tester.pumpWidget(Container());
+      });
 
-          final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-          await userService.register(RegisterUserCommand(
-            id: userId,
-            name: 'Test',
-            lastName: 'User',
-            email: 'test@test.com',
-            password: 'password',
-          ));
+      final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+      await userService.register(RegisterUserCommand(
+        id: userId,
+        name: 'Test',
+        lastName: 'User',
+        email: 'test@test.com',
+        password: 'password',
+      ));
 
-          final trip1 = await tripService.create(CreateTripCommand(
-            id: 't1',
-            ownerId: userId,
-            title: 'Barcelona',
-            description: 'Viaje a Barcelona',
-            startDate: DateTime(2025, 1, 10),
-            endDate: DateTime(2025, 1, 15),
-          ));
+      final trip1 = await tripService.create(CreateTripCommand(
+        id: 't1',
+        ownerId: userId,
+        title: 'Barcelona',
+        description: 'Viaje a Barcelona',
+        startDate: DateTime(2025, 1, 10),
+        endDate: DateTime(2025, 1, 15),
+      ));
 
-          final trip2 = await tripService.create(CreateTripCommand(
-            id: 't2',
-            ownerId: userId,
-            title: 'Madrid',
-            description: 'Viaje a Madrid',
-            startDate: DateTime(2025, 2, 5),
-            endDate: DateTime(2025, 2, 10),
-          ));
+      final trip2 = await tripService.create(CreateTripCommand(
+        id: 't2',
+        ownerId: userId,
+        title: 'Madrid',
+        description: 'Viaje a Madrid',
+        startDate: DateTime(2025, 2, 5),
+        endDate: DateTime(2025, 2, 10),
+      ));
 
-          final viajes = [trip1.valueOrNull!, trip2.valueOrNull!];
+      final viajes = [trip1.valueOrNull!, trip2.valueOrNull!];
 
-          await tester.pumpWidget(MaterialApp(
-            home: MyHomePage(
-              title: 'JOURNI',
-              sesionIniciada: true,
-              viajes: viajes,
-              tripRepo: tripRepo,
-              entryRepo: entryRepo,
-              tripService: tripService,
-              entryService: makeEntryService(entryRepo),
-              userRepo: userRepo,
-              userService: userService,
-              skipLogin: true,  ),    ));        
+      await tester.pumpWidget(MaterialApp(
+        home: MyHomePage(
+          title: 'JOURNI',
+          sesionIniciada: true,
+          viajes: viajes,
+          tripRepo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: tripService,
+          entryService: makeEntryService(entryRepo),
+          userRepo: userRepo,
+          userService: userService,
+          skipLogin: true,
+        ),
+      ));
 
-          await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 50));
 
-          final filtroStart = DateTime(2025, 1, 1);
-          final filtroEnd = DateTime(2025, 1, 31);
+      final filtroStart = DateTime(2025, 1, 1);
+      final filtroEnd = DateTime(2025, 1, 31);
 
-          final filtered = viajes.where((v) =>
-          v.startDate!.isAfter(filtroStart.subtract(const Duration(days: 1))) &&
+      final filtered = viajes
+          .where((v) =>
+              v.startDate!
+                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
               v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))) &&
-              v.title == 'Barcelona').toList();
+              v.title == 'Barcelona')
+          .toList();
 
-          expect(filtered.length, 1);
-          expect(filtered.first.title, 'Barcelona');
-        });
+      expect(filtered.length, 1);
+      expect(filtered.first.title, 'Barcelona');
+    });
   });
 }
