@@ -140,8 +140,7 @@ class _EditarViajeState extends State<Editar_viaje> {
                 InputField(
                     key: const Key('tituloField'),
                     controller: _titulo,
-                    hintText: 'Titulo del viaje'
-                ),
+                    hintText: 'Titulo del viaje'),
                 const SizedBox(height: 10),
               ],
             ),
