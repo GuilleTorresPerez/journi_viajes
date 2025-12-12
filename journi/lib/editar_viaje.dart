@@ -172,6 +172,7 @@ class _EditarViajeState extends State<Editar_viaje> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 RoundedButton(
+                  key: const Key('guardarButton'),
                   text: 'Guardar',
                   backgroundColor: Colors.white,
                   textColor: Colors.black,
