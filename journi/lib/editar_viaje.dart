@@ -218,7 +218,8 @@ class _EditarViajeState extends State<Editar_viaje> {
                         SnackBar(
                           key: const Key('snackbar_ok'),
                           duration: const Duration(seconds: 5),
-                          content: const Text('Viaje actualizado correctamente'),
+                          content:
+                              const Text('Viaje actualizado correctamente'),
                         ),
                       );
 
