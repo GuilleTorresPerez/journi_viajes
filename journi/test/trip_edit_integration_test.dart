@@ -104,7 +104,8 @@ void main() {
         find.byKey(const Key('fechaFinField')), '15-01-2025');
 
     await tester.tap(find.byKey(const Key('guardarButton')));
-    await tester.pumpAndSettle();
+    await tester.pump();                    // dispara el onPressed
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Verificar SnackBar de éxito
     expect(find.byKey(const Key('snackbar_ok')), findsOneWidget);
