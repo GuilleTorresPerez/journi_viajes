@@ -143,7 +143,7 @@ void main() {
     await tester.tap(find.byKey(const Key('guardarButton')));
     await tester.pump();
 
-    expect(find.text('Ya existe un usuario con ese email'), findsOneWidget);
+    expect(find.text('Email ya existe'), findsOneWidget);
   });
 
   // ------------------------------------------------------------
