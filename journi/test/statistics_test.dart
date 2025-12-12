@@ -143,7 +143,7 @@ void main() {
       await tester.pumpWidget(_wrap(screen));
 
       // Mensaje de éxito visible
-      expect(find.textContaining("¡Enhorabuena!"), findsOneWidget);
+      expect(find.textContaining("🌍 ¡Enhorabuena!"), findsOneWidget);
       expect(find.textContaining("Has realizado 2 viajes"), findsOneWidget);
 
       // Título de la sección
