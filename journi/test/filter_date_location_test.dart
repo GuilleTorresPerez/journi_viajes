@@ -45,21 +45,18 @@ void main() {
         await tester.pumpWidget(Container());
       });
 
-      final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-
-      final cmd = RegisterUserCommand(
-        id: generatedId,
-        name: 'nombre',
-        lastName: 'apellidos',
-        email: 'email@gmail.com',
+      final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+      await userService.register(RegisterUserCommand(
+        id: userId,
+        name: 'Test',
+        lastName: 'User',
+        email: 'test@test.com',
         password: 'password',
-      );
-
-      final result = await userService.register(cmd);
+      ));
 
       final trip1 = CreateTripCommand(
         id: 't1',
-        ownerId: generatedId,
+        ownerId: userId,
         title: 'Viaje Enero',
         description: 'Viaje de prueba enero',
         startDate: DateTime(2025, 1, 10),
@@ -68,7 +65,7 @@ void main() {
 
       final trip2 = CreateTripCommand(
         id: 't2',
-        ownerId: generatedId,
+        ownerId: userId,
         title: 'Viaje Febrero',
         description: 'Viaje de prueba febrero',
         startDate: DateTime(2025, 2, 5),
@@ -117,21 +114,18 @@ void main() {
         await tester.pumpWidget(Container());
       });
 
-      final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-
-      final cmd = RegisterUserCommand(
-        id: generatedId,
-        name: 'nombre',
-        lastName: 'apellidos',
-        email: 'email@gmail.com',
+      final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+      await userService.register(RegisterUserCommand(
+        id: userId,
+        name: 'Test',
+        lastName: 'User',
+        email: 'test@test.com',
         password: 'password',
-      );
-
-      final result = await userService.register(cmd);
+      ));
 
       final trip1 = await tripService.create(CreateTripCommand(
         id: 't1',
-        ownerId: generatedId,
+        ownerId: userId,
         title: 'Barcelona',
         description: 'Viaje a Barcelona',
         startDate: DateTime(2025, 1, 10),
@@ -140,7 +134,7 @@ void main() {
 
       final trip2 = await tripService.create(CreateTripCommand(
         id: 't2',
-        ownerId: generatedId,
+        ownerId: userId,
         title: 'Madrid',
         description: 'Viaje a Madrid',
         startDate: DateTime(2025, 2, 5),
@@ -178,21 +172,18 @@ void main() {
         await tester.pumpWidget(Container());
       });
 
-      final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-
-      final cmd = RegisterUserCommand(
-        id: generatedId,
-        name: 'nombre',
-        lastName: 'apellidos',
-        email: 'email@gmail.com',
+      final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+      await userService.register(RegisterUserCommand(
+        id: userId,
+        name: 'Test',
+        lastName: 'User',
+        email: 'test@test.com',
         password: 'password',
-      );
-
-      final result = await userService.register(cmd);
+      ));
 
       final trip1 = await tripService.create(CreateTripCommand(
         id: 't1',
-        ownerId: generatedId,
+        ownerId: userId,
         title: 'Barcelona',
         description: 'Viaje a Barcelona',
         startDate: DateTime(2025, 1, 10),
@@ -201,7 +192,7 @@ void main() {
 
       final trip2 = await tripService.create(CreateTripCommand(
         id: 't2',
-        ownerId: generatedId,
+        ownerId: userId,
         title: 'Madrid',
         description: 'Viaje a Madrid',
         startDate: DateTime(2025, 2, 5),
