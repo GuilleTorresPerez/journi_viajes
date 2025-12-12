@@ -10,6 +10,8 @@ import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_entry_repository.dart';
 import 'package:journi/data/local/drift/drift_trip_repository.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
+import 'package:journi/domain/trip.dart';
+import 'package:journi/domain/user.dart';
 import 'package:journi/main.dart';
 import 'fake_geocoding_repository.dart';
 
@@ -23,8 +25,7 @@ void main() {
   late DriftTripRepository tripRepo;
   late TripService tripService;
 
-  /// 🔥 Se crea SOLO UNA VEZ, no 3 veces
-  setUpAll(() async {
+  setUp(() async {
     db = AppDatabase.forTesting(NativeDatabase.memory());
     userRepo = DriftUserRepository(db);
     userService = makeUserService(userRepo);
@@ -35,15 +36,14 @@ void main() {
         tripRepo, userRepo, entryRepo, FakeGeocodingRepository());
   });
 
-  tearDownAll(() async {
+  tearDown(() async {
     await db.close();
   });
 
   group('🔍 MyHomePage - Filtros de viajes', () {
-
     testWidgets('✅ Filtrar viajes por fecha correctamente', (tester) async {
       addTearDown(() async {
-        await tester.pumpWidget(Container());
+        await tester.pumpWidget(Container()); // desmonta widget
       });
 
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
@@ -59,7 +59,8 @@ void main() {
         id: 't1',
         ownerId: userId,
         title: 'Viaje Enero',
-        description: 'Viaje de prueba enero',
+        description:
+            'Viaje de prueba enero', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 1, 10),
         endDate: DateTime(2025, 1, 15),
       );
@@ -68,17 +69,18 @@ void main() {
         id: 't2',
         ownerId: userId,
         title: 'Viaje Febrero',
-        description: 'Viaje de prueba febrero',
+        description:
+            'Viaje de prueba febrero', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 2, 5),
         endDate: DateTime(2025, 2, 10),
       );
 
-      final r1 = await tripService.create(trip1);
-      final r2 = await tripService.create(trip2);
+      // Servicio de aplicación
+      final result = await tripService.create(trip1);
+      final result2 = await tripService.create(trip2);
 
-      final viajes = [r1.valueOrNull!, r2.valueOrNull!];
+      final viajes = [result.valueOrNull!, result2.valueOrNull!];
 
-      /// 🔥 Widget súper ligero, NO carga repos ni streams
       await tester.pumpWidget(MaterialApp(
         home: MyHomePage(
           title: 'JOURNI',
@@ -90,26 +92,31 @@ void main() {
           entryService: makeEntryService(entryRepo),
           userRepo: userRepo,
           userService: userService,
-          skipLogin: true,  ),    ));
+          skipLogin: true,
+        ),
+      ));
 
-      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 100));
 
+      // Simulamos filtro por fecha
       final filtroStart = DateTime(2025, 1, 1);
       final filtroEnd = DateTime(2025, 1, 20);
 
-      final filtered = viajes.where((v) =>
-      v.startDate!.isAfter(filtroStart.subtract(const Duration(days: 1))) &&
-          v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1)))).toList();
+      final filteredTrips = viajes
+          .where((v) =>
+              v.startDate!
+                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
+              v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))))
+          .toList();
 
-      expect(filtered.length, 1);
-      expect(filtered.first.title, 'Viaje Enero');
+      expect(filteredTrips.length, 1);
+      expect(filteredTrips.first.title, 'Viaje Enero');
     });
 
     testWidgets('✅ Filtrar viajes por ubicación correctamente', (tester) async {
       addTearDown(() async {
-        await tester.pumpWidget(Container());
+        await tester.pumpWidget(Container()); // desmonta widget
       });
-
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
         id: userId,
@@ -119,107 +126,126 @@ void main() {
         password: 'password',
       ));
 
-      final trip1 = await tripService.create(CreateTripCommand(
+      final trip1 = CreateTripCommand(
         id: 't1',
         ownerId: userId,
         title: 'Barcelona',
-        description: 'Viaje a Barcelona',
+        description:
+            'Viaje a Barcelona', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 1, 10),
         endDate: DateTime(2025, 1, 15),
-      ));
+      );
 
-      final trip2 = await tripService.create(CreateTripCommand(
+      final trip2 = CreateTripCommand(
         id: 't2',
         ownerId: userId,
         title: 'Madrid',
-        description: 'Viaje a Madrid',
+        description:
+            'Viaje a Madrid', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 2, 5),
         endDate: DateTime(2025, 2, 10),
-      ));
+      );
 
-      final viajes = [trip1.valueOrNull!, trip2.valueOrNull!];
+      // Servicio de aplicación
+      final result = await tripService.create(trip1);
+      final result2 = await tripService.create(trip2);
+
+      final viajes = [result.valueOrNull!, result2.valueOrNull!];
 
       await tester.pumpWidget(MaterialApp(
         home: MyHomePage(
-        title: 'JOURNI',
-        sesionIniciada: true,
-        viajes: viajes,
-        tripRepo: tripRepo,
-        entryRepo: entryRepo,
-        tripService: tripService,
-        entryService: makeEntryService(entryRepo),
-        userRepo: userRepo,
-        userService: userService,
-        skipLogin: true,  ),    ));
+          title: 'JOURNI',
+          sesionIniciada: true,
+          viajes: viajes,
+          tripRepo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: tripService,
+          entryService: makeEntryService(entryRepo),
+          userRepo: userRepo,
+          userService: userService,
+          skipLogin: true,
+        ),
+      ));
 
-      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 100));
 
-      final filtered = viajes.where((v) => v.title == 'Madrid').toList();
+      final filteredTrips = viajes.where((v) => v.title == 'Madrid').toList();
 
-      expect(filtered.length, 1);
-      expect(filtered.first.title, 'Viaje Madrid');
+      expect(filteredTrips.length, 1);
+      expect(filteredTrips.first.title, 'Viaje Madrid');
     });
 
     testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
-            (tester) async {
-          addTearDown(() async {
-            await tester.pumpWidget(Container());
-          });
+        (tester) async {
+      addTearDown(() async {
+        await tester.pumpWidget(Container()); // desmonta widget
+      });
+      final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+      await userService.register(RegisterUserCommand(
+        id: userId,
+        name: 'Test',
+        lastName: 'User',
+        email: 'test@test.com',
+        password: 'password',
+      ));
 
-          final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-          await userService.register(RegisterUserCommand(
-            id: userId,
-            name: 'Test',
-            lastName: 'User',
-            email: 'test@test.com',
-            password: 'password',
-          ));
+      final trip1 = CreateTripCommand(
+        id: 't1',
+        ownerId: userId,
+        title: 'Barcelona',
+        description:
+            'Viaje a Barcelona', // (Opcional: podrías añadir un campo de texto para esto)
+        startDate: DateTime(2025, 1, 10),
+        endDate: DateTime(2025, 1, 15),
+      );
 
-          final trip1 = await tripService.create(CreateTripCommand(
-            id: 't1',
-            ownerId: userId,
-            title: 'Barcelona',
-            description: 'Viaje a Barcelona',
-            startDate: DateTime(2025, 1, 10),
-            endDate: DateTime(2025, 1, 15),
-          ));
+      final trip2 = CreateTripCommand(
+        id: 't2',
+        ownerId: userId,
+        title: 'Madrid',
+        description:
+            'Viaje a Madrid', // (Opcional: podrías añadir un campo de texto para esto)
+        startDate: DateTime(2025, 2, 5),
+        endDate: DateTime(2025, 2, 10),
+      );
 
-          final trip2 = await tripService.create(CreateTripCommand(
-            id: 't2',
-            ownerId: userId,
-            title: 'Madrid',
-            description: 'Viaje a Madrid',
-            startDate: DateTime(2025, 2, 5),
-            endDate: DateTime(2025, 2, 10),
-          ));
+      // Servicio de aplicación
+      final result = await tripService.create(trip1);
+      final result2 = await tripService.create(trip2);
 
-          final viajes = [trip1.valueOrNull!, trip2.valueOrNull!];
+      final viajes = [result.valueOrNull!, result2.valueOrNull!];
 
-          await tester.pumpWidget(MaterialApp(
-            home: MyHomePage(
-              title: 'JOURNI',
-              sesionIniciada: true,
-              viajes: viajes,
-              tripRepo: tripRepo,
-              entryRepo: entryRepo,
-              tripService: tripService,
-              entryService: makeEntryService(entryRepo),
-              userRepo: userRepo,
-              userService: userService,
-              skipLogin: true,  ),    ));        
+      await tester.pumpWidget(MaterialApp(
+        home: MyHomePage(
+          title: 'JOURNI',
+          sesionIniciada: true,
+          viajes: viajes,
+          tripRepo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: tripService,
+          entryService: makeEntryService(entryRepo),
+          userRepo: userRepo,
+          userService: userService,
+          skipLogin: true,
+        ),
+      ));
 
-          await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 100));
 
-          final filtroStart = DateTime(2025, 1, 1);
-          final filtroEnd = DateTime(2025, 1, 31);
+      final filtroStart = DateTime(2025, 1, 1);
+      final filtroEnd = DateTime(2025, 1, 31);
+      final locationFilter = 'Barcelona';
 
-          final filtered = viajes.where((v) =>
-          v.startDate!.isAfter(filtroStart.subtract(const Duration(days: 1))) &&
+      final filteredTrips = viajes
+          .where((v) =>
+              v.startDate!
+                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
               v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))) &&
-              v.title == 'Barcelona').toList();
+              v.title == locationFilter)
+          .toList();
 
-          expect(filtered.length, 1);
-          expect(filtered.first.title, 'Barcelona');
-        });
+      expect(filteredTrips.length, 1);
+      expect(filteredTrips.first.title, 'Barcelona');
+    });
   });
 }
