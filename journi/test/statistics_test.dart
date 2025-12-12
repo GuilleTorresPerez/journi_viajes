@@ -87,22 +87,23 @@ void main() {
       // Mensajes principales
       expect(
         find.byWidgetPredicate(
-              (widget) =>
-          widget is RichText &&
-              widget.text.toPlainText().contains("Todavía no tienes ningún viaje registrado"),
+          (widget) =>
+              widget is RichText &&
+              widget.text
+                  .toPlainText()
+                  .contains("Todavía no tienes ningún viaje registrado"),
         ),
         findsOneWidget,
       );
 
       expect(
         find.byWidgetPredicate(
-              (widget) =>
-          widget is RichText &&
+          (widget) =>
+              widget is RichText &&
               widget.text.toPlainText().contains("¿Quieres crear uno?"),
         ),
         findsOneWidget,
       );
-
 
       // Botón crear viaje visible
       expect(find.text("Crear viaje"), findsOneWidget);
