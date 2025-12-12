@@ -220,7 +220,8 @@ class _EditarViajeState extends State<Editar_viaje> {
                           content: Text("Viaje actualizado correctamente"),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.pop(context, result.value),
+                              onPressed: () =>
+                                  Navigator.pop(context, result.value),
                               child: const Text("OK"),
                             ),
                           ],
