@@ -16,7 +16,6 @@ import 'package:journi/main.dart';
 import 'fake_geocoding_repository.dart';
 
 void main() {
-
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late AppDatabase db;
@@ -99,7 +98,6 @@ void main() {
           skipLogin: true,
         ),
       ));
-
 
       // Simulamos filtro por fecha
       final filtroStart = DateTime(2025, 1, 1);
@@ -256,7 +254,6 @@ void main() {
           .toList();
 
       await tester.pump(const Duration(milliseconds: 50));
-
 
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Barcelona');
