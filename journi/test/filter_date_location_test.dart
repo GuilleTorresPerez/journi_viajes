@@ -42,7 +42,6 @@ void main() {
 
   group('🔍 MyHomePage - Filtros de viajes', () {
     testWidgets('✅ Filtrar viajes por fecha correctamente', (tester) async {
-
       addTearDown(() async {
         await tester.pumpWidget(Container()); // desmonta widget
       });
