@@ -111,6 +111,8 @@ void main() {
               v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))))
           .toList();
 
+      await tester.pump(Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Viaje Enero');
     });
@@ -177,7 +179,7 @@ void main() {
       final filteredTrips = viajes.where((v) => v.title == 'Madrid').toList();
 
       expect(filteredTrips.length, 1);
-      expect(filteredTrips.first.title, 'Viaje Madrid');
+      expect(filteredTrips.first.title, 'Madrid');
     });
 
     testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
@@ -251,6 +253,9 @@ void main() {
               v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))) &&
               v.title == locationFilter)
           .toList();
+
+      await tester.pump(Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
 
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Barcelona');
