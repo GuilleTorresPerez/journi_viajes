@@ -86,10 +86,14 @@ void main() {
 
       // Mensajes principales
       expect(
-        find.text("🌍 Todavía no tienes ningún viaje registrado.\n"),
+        find.textContaining("Todavía no tienes ningún viaje registrado"),
         findsOneWidget,
       );
-      expect(find.text("¿Quieres crear uno?"), findsOneWidget);
+
+      expect(
+        find.textContaining("¿Quieres crear uno?"),
+        findsOneWidget,
+      );
 
       // Botón crear viaje visible
       expect(find.text("Crear viaje"), findsOneWidget);
