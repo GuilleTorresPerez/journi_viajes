@@ -68,8 +68,8 @@ void main() {
         title: 'Viaje Febrero',
         description:
             'Viaje de prueba febrero', // (Opcional: podrías añadir un campo de texto para esto)
-        startDate: DateTime(2025, 2, 5),
-        endDate: DateTime(2025, 2, 10),
+        startDate: DateTime(2026, 2, 5),
+        endDate: DateTime(2026, 2, 10),
       );
 
       // Servicio de aplicación
@@ -98,6 +98,16 @@ void main() {
       // Abrir el diálogo de búsqueda
       await tester.tap(find.byIcon(Icons.search));
       await tester.pumpAndSettle();
+
+      // Escribir en el buscador
+      await tester.enterText(find.byType(TextField), "2026");
+      await tester.pumpAndSettle();
+
+      // Debe aparecer Viaje Enero
+      expect(find.text("Viaje Febrero"), findsOneWidget);
+
+      // No debe aparecer Febrero
+      expect(find.text("Viaje Enero"), findsNothing);
     });
 
     testWidgets('✅ Filtrar viajes por ubicación correctamente', (tester) async {
@@ -156,6 +166,13 @@ void main() {
       // Abrir el diálogo de búsqueda
       await tester.tap(find.byIcon(Icons.search));
       await tester.pumpAndSettle();
+
+      // Buscar por mes de febrero
+      await tester.enterText(find.byType(TextField), "Madrid");
+      await tester.pumpAndSettle();
+
+      expect(find.text("Madrid"), findsOneWidget);
+      expect(find.text("Barcelona"), findsNothing);
     });
 
     testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
@@ -215,6 +232,13 @@ void main() {
       // Abrir el diálogo de búsqueda
       await tester.tap(find.byIcon(Icons.search));
       await tester.pumpAndSettle();
+
+      // Buscar por "Barcelona" y "2025-01"
+      await tester.enterText(find.byType(TextField), "Barcelona");
+      await tester.pumpAndSettle();
+
+      expect(find.text("Barcelona"), findsOneWidget);
+      expect(find.text("Madrid"), findsNothing);
     });
   });
 }
