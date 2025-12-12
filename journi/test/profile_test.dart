@@ -60,46 +60,49 @@ void main() {
   // 🚀 TEST — La pantalla MiPerfil muestra los datos correctamente
   // ------------------------------------------------------------------
   testWidgets("👤 MiPerfil muestra los datos del usuario correctamente",
-          (WidgetTester tester) async {
-        // Usuario de prueba
-        final fakeUser = User(
-          id: "u100",
-          name: "Paula",
-          lastName: "Tester",
-          email: "paula@test.com",
-          createdAt: DateTime(2024, 01, 15), passwordHash: '', passwordSalt: '', updatedAt: DateTime(2024, 01, 15),
-        );
+      (WidgetTester tester) async {
+    // Usuario de prueba
+    final fakeUser = User(
+      id: "u100",
+      name: "Paula",
+      lastName: "Tester",
+      email: "paula@test.com",
+      createdAt: DateTime(2024, 01, 15),
+      passwordHash: '',
+      passwordSalt: '',
+      updatedAt: DateTime(2024, 01, 15),
+    );
 
-        await tester.pumpWidget(
-          MaterialApp(
-            home: MiPerfil(
-              sesionIniciada: true,
-              viajes: const [],
-              selectedIndex: 4,
-              tripRepo: tripRepo,
-              entryRepo: entryRepo,
-              tripService: makeTripService(
-                  tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
-              entryService: makeEntryService(entryRepo),
-              userRepo: userRepo,
-              userService: userService,
-              currentUser: fakeUser,
-            ),
-          ),
-        );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MiPerfil(
+          sesionIniciada: true,
+          viajes: const [],
+          selectedIndex: 4,
+          tripRepo: tripRepo,
+          entryRepo: entryRepo,
+          tripService: makeTripService(
+              tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+          entryService: makeEntryService(entryRepo),
+          userRepo: userRepo,
+          userService: userService,
+          currentUser: fakeUser,
+        ),
+      ),
+    );
 
-        await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
 
-        // 🔎 1. Nombre completo
-        expect(find.text("Paula Tester"), findsOneWidget);
+    // 🔎 1. Nombre completo
+    expect(find.text("Paula Tester"), findsOneWidget);
 
-        // 🔎 2. ID
-        expect(find.text("u100"), findsOneWidget);
+    // 🔎 2. ID
+    expect(find.text("u100"), findsOneWidget);
 
-        // 🔎 3. Email
-        expect(find.text("paula@test.com"), findsOneWidget);
+    // 🔎 3. Email
+    expect(find.text("paula@test.com"), findsOneWidget);
 
-        // 🔎 4. Fecha de creación (YYYY-MM-DD)
-        expect(find.text("2024-01-15"), findsOneWidget);
-      });
+    // 🔎 4. Fecha de creación (YYYY-MM-DD)
+    expect(find.text("2024-01-15"), findsOneWidget);
+  });
 }
