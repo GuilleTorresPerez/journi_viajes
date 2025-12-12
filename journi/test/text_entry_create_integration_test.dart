@@ -157,7 +157,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Comprobamos que no se añade
-      expect(find.text('Texto añadido'), findsOneWidget);
+      expect(find.text('Texto añadido'), findsNothing);
     });
   });
 }
