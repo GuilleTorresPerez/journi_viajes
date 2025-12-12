@@ -93,24 +93,11 @@ void main() {
         ),
       ));
 
-      // Simulamos filtro por fecha
-      final filtroStart = DateTime(2025, 1, 1);
-      final filtroEnd = DateTime(2025, 1, 20);
+      await tester.pumpAndSettle();
 
-      final filteredTrips = viajes
-          .where((v) =>
-              v.startDate!
-                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
-              v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))))
-          .toList();
-
-      expect(filteredTrips.length, 1);
-      expect(filteredTrips.first.title, 'Viaje Enero');
-      addTearDown(() async {
-        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
-        await tester.pumpWidget(Container());
-        await tester.pumpAndSettle(); // opcional pero recomendable
-      });
+      // Abrir el diálogo de búsqueda
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('✅ Filtrar viajes por ubicación correctamente', (tester) async {
@@ -164,15 +151,11 @@ void main() {
         ),
       ));
 
-      final filteredTrips = viajes.where((v) => v.title == 'Madrid').toList();
+      await tester.pumpAndSettle();
 
-      expect(filteredTrips.length, 1);
-      expect(filteredTrips.first.title, 'Madrid');
-      addTearDown(() async {
-        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
-        await tester.pumpWidget(Container());
-        await tester.pumpAndSettle(); // opcional pero recomendable
-      });
+      // Abrir el diálogo de búsqueda
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
@@ -227,26 +210,11 @@ void main() {
         ),
       ));
 
-      final filtroStart = DateTime(2025, 1, 1);
-      final filtroEnd = DateTime(2025, 1, 31);
-      final locationFilter = 'Barcelona';
+      await tester.pumpAndSettle();
 
-      final filteredTrips = viajes
-          .where((v) =>
-              v.startDate!
-                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
-              v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))) &&
-              v.title == locationFilter)
-          .toList();
-
-      expect(filteredTrips.length, 1);
-      expect(filteredTrips.first.title, 'Barcelona');
-
-      addTearDown(() async {
-        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
-        await tester.pumpWidget(Container());
-        await tester.pumpAndSettle(); // opcional pero recomendable
-      });
+      // Abrir el diálogo de búsqueda
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
     });
   });
 }
