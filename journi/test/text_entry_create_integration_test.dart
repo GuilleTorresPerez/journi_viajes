@@ -1,128 +1,163 @@
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:flutter/material.dart';
-// import 'package:journi/application/user_service.dart';
-// import 'package:journi/data/local/drift/app_database.dart';
-// import 'package:journi/data/local/drift/drift_user_repository.dart';
-// import 'package:journi/data/memory/in_memory_entry_repository.dart';
-// import 'package:journi/data/memory/in_memory_trip_repository.dart';
-// import 'package:journi/application/trip_service.dart';
-// import 'package:journi/application/entry_service.dart';
-// import 'package:journi/main.dart';
+import 'package:drift/native.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
+import 'package:journi/application/use_cases/user_use_cases.dart';
+import 'package:journi/data/local/drift/app_database.dart';
+import 'package:journi/data/local/drift/drift_user_repository.dart';
+import 'package:journi/domain/trip.dart';
+import 'package:journi/application/trip_service.dart';
+import 'package:journi/application/entry_service.dart';
+import 'package:journi/data/memory/in_memory_trip_repository.dart';
+import 'package:journi/data/memory/in_memory_entry_repository.dart';
+import 'package:journi/domain/ports/user_repository.dart';
+import 'package:journi/application/user_service.dart';
+import 'package:journi/pantalla_viaje.dart';
+import 'package:journi/domain/entry.dart';
+
+import 'fake_geocoding_repository.dart';
 
 void main() {
-  //   // 🔧 Inicializa el entorno de test (sustituye al antiguo IntegrationTestWidgetsFlutterBinding)
-  //   TestWidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-  //   group('🧭 Pruebas de integración: Crear_Text_Entry', () {
-  //     late InMemoryTripRepository tripRepo;
-  //     late InMemoryEntryRepository entryRepo;
-  //     late DefaultTripService tripService;
-  //     late DefaultEntryService entryService;
-  //     final db = AppDatabase();
-  //     final userRepo = DriftUserRepository(db);
-  //     final userService = makeUserService(userRepo);
+  late AppDatabase db;
+  late DriftUserRepository userRepo;
+  late DefaultUserService userService;
 
-  //     setUp(() {
-  //       tripRepo = InMemoryTripRepository();
-  //       entryRepo = InMemoryEntryRepository();
-  //       tripService = DefaultTripService(repo: tripRepo);
-  //       entryService = DefaultEntryService(repo: entryRepo);
-  //     });
-  //     testWidgets('✅ Crear entrada correctamente', (WidgetTester tester) async {
-  //       await tester.pumpWidget(MaterialApp(
-  //         home: MyHomePage(
-  //           title: 'JOURNI',
-  //           sesionIniciada: false,
-  //           tripService: tripService,
-  //           entryService: entryService,
-  //           tripRepo: tripRepo,
-  //           entryRepo: entryRepo,
-  //           userRepo: userRepo,
-  //           userService: userService,
-  //         ),
-  //       ));
+  late InMemoryTripRepository tripRepo;
+  late InMemoryEntryRepository entryRepo;
 
-  // // Pulsa el BottomNavigationBarItem "Nuevo viaje"
-  //       await tester.tap(find.byKey(const Key('anadirButton')));
-  //       await tester.pumpAndSettle();
+  setUp(() async {
+    db = AppDatabase.forTesting(NativeDatabase.memory());
+    userRepo = DriftUserRepository(db);
+    userService = makeUserService(userRepo);
 
-  //       // 🧩 Rellenar los campos
-  //       await tester.enterText(
-  //         find.byKey(const Key('tituloField')),
-  //         'Vacaciones 2025',
-  //       );
-  //       await tester.enterText(
-  //         find.byKey(const Key('fechaIniField')),
-  //         '01-01-2025',
-  //       );
-  //       await tester.enterText(
-  //         find.byKey(const Key('fechaFinField')),
-  //         '10-01-2025',
-  //       );
+    tripRepo = InMemoryTripRepository();
+    entryRepo = InMemoryEntryRepository();
+  });
 
-  //       await tester.tap(find.byKey(const Key('guardarButton')));
-  //       await tester.pumpAndSettle(
-  //           const Duration(seconds: 1)); // Espera a que el SnackBar aparezca
-  //       await tester.tap(find.byKey(const Key('id0')));
-  //       await tester.pumpAndSettle();
-  //       await tester.tap(find.byKey(const Key('anadirEntrada')));
-  //       await tester.pumpAndSettle();
-  //       await tester.enterText(
-  //         find.byKey(const Key('textoEntrada')),
-  //         'Que grande que eres Nano',
-  //       );
-  //       await tester.tap(find.byKey(const Key('aceptarButton')));
-  //       await tester.pumpAndSettle();
-  //       expect(find.byKey(const Key('eid0')), findsOneWidget);
-  //       // ✅ Verificar éxito
-  //       // Verifica que la pantalla principal está visible
-  //     });
-  //     testWidgets('❌ Error: Entrada vacía', (WidgetTester tester) async {
-  //       await tester.pumpWidget(MaterialApp(
-  //         home: MyHomePage(
-  //           title: 'JOURNI',
-  //           sesionIniciada: false,
-  //           tripService: tripService,
-  //           entryService: entryService,
-  //           tripRepo: tripRepo,
-  //           entryRepo: entryRepo,
-  //           userRepo: userRepo,
-  //           userService: userService,
-  //         ),
-  //       ));
+  tearDown(() async {
+    await db.close();
+  });
 
-  // // Pulsa el BottomNavigationBarItem "Nuevo viaje"
-  //       await tester.tap(find.byKey(const Key('anadirButton')));
-  //       await tester.pumpAndSettle();
+  group('📝 Pantalla_Viaje - Crear entrada de texto', () {
+    testWidgets('✅ Añadir entrada de texto correctamente',
+        (WidgetTester tester) async {
+      final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
 
-  //       // 🧩 Campos con fechas inválidas
-  //       await tester.enterText(
-  //         find.byKey(const Key('tituloField')),
-  //         'Nanoseco',
-  //       );
-  //       await tester.enterText(
-  //         find.byKey(const Key('fechaIniField')),
-  //         '10-01-2025',
-  //       );
-  //       await tester.enterText(
-  //         find.byKey(const Key('fechaFinField')),
-  //         '11-01-2025',
-  //       );
+      final cmd = RegisterUserCommand(
+        id: generatedId,
+        name: "nombre",
+        lastName: "apellidos",
+        email: "email@gmail.com",
+        password: "password",
+      );
 
-  //       await tester.tap(find.byKey(const Key('guardarButton')));
-  //       await tester.pumpAndSettle();
+      final result = await userService.register(cmd);
 
-  //       await tester.tap(find.byKey(const Key('id0')));
-  //       await tester.pumpAndSettle();
-  //       await tester.tap(find.byKey(const Key('anadirEntrada')));
-  //       await tester.pumpAndSettle();
-  //       await tester.enterText(
-  //         find.byKey(const Key('textoEntrada')),
-  //         '',
-  //       );
-  //       await tester.tap(find.byKey(const Key('aceptarButton')));
-  //       await tester.pumpAndSettle();
-  //       expect(find.byKey(const Key('eid0')), findsNothing);
-  //     });
-  //   });
+      final viajes = [
+        Trip(
+          id: '1',
+          title: 'Viaje Test',
+          description: 'Test',
+          startDate: DateTime(2025, 1, 1),
+          endDate: DateTime(2025, 1, 5),
+          ownerId: generatedId,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        )
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Pantalla_Viaje(
+            selectedIndex: 0,
+            sesionIniciada: true,
+            viajes: viajes,
+            num_viaje: 0,
+            repo: tripRepo,
+            entryRepo: entryRepo,
+            tripService: makeTripService(
+                tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+            entryService: makeEntryService(entryRepo),
+            userRepo: userRepo,
+            userService: userService,
+            currentUser: result.valueOrNull,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Abrir el diálogo de añadir texto
+      await tester.tap(find.byIcon(Icons.text_fields));
+      await tester.pumpAndSettle();
+
+      // Introducir texto
+      await tester.enterText(find.byType(TextField), 'Mi primera nota');
+      await tester.tap(find.text('Aceptar'));
+      await tester.pumpAndSettle();
+
+      // Comprobamos que el SnackBar aparece
+      expect(find.text('Texto añadido'), findsOneWidget);
+    });
+
+    testWidgets('❌ No añadir entrada vacía', (WidgetTester tester) async {
+      final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+
+      final cmd = RegisterUserCommand(
+        id: generatedId,
+        name: "nombre",
+        lastName: "apellidos",
+        email: "email@gmail.com",
+        password: "password",
+      );
+
+      final result = await userService.register(cmd);
+
+      final viajes = [
+        Trip(
+          id: '1',
+          title: 'Viaje Test',
+          description: 'Test',
+          startDate: DateTime(2025, 1, 1),
+          endDate: DateTime(2025, 1, 5),
+          ownerId: generatedId,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        )
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Pantalla_Viaje(
+            selectedIndex: 0,
+            sesionIniciada: true,
+            viajes: viajes,
+            num_viaje: 0,
+            repo: tripRepo,
+            entryRepo: entryRepo,
+            tripService: makeTripService(
+                tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+            entryService: makeEntryService(entryRepo),
+            userRepo: userRepo,
+            userService: userService,
+            currentUser: result.valueOrNull,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.text_fields));
+      await tester.pumpAndSettle();
+
+      // Dejar campo vacío
+      await tester.enterText(find.byType(TextField), '');
+      await tester.tap(find.text('Aceptar'));
+      await tester.pumpAndSettle();
+
+      // Comprobamos que no se añade
+      expect(find.text('Texto añadido'), findsOneWidget);
+    });
+  });
 }
