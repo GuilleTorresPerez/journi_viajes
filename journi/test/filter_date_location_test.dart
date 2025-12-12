@@ -43,11 +43,6 @@ void main() {
 
   group('🔍 MyHomePage - Filtros de viajes', () {
     testWidgets('✅ Filtrar viajes por fecha correctamente', (tester) async {
-      addTearDown(() async {
-        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
-        await tester.pumpWidget(Container());
-        await tester.pumpAndSettle(); // opcional pero recomendable
-      });
 
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
@@ -110,18 +105,17 @@ void main() {
               v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))))
           .toList();
 
-      await tester.pump(const Duration(milliseconds: 50));
-
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Viaje Enero');
-    });
-
-    testWidgets('✅ Filtrar viajes por ubicación correctamente', (tester) async {
       addTearDown(() async {
         await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
         await tester.pumpWidget(Container());
         await tester.pumpAndSettle(); // opcional pero recomendable
       });
+    });
+
+    testWidgets('✅ Filtrar viajes por ubicación correctamente', (tester) async {
+
 
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
@@ -173,21 +167,21 @@ void main() {
         ),
       ));
 
-      await tester.pump(const Duration(milliseconds: 100));
 
       final filteredTrips = viajes.where((v) => v.title == 'Madrid').toList();
 
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Madrid');
-    });
-
-    testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
-        (tester) async {
       addTearDown(() async {
         await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
         await tester.pumpWidget(Container());
         await tester.pumpAndSettle(); // opcional pero recomendable
       });
+    });
+
+    testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
+        (tester) async {
+
 
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
@@ -239,7 +233,6 @@ void main() {
         ),
       ));
 
-      await tester.pump(const Duration(milliseconds: 100));
 
       final filtroStart = DateTime(2025, 1, 1);
       final filtroEnd = DateTime(2025, 1, 31);
@@ -253,10 +246,16 @@ void main() {
               v.title == locationFilter)
           .toList();
 
-      await tester.pump(const Duration(milliseconds: 50));
 
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Barcelona');
+
+      addTearDown(() async {
+        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
+        await tester.pumpWidget(Container());
+        await tester.pumpAndSettle(); // opcional pero recomendable
+      });
+
     });
   });
 }
