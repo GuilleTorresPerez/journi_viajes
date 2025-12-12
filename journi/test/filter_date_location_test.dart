@@ -32,7 +32,8 @@ void main() {
     entryRepo = DriftEntryRepository(db);
 
     tripRepo = DriftTripRepository(db);
-    tripService = makeTripService(tripRepo, userRepo, entryRepo, FakeGeocodingRepository());
+    tripService = makeTripService(
+        tripRepo, userRepo, entryRepo, FakeGeocodingRepository());
   });
 
   tearDown(() async {
@@ -55,7 +56,7 @@ void main() {
         ownerId: userId,
         title: 'Viaje Enero',
         description:
-        'Viaje de prueba enero', // (Opcional: podrías añadir un campo de texto para esto)
+            'Viaje de prueba enero', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 1, 10),
         endDate: DateTime(2025, 1, 15),
       );
@@ -65,7 +66,7 @@ void main() {
         ownerId: userId,
         title: 'Viaje Febrero',
         description:
-        'Viaje de prueba febrero', // (Opcional: podrías añadir un campo de texto para esto)
+            'Viaje de prueba febrero', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 2, 5),
         endDate: DateTime(2025, 2, 10),
       );
@@ -75,7 +76,6 @@ void main() {
       final result2 = await tripService.create(trip2);
 
       final viajes = [result.valueOrNull!, result2.valueOrNull!];
-
 
       await tester.pumpWidget(MaterialApp(
         home: MyHomePage(
@@ -98,9 +98,12 @@ void main() {
       final filtroStart = DateTime(2025, 1, 1);
       final filtroEnd = DateTime(2025, 1, 20);
 
-      final filteredTrips = viajes.where((v) =>
-      v.startDate!.isAfter(filtroStart.subtract(const Duration(days: 1))) &&
-          v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1)))).toList();
+      final filteredTrips = viajes
+          .where((v) =>
+              v.startDate!
+                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
+              v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))))
+          .toList();
 
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Viaje Enero');
@@ -121,7 +124,7 @@ void main() {
         ownerId: userId,
         title: 'Barcelona',
         description:
-        'Viaje a Barcelona', // (Opcional: podrías añadir un campo de texto para esto)
+            'Viaje a Barcelona', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 1, 10),
         endDate: DateTime(2025, 1, 15),
       );
@@ -131,7 +134,7 @@ void main() {
         ownerId: userId,
         title: 'Madrid',
         description:
-        'Viaje a Madrid', // (Opcional: podrías añadir un campo de texto para esto)
+            'Viaje a Madrid', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 2, 5),
         endDate: DateTime(2025, 2, 10),
       );
@@ -165,7 +168,8 @@ void main() {
       expect(filteredTrips.first.title, 'Viaje Madrid');
     });
 
-    testWidgets('✅ Filtrar viajes por fecha y ubicación combinados', (tester) async {
+    testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
+        (tester) async {
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
         id: userId,
@@ -175,13 +179,12 @@ void main() {
         password: 'password',
       ));
 
-
       final trip1 = CreateTripCommand(
         id: 't1',
         ownerId: userId,
         title: 'Barcelona',
         description:
-        'Viaje a Barcelona', // (Opcional: podrías añadir un campo de texto para esto)
+            'Viaje a Barcelona', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 1, 10),
         endDate: DateTime(2025, 1, 15),
       );
@@ -191,7 +194,7 @@ void main() {
         ownerId: userId,
         title: 'Madrid',
         description:
-        'Viaje a Madrid', // (Opcional: podrías añadir un campo de texto para esto)
+            'Viaje a Madrid', // (Opcional: podrías añadir un campo de texto para esto)
         startDate: DateTime(2025, 2, 5),
         endDate: DateTime(2025, 2, 10),
       );
@@ -223,11 +226,13 @@ void main() {
       final filtroEnd = DateTime(2025, 1, 31);
       final locationFilter = 'Barcelona';
 
-      final filteredTrips = viajes.where((v) =>
-      v.startDate!.isAfter(filtroStart.subtract(const Duration(days: 1))) &&
-          v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))) &&
-          v.title == locationFilter
-      ).toList();
+      final filteredTrips = viajes
+          .where((v) =>
+              v.startDate!
+                  .isAfter(filtroStart.subtract(const Duration(days: 1))) &&
+              v.endDate!.isBefore(filtroEnd.add(const Duration(days: 1))) &&
+              v.title == locationFilter)
+          .toList();
 
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Barcelona');
