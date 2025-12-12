@@ -26,7 +26,6 @@ void main() {
   late TripService tripService;
 
   setUp(() async {
-
     db = AppDatabase.forTesting(NativeDatabase.memory());
     userRepo = DriftUserRepository(db);
     userService = makeUserService(userRepo);
@@ -44,11 +43,10 @@ void main() {
   group('🔍 MyHomePage - Filtros de viajes', () {
     testWidgets('✅ Filtrar viajes por fecha correctamente', (tester) async {
       addTearDown(() async {
-        await tester.pumpAndSettle();  // 🔥 elimina timers/streams pendientes
+        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
         await tester.pumpWidget(Container());
-        await tester.pumpAndSettle();  // opcional pero recomendable
+        await tester.pumpAndSettle(); // opcional pero recomendable
       });
-
 
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
@@ -119,9 +117,9 @@ void main() {
 
     testWidgets('✅ Filtrar viajes por ubicación correctamente', (tester) async {
       addTearDown(() async {
-        await tester.pumpAndSettle();  // 🔥 elimina timers/streams pendientes
+        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
         await tester.pumpWidget(Container());
-        await tester.pumpAndSettle();  // opcional pero recomendable
+        await tester.pumpAndSettle(); // opcional pero recomendable
       });
 
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
@@ -184,13 +182,13 @@ void main() {
 
     testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
         (tester) async {
-          addTearDown(() async {
-            await tester.pumpAndSettle();  // 🔥 elimina timers/streams pendientes
-            await tester.pumpWidget(Container());
-            await tester.pumpAndSettle();  // opcional pero recomendable
-          });
+      addTearDown(() async {
+        await tester.pumpAndSettle(); // 🔥 elimina timers/streams pendientes
+        await tester.pumpWidget(Container());
+        await tester.pumpAndSettle(); // opcional pero recomendable
+      });
 
-          final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+      final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
         id: userId,
         name: 'Test',
