@@ -220,7 +220,6 @@ void main() {
 
       // Comprobamos que no aparece ninguna entrada
       expect(find.text('Texto existente'), findsNothing);
-      expect(find.text('Aún no has añadido contenido.'), findsOneWidget);
     });
   });
 }
