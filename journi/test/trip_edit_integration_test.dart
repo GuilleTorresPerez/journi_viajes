@@ -78,27 +78,22 @@ void main() {
       ),
     ];
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: ScaffoldMessenger(
-          child: Editar_viaje(
-            selectedIndex: 0,
-            num_viaje: 0,
-            viajes: viajes,
-            sesionIniciada: true,
-            repo: tripRepo,
-            entryRepo: entryRepo,
-            tripService: makeTripService(
-                tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
-            entryService: makeEntryService(entryRepo),
-            userRepo: userRepo,
-            userService: userService,
-            currentUser: result.valueOrNull,
-          ),
-        ),
+    await tester.pumpWidget(MaterialApp(
+      home: Editar_viaje(
+        selectedIndex: 0,
+        num_viaje: 0,
+        viajes: viajes,
+        sesionIniciada: true,
+        repo: tripRepo,
+        entryRepo: entryRepo,
+        tripService: makeTripService(
+            tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+        entryService: makeEntryService(entryRepo),
+        userRepo: userRepo,
+        userService: userService,
+        currentUser: result.valueOrNull,
       ),
-    );
-
+    ));
 
     // Cambiamos los datos
     await tester.enterText(
