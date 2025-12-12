@@ -43,7 +43,6 @@ void main() {
 
   group('🔍 MyHomePage - Filtros de viajes', () {
     testWidgets('✅ Filtrar viajes por fecha correctamente', (tester) async {
-
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
         id: userId,
@@ -115,8 +114,6 @@ void main() {
     });
 
     testWidgets('✅ Filtrar viajes por ubicación correctamente', (tester) async {
-
-
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
         id: userId,
@@ -166,7 +163,6 @@ void main() {
           skipLogin: true,
         ),
       ));
-
 
       final filteredTrips = viajes.where((v) => v.title == 'Madrid').toList();
 
@@ -181,8 +177,6 @@ void main() {
 
     testWidgets('✅ Filtrar viajes por fecha y ubicación combinados',
         (tester) async {
-
-
       final userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
       await userService.register(RegisterUserCommand(
         id: userId,
@@ -233,7 +227,6 @@ void main() {
         ),
       ));
 
-
       final filtroStart = DateTime(2025, 1, 1);
       final filtroEnd = DateTime(2025, 1, 31);
       final locationFilter = 'Barcelona';
@@ -246,7 +239,6 @@ void main() {
               v.title == locationFilter)
           .toList();
 
-
       expect(filteredTrips.length, 1);
       expect(filteredTrips.first.title, 'Barcelona');
 
@@ -255,7 +247,6 @@ void main() {
         await tester.pumpWidget(Container());
         await tester.pumpAndSettle(); // opcional pero recomendable
       });
-
     });
   });
 }
