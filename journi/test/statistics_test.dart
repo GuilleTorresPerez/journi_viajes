@@ -153,8 +153,23 @@ void main() {
       await tester.pumpWidget(_wrap(screen));
 
       // Mensaje de éxito visible
-      expect(find.textContaining("🌍 ¡Enhorabuena!"), findsOneWidget);
-      expect(find.textContaining("Has realizado 2 viajes"), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is RichText &&
+              w.text.toPlainText().contains("🌍 ¡Enhorabuena!"),
+        ),
+        findsOneWidget,
+      );
+
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is RichText &&
+              w.text.toPlainText().contains("Has realizado 2 viajes"),
+        ),
+        findsOneWidget,
+      );
 
       // Título de la sección
       expect(find.text("Resumen de tus viajes"), findsOneWidget);
