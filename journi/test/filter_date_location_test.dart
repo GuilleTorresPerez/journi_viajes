@@ -98,7 +98,6 @@ void main() {
 
       await tester.pump(const Duration(milliseconds: 100));
 
-
       // Simulamos filtro por fecha
       final filtroStart = DateTime(2025, 1, 1);
       final filtroEnd = DateTime(2025, 1, 20);
