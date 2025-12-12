@@ -98,7 +98,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuario registrado correctamente')),
       );
-
     } else {
       final msg = result.errorsOrEmpty.isNotEmpty
           ? result.errorsOrEmpty.first.message
