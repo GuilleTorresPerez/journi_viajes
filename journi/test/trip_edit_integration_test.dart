@@ -115,7 +115,13 @@ void main() {
     // Verificar cambios en repo
     final updatedTrip = await tripRepo.findById("1");
     expect(updatedTrip.valueOrNull?.title, 'Viaje Editado');
-    expect(updatedTrip.valueOrNull?.startDate, DateTime(2025, 1, 5));
+    expect(updatedTrip.valueOrNull?.startDate?.year, 2025);
+    expect(updatedTrip.valueOrNull?.startDate?.month, 1);
+    expect(updatedTrip.valueOrNull?.startDate?.day, 5);
+    expect(updatedTrip.valueOrNull?.endDate?.year, 2025);
+    expect(updatedTrip.valueOrNull?.endDate?.month, 1);
+    expect(updatedTrip.valueOrNull?.endDate?.day, 15);
+
     expect(updatedTrip.valueOrNull?.endDate, DateTime(2025, 1, 15));
   });
 
