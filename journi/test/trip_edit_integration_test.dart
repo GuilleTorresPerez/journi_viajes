@@ -78,6 +78,8 @@ void main() {
       ),
     ];
 
+    await tripRepo.upsert(viajes[0]);
+
     await tester.pumpWidget(MaterialApp(
       home: Editar_viaje(
         selectedIndex: 0,
@@ -143,6 +145,8 @@ void main() {
         updatedAt: DateTime(2024, 1, 15),
       ),
     ];
+
+    await tripRepo.upsert(viajes[0]);
 
     await tester.pumpWidget(MaterialApp(
       home: Editar_viaje(
