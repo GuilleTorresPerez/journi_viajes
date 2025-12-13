@@ -21,35 +21,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Instalar Flutter usando subosito/flutter-action (acción estándar de la comunidad)
-      # Doc: GitHub Marketplace / repo oficial de la action. :contentReference[oaicite:8]{index=8}
+      # 🔴 NUEVO: Instalar lcov en el entorno Linux (necesario para genhtml)
+      # Nota: sudo se ejecuta fuera del working-directory, pero no afecta al resto.
+      - name: Install LCOV
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lcov
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          #flutter-version-file: ./journi/pubspec.yaml
           cache: true
 
       - run: flutter --version
       - run: flutter pub get
 
-      # 1) Comprobar formateo sin modificar archivos
-      # Doc oficial dart format + --set-exit-if-changed. :contentReference[oaicite:9]{index=9}
       - run: dart format -o none --set-exit-if-changed .
 
-      # 2) Análisis estático (fallando en warnings/errores; infos no fatales si quieres)
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
-      # 3) Tests con cobertura
-      - run: flutter test --coverage
+      # 🔴 NUEVO: Ejecutar el script helper ANTES de los tests
+      # Esto asegura que el CI incluya los archivos sin tests (0% coverage)
+      - name: Generate Coverage Helper
+        run: dart run test/generate_coverage_helper.dart
 
-      # 4) Build de APK de debug (opcional, pero útil)
+      # 3) Tests con cobertura
+      - name: Run Tests
+        run: flutter test --coverage
+
+      # 🔴 NUEVO: Limpiar y Generar HTML en el CI
+      # Usamos la misma lógica que en local para eliminar ruido y crear la web
+      - name: Generate Coverage Report HTML
+        run: |
+          lcov --remove coverage/lcov.info '*.g.dart' '*.freezed.dart' -o coverage/lcov.info --ignore-errors unused
+          genhtml coverage/lcov.info -o coverage/html
+
+      # 4) Build de APK de debug
       - run: flutter build apk --debug
 
-      # 5) Subir coverage y builds como artefacto
+      # 5) Subir coverage HTML y APKs
+      # He actualizado el path para que incluya especificamente la carpeta html
       - uses: actions/upload-artifact@v4
         with:
-          name: coverage-and-builds
+          name: coverage-report-and-builds
           path: |
-            journi/coverage/**
+            journi/coverage/html/**
             journi/build/web/**
             journi/build/app/outputs/**/*.apk
