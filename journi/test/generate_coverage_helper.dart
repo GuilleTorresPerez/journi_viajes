@@ -1,7 +1,7 @@
 import 'dart:io';
 
 // CONFIGURACIÓN
-const String packageName = 'journi'; 
+const String packageName = 'journi';
 const String targetFile = 'test/coverage_helper_test.dart';
 
 void main() async {
@@ -15,12 +15,13 @@ void main() async {
 
   print('🔍 Escaneando archivos en: ${libDir.path}...');
 
-  final files = libDir.listSync(recursive: true)
+  final files = libDir
+      .listSync(recursive: true)
       .where((entity) => entity is File && entity.path.endsWith('.dart'))
       .cast<File>();
 
   final buffer = StringBuffer();
-  
+
   buffer.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
   buffer.writeln('// Script: test/generate_coverage_helper.dart');
   buffer.writeln('// ignore_for_file: unused_import');
@@ -31,15 +32,36 @@ void main() async {
 
   for (final file in files) {
     final path = file.path.replaceAll(r'\', '/');
-    
+
     // --- FILTROS POR NOMBRE (Metadatos) ---
-    if (path.endsWith('.g.dart')) { ignoredCount++; continue; }
-    if (path.endsWith('.freezed.dart')) { ignoredCount++; continue; }
-    if (path.endsWith('generated_plugin_registrant.dart')) { ignoredCount++; continue; }
-    if (path.endsWith('/main.dart')) { ignoredCount++; continue; } 
-    if (path.contains('/integration_test/')) { ignoredCount++; continue; }
-    if (path.contains('mock')) { ignoredCount++; continue; } 
-    if (path.contains('/example/')) { ignoredCount++; continue; }
+    if (path.endsWith('.g.dart')) {
+      ignoredCount++;
+      continue;
+    }
+    if (path.endsWith('.freezed.dart')) {
+      ignoredCount++;
+      continue;
+    }
+    if (path.endsWith('generated_plugin_registrant.dart')) {
+      ignoredCount++;
+      continue;
+    }
+    if (path.endsWith('/main.dart')) {
+      ignoredCount++;
+      continue;
+    }
+    if (path.contains('/integration_test/')) {
+      ignoredCount++;
+      continue;
+    }
+    if (path.contains('mock')) {
+      ignoredCount++;
+      continue;
+    }
+    if (path.contains('/example/')) {
+      ignoredCount++;
+      continue;
+    }
 
     // --- FILTRO POR CONTENIDO (Análisis Estático) ---
     // Leemos el archivo para ver si es una "part" de otro
