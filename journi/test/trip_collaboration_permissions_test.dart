@@ -72,7 +72,9 @@ void main() {
       expect(trip.canEdit('viewer1'), isFalse);
     });
 
-    test('✅ Un usuario que no participa devuelve null en getRole y no tiene permisos', () {
+    test(
+        '✅ Un usuario que no participa devuelve null en getRole y no tiene permisos',
+        () {
       final now = DateTime.utc(2025, 1, 1);
 
       final trip = _unwrap(Trip.create(
@@ -93,7 +95,9 @@ void main() {
       expect(trip.canEdit('random'), isFalse);
     });
 
-    test('✅ Si en participants intentan poner al owner como viewer, se fuerza a admin', () {
+    test(
+        '✅ Si en participants intentan poner al owner como viewer, se fuerza a admin',
+        () {
       final now = DateTime.utc(2025, 1, 1);
 
       final trip = _unwrap(Trip.create(

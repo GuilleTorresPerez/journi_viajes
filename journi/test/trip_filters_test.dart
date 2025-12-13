@@ -62,11 +62,11 @@ List<Trip> filterTrips({
 }) {
   return trips.where((t) {
     return _overlapsDates(
-      tripStart: t.startDate,
-      tripEnd: t.endDate,
-      filterStart: start,
-      filterEnd: end,
-    ) &&
+          tripStart: t.startDate,
+          tripEnd: t.endDate,
+          filterStart: start,
+          filterEnd: end,
+        ) &&
         _matchesLocation(t, locationQuery);
   }).toList();
 }
@@ -120,7 +120,8 @@ void main() {
       expect(res.length, 4);
     });
 
-    test('✅ Filtro por ubicación (case-insensitive) devuelve los correctos', () {
+    test('✅ Filtro por ubicación (case-insensitive) devuelve los correctos',
+        () {
       final res = filterTrips(trips: trips, locationQuery: 'japón');
       expect(res.map((t) => t.id).toList(), ['t1']);
     });
@@ -144,7 +145,8 @@ void main() {
       );
 
       expect(res.any((t) => t.id == 't4'), isFalse,
-          reason: 'Si hay filtro de fechas, un trip sin fechas no debería salir');
+          reason:
+              'Si hay filtro de fechas, un trip sin fechas no debería salir');
     });
 
     test('✅ Combinado: ubicación + rango fechas', () {

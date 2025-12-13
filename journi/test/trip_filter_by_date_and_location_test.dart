@@ -211,7 +211,9 @@ void main() {
       expect(res.any((t) => t.id == 't_sin_fechas'), isFalse);
     });
 
-    test('✅ Filtro por ubicación (texto) devuelve el trip que tenga una Entry que lo mencione', () {
+    test(
+        '✅ Filtro por ubicación (texto) devuelve el trip que tenga una Entry que lo mencione',
+        () {
       final res = filterTrips(
         trips: trips,
         entries: entries,
@@ -220,7 +222,8 @@ void main() {
       expect(res.map((t) => t.id).toList(), ['t_zgz']);
     });
 
-    test('✅ Filtro por ubicación (cercanía coords) devuelve el trip cercano', () {
+    test('✅ Filtro por ubicación (cercanía coords) devuelve el trip cercano',
+        () {
       // Punto cerca de Zaragoza
       const nearZgz = EntryLocation(lat: 41.65, lon: -0.88);
 
