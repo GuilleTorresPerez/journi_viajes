@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:journi/application/entry_service.dart';
 import 'package:journi/domain/entry.dart';
+import 'package:journi/domain/trip.dart';
 import 'package:journi/estadisticasScreen.dart';
-import 'package:journi/map_screen.dart'; // ajusta si TimelineList está en otro archivo
+import 'package:journi/map_screen.dart';
+
+import 'trip_service_test.dart'; // ajusta si TimelineList está en otro archivo
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -91,5 +95,46 @@ void main() {
 
       expect(tappedEntry, equals(entries[1]));
     });
+  });
+  group('LineaTemporalScreen - viaje sin entradas', () {
+    testWidgets(
+      'Muestra mensaje cuando el viaje no tiene eventos',
+      (tester) async {
+        final trip = Trip(
+          id: 'trip1',
+          title: 'Viaje vacío',
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 10),
+          ownerId: '',
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: LineaTemporalScreen(
+              viaje: trip,
+              entryService: makeEntryService(FakeEntryRepository()),
+              entryRepo: FakeEntryRepository(),
+            ),
+          ),
+        );
+
+        // Estado inicial: loading
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        // Esperar a que termine el Future
+        await tester.pumpAndSettle();
+
+        // Mensaje de viaje vacío
+        expect(
+          find.text('Este viaje no tiene eventos.'),
+          findsOneWidget,
+        );
+
+        // No debe existir TimelineList
+        expect(find.byType(TimelineList), findsNothing);
+      },
+    );
   });
 }
