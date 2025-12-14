@@ -77,9 +77,14 @@ class DriftEntryRepository implements EntryRepository {
   Future<Result<List<Entry>>> list({String? tripId, EntryType? type}) async {
     final q = _db.select(_db.entries)
       ..orderBy([(e) => d.OrderingTerm.desc(e.createdAt)]);
+
     if (tripId != null) q.where((e) => e.tripId.equals(tripId));
-    if (type != null)
-      q.where((e) => e.type.equals(type as String)); // ahora acepta EntryType
+
+    // ✅ CORRECCIÓN: Usamos 'type.name' para convertir el Enum a String
+    if (type != null) {
+      q.where((e) => e.type.equals(type.name));
+    }
+
     final rows = await q.get();
     return Ok(List.unmodifiable(rows.map(_toDomain).toList()));
   }
@@ -88,8 +93,14 @@ class DriftEntryRepository implements EntryRepository {
   Stream<List<Entry>> watchAll({String? tripId, EntryType? type}) {
     final q = _db.select(_db.entries)
       ..orderBy([(e) => d.OrderingTerm.desc(e.createdAt)]);
+
     if (tripId != null) q.where((e) => e.tripId.equals(tripId));
-    if (type != null) q.where((e) => e.type.equals(type as String));
+
+    // ✅ CORRECCIÓN: Usamos 'type.name'
+    if (type != null) {
+      q.where((e) => e.type.equals(type.name));
+    }
+
     return q.watch().map((rows) => rows.map(_toDomain).toList());
   }
 }
