@@ -9,58 +9,56 @@ import 'package:journi/domain/user.dart';
 import 'trip_service_test.dart';
 
 void main() {
-  testWidgets("🧱 _buildDataRow muestra icono, título y valor correctamente",
+  testWidgets("🧱 _buildDataRow renderiza correctamente ID, Email y Fecha",
       (WidgetTester tester) async {
-    // Usuario mínimo fake (no se usa realmente aquí)
     final fakeUser = User(
-      id: "u1",
-      name: "Test",
-      lastName: "User",
-      email: "test@test.com",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      id: "u100",
+      name: "Paula",
+      lastName: "Tester",
+      email: "paula@test.com",
+      createdAt: DateTime(2024, 01, 15),
+      updatedAt: DateTime(2024, 01, 15),
       passwordHash: '',
       passwordSalt: '',
     );
 
-    // Construimos el widget padre
-    final widget = MiPerfil(
-      sesionIniciada: true,
-      viajes: const [],
-      selectedIndex: 4,
-      tripRepo: FakeTripRepository(),
-      entryRepo: FakeEntryRepository(),
-      tripService: makeTripService(FakeTripRepository(), FakeUserRepository(),
-          FakeEntryRepository(), FakeGeocodingRepository()),
-      entryService: makeEntryService(FakeEntryRepository()),
-      userRepo: FakeUserRepository(),
-      userService: makeUserService(FakeUserRepository()),
-      currentUser: fakeUser,
-    );
-
-    // Accedemos al State
-    final state = widget.createState() as dynamic;
-
-    // Widget a testear
-    final dataRow = state._buildDataRow(
-      Icons.email,
-      "Email",
-      "correo@test.com",
-    );
-
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: dataRow),
+        home: MiPerfil(
+          sesionIniciada: true,
+          viajes: const [],
+          selectedIndex: 4,
+          tripRepo: FakeTripRepository(),
+          entryRepo: FakeEntryRepository(),
+          tripService: makeTripService(
+            FakeTripRepository(),
+            FakeUserRepository(),
+            FakeEntryRepository(),
+            FakeGeocodingRepository(),
+          ),
+          entryService: makeEntryService(FakeEntryRepository()),
+          userRepo: FakeUserRepository(),
+          userService: makeUserService(FakeUserRepository()),
+          currentUser: fakeUser,
+        ),
       ),
     );
 
-    // 🔎 Icono
-    expect(find.byIcon(Icons.email), findsOneWidget);
+    await tester.pumpAndSettle();
 
-    // 🔎 Título
+    // 🔎 ID
+    expect(find.byIcon(Icons.perm_identity), findsOneWidget);
+    expect(find.text("ID"), findsOneWidget);
+    expect(find.text("u100"), findsOneWidget);
+
+    // 🔎 Email
+    expect(find.byIcon(Icons.email_outlined), findsOneWidget);
     expect(find.text("Email"), findsOneWidget);
+    expect(find.text("paula@test.com"), findsOneWidget);
 
-    // 🔎 Valor
-    expect(find.text("correo@test.com"), findsOneWidget);
+    // 🔎 Fecha
+    expect(find.byIcon(Icons.calendar_month), findsOneWidget);
+    expect(find.text("Usuario desde"), findsOneWidget);
+    expect(find.text("2024-01-15"), findsOneWidget);
   });
 }
