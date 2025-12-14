@@ -1,32 +1,23 @@
 import 'package:drift/native.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:journi/application/entry_service.dart';
+import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/use_cases/user_use_cases.dart';
 import 'package:journi/application/user_service.dart';
 import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
-import 'package:journi/application/trip_service.dart';
-import 'package:journi/application/entry_service.dart';
 import 'package:journi/domain/trip.dart';
+import 'package:journi/domain/user.dart';
 import 'package:journi/editar_viaje.dart';
-import 'package:journi/main.dart';
-import 'package:journi/pantalla_viaje.dart';
 
 import 'fake_geocoding_repository.dart';
 
-extension WidgetTesterExtension on WidgetTester {
-  Future<void> pumpUntilFound(Finder finder, WidgetTester tester,
-      {Duration timeout = const Duration(seconds: 5)}) async {
-    final end = DateTime.now().add(timeout);
-    while (DateTime.now().isBefore(end)) {
-      await pump(const Duration(milliseconds: 100));
-      if (any(finder)) return;
-    }
-    throw Exception(
-        'Widget ${finder.description} no encontrado tras ${timeout.inSeconds}s');
-  }
+DateTime _dateOnlyLocal(DateTime dt) {
+  final l = dt.toLocal();
+  return DateTime(l.year, l.month, l.day);
 }
 
 void main() {
@@ -54,16 +45,20 @@ void main() {
 
   testWidgets('Editar viaje correctamente', (WidgetTester tester) async {
     final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+    final uniqueEmail =
+        'email_${DateTime.now().millisecondsSinceEpoch}@gmail.com';
 
     final cmd = RegisterUserCommand(
       id: generatedId,
       name: "nombre",
       lastName: "apellidos",
-      email: "email@gmail.com",
+      email: uniqueEmail,
       password: "password",
     );
 
-    final result = await userService.register(cmd);
+    final reg = await userService.register(cmd);
+    expect(reg, isA<Ok<User>>(), reason: 'El registro debe ser correcto');
+    final currentUser = (reg as Ok<User>).value;
 
     final viajes = [
       Trip(
@@ -93,7 +88,7 @@ void main() {
         entryService: makeEntryService(entryRepo),
         userRepo: userRepo,
         userService: userService,
-        currentUser: result.valueOrNull,
+        currentUser: currentUser,
       ),
     ));
 
@@ -106,36 +101,43 @@ void main() {
         find.byKey(const Key('fechaFinField')), '15-01-2025');
 
     await tester.tap(find.byKey(const Key('guardarButton')));
-    await tester.pump(); // procesa onPressed
-    await tester.pump(); // procesa async
-    await tester.pump(const Duration(seconds: 1)); // deja aparecer el snackbar
+    await tester.pump(); // deja que muestre SnackBar
 
-    expect(find.text('Viaje actualizado correctamente'), findsOneWidget);
+    // SnackBar (más estable por key que por texto)
+    expect(find.byKey(const Key('snackbar_ok')), findsOneWidget);
+
+    // deja terminar el flujo (hay delayed + Navigator.pop)
+    await tester.pumpAndSettle();
 
     // Verificar cambios en repo
-    final updatedTrip = await tripRepo.findById("1");
-    expect(updatedTrip.valueOrNull?.title, 'Viaje Editado');
-    expect(updatedTrip.valueOrNull?.startDate?.year, 2025);
-    expect(updatedTrip.valueOrNull?.startDate?.month, 1);
-    expect(updatedTrip.valueOrNull?.startDate?.day, 5);
-    expect(updatedTrip.valueOrNull?.endDate?.year, 2025);
-    expect(updatedTrip.valueOrNull?.endDate?.month, 1);
-    expect(updatedTrip.valueOrNull?.endDate?.day, 15);
+    final updatedTripRes = await tripRepo.findById("1");
+    final updatedTrip = updatedTripRes.valueOrNull;
+    expect(updatedTrip, isNotNull);
+
+    expect(updatedTrip!.title, 'Viaje Editado');
+
+    // ✅ Comparación robusta ignorando zona horaria (UTC vs local)
+    expect(_dateOnlyLocal(updatedTrip.startDate!), DateTime(2025, 1, 5));
+    expect(_dateOnlyLocal(updatedTrip.endDate!), DateTime(2025, 1, 15));
   });
 
   testWidgets('Editar viaje con fecha inicio posterior a fin muestra error',
       (WidgetTester tester) async {
     final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+    final uniqueEmail =
+        'email_${DateTime.now().millisecondsSinceEpoch}@gmail.com';
 
     final cmd = RegisterUserCommand(
       id: generatedId,
       name: "nombre",
       lastName: "apellidos",
-      email: "email@gmail.com",
+      email: uniqueEmail,
       password: "password",
     );
 
-    final result = await userService.register(cmd);
+    final reg = await userService.register(cmd);
+    expect(reg, isA<Ok<User>>(), reason: 'El registro debe ser correcto');
+    final currentUser = (reg as Ok<User>).value;
 
     final viajes = [
       Trip(
@@ -165,21 +167,22 @@ void main() {
         entryService: makeEntryService(entryRepo),
         userRepo: userRepo,
         userService: userService,
-        currentUser: result.valueOrNull,
+        currentUser: currentUser,
       ),
     ));
 
-    // Introducimos fecha inicio posterior a fecha fin
     await tester.enterText(
         find.byKey(const Key('fechaIniField')), '20-01-2025');
     await tester.enterText(
         find.byKey(const Key('fechaFinField')), '15-01-2025');
+
     await tester.tap(find.byKey(const Key('guardarButton')));
     await tester.pumpAndSettle();
 
-    // Verificar que aparece el diálogo de error
     expect(find.text('La fecha de inicio no puede ser posterior a la final'),
         findsOneWidget);
-    expect(find.text('Viaje actualizado correctamente'), findsNothing);
+
+    // No debe aparecer el OK
+    expect(find.byKey(const Key('snackbar_ok')), findsNothing);
   });
 }
