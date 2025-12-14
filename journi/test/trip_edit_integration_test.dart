@@ -93,9 +93,12 @@ void main() {
     ));
 
     // Cambiamos los datos
-    await tester.enterText(find.byKey(const Key('tituloField')), 'Viaje Editado');
-    await tester.enterText(find.byKey(const Key('fechaIniField')), '05-01-2025');
-    await tester.enterText(find.byKey(const Key('fechaFinField')), '15-01-2025');
+    await tester.enterText(
+        find.byKey(const Key('tituloField')), 'Viaje Editado');
+    await tester.enterText(
+        find.byKey(const Key('fechaIniField')), '05-01-2025');
+    await tester.enterText(
+        find.byKey(const Key('fechaFinField')), '15-01-2025');
 
     await tester.tap(find.byKey(const Key('guardarButton')));
     await tester.pump(); // deja que muestre SnackBar
@@ -119,65 +122,67 @@ void main() {
   });
 
   testWidgets('Editar viaje con fecha inicio posterior a fin muestra error',
-          (WidgetTester tester) async {
-        final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-        final uniqueEmail =
-            'email_${DateTime.now().millisecondsSinceEpoch}@gmail.com';
+      (WidgetTester tester) async {
+    final generatedId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+    final uniqueEmail =
+        'email_${DateTime.now().millisecondsSinceEpoch}@gmail.com';
 
-        final cmd = RegisterUserCommand(
-          id: generatedId,
-          name: "nombre",
-          lastName: "apellidos",
-          email: uniqueEmail,
-          password: "password",
-        );
+    final cmd = RegisterUserCommand(
+      id: generatedId,
+      name: "nombre",
+      lastName: "apellidos",
+      email: uniqueEmail,
+      password: "password",
+    );
 
-        final reg = await userService.register(cmd);
-        expect(reg, isA<Ok<User>>(), reason: 'El registro debe ser correcto');
-        final currentUser = (reg as Ok<User>).value;
+    final reg = await userService.register(cmd);
+    expect(reg, isA<Ok<User>>(), reason: 'El registro debe ser correcto');
+    final currentUser = (reg as Ok<User>).value;
 
-        final viajes = [
-          Trip(
-            id: "1",
-            title: "Italia",
-            description: "Roma",
-            startDate: DateTime(2024, 1, 10),
-            endDate: DateTime(2024, 1, 15),
-            ownerId: generatedId,
-            createdAt: DateTime(2024, 1, 15),
-            updatedAt: DateTime(2024, 1, 15),
-          ),
-        ];
+    final viajes = [
+      Trip(
+        id: "1",
+        title: "Italia",
+        description: "Roma",
+        startDate: DateTime(2024, 1, 10),
+        endDate: DateTime(2024, 1, 15),
+        ownerId: generatedId,
+        createdAt: DateTime(2024, 1, 15),
+        updatedAt: DateTime(2024, 1, 15),
+      ),
+    ];
 
-        await tripRepo.upsert(viajes[0]);
+    await tripRepo.upsert(viajes[0]);
 
-        await tester.pumpWidget(MaterialApp(
-          home: Editar_viaje(
-            selectedIndex: 0,
-            num_viaje: 0,
-            viajes: viajes,
-            sesionIniciada: true,
-            repo: tripRepo,
-            entryRepo: entryRepo,
-            tripService: makeTripService(
-                tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
-            entryService: makeEntryService(entryRepo),
-            userRepo: userRepo,
-            userService: userService,
-            currentUser: currentUser,
-          ),
-        ));
+    await tester.pumpWidget(MaterialApp(
+      home: Editar_viaje(
+        selectedIndex: 0,
+        num_viaje: 0,
+        viajes: viajes,
+        sesionIniciada: true,
+        repo: tripRepo,
+        entryRepo: entryRepo,
+        tripService: makeTripService(
+            tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+        entryService: makeEntryService(entryRepo),
+        userRepo: userRepo,
+        userService: userService,
+        currentUser: currentUser,
+      ),
+    ));
 
-        await tester.enterText(find.byKey(const Key('fechaIniField')), '20-01-2025');
-        await tester.enterText(find.byKey(const Key('fechaFinField')), '15-01-2025');
+    await tester.enterText(
+        find.byKey(const Key('fechaIniField')), '20-01-2025');
+    await tester.enterText(
+        find.byKey(const Key('fechaFinField')), '15-01-2025');
 
-        await tester.tap(find.byKey(const Key('guardarButton')));
-        await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('guardarButton')));
+    await tester.pumpAndSettle();
 
-        expect(find.text('La fecha de inicio no puede ser posterior a la final'),
-            findsOneWidget);
+    expect(find.text('La fecha de inicio no puede ser posterior a la final'),
+        findsOneWidget);
 
-        // No debe aparecer el OK
-        expect(find.byKey(const Key('snackbar_ok')), findsNothing);
-      });
+    // No debe aparecer el OK
+    expect(find.byKey(const Key('snackbar_ok')), findsNothing);
+  });
 }

@@ -14,7 +14,7 @@ class FakeUserRepository implements UserRepository {
   Future<Result<User?>> findByEmail(String email) async {
     try {
       final user =
-      _users.values.firstWhere((u) => u.email == email.toLowerCase());
+          _users.values.firstWhere((u) => u.email == email.toLowerCase());
       return Ok(user);
     } catch (_) {
       return const Ok(null);
@@ -60,8 +60,7 @@ void main() {
       await tripRepo.upsert(trip);
 
       // Act
-      final result =
-      await useCase.call('t_no_user', 'noexiste@correo.com');
+      final result = await useCase.call('t_no_user', 'noexiste@correo.com');
 
       // Assert
       expect(result, isA<Err<Unit>>(),
