@@ -110,7 +110,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
           });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No se encontró esa ubicación')),
+            const SnackBar(key: Key('ubicacionNoExiste'), content: Text('No se encontró esa ubicación')),
           );
         }
       } else {
@@ -212,6 +212,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    key: const Key('nombreUbicacion'),
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Buscar dirección...',
@@ -228,6 +229,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
+                  key: const Key('buscaUbicacion'),
                   icon: const Icon(Icons.search, color: Colors.teal),
                   onPressed: _searchLocation,
                 ),
@@ -239,6 +241,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: TextField(
+              key: const Key('tituloUbicacion'),
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Nombre de la ubicación (opcional)',
@@ -305,6 +308,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                   heroTag: 'save',
                   backgroundColor: Colors.teal,
                   onPressed: _saveLocation,
+                  key: const Key('guardarUbicacion'),
                   icon: const Icon(Icons.check),
                   label: const Text('Guardar ubicación'),
                 ),

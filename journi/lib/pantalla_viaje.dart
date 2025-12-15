@@ -439,6 +439,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
+                                key: const Key('ubicacionButton'),
                                 icon: const Icon(Icons.location_on,
                                     color: Colors.teal),
                                 onPressed: () {
@@ -528,6 +529,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                                     right: 8,
                                     child: Column(children: [
                                       IconButton(
+                                        key: const Key('ubicacionButton'),
                                         icon: const Icon(Icons.location_on,
                                             color: Colors.teal),
                                         onPressed: () {
@@ -628,6 +630,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                               },
                             ),
                             IconButton(
+                              key: const Key('ubicacionButton'),
                               icon: const Icon(Icons.location_on,
                                   color: Colors.teal),
                               onPressed: () {
