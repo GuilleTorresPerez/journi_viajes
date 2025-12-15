@@ -342,7 +342,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                 query: _searchQuery,
               );
 
-
               return Column(children: [
                 if (_searchQuery.isNotEmpty)
                   Padding(
