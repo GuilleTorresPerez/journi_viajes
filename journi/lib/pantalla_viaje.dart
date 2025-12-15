@@ -19,6 +19,7 @@ import 'application/user_service.dart';
 import 'crear_viaje.dart';
 import 'domain/ports/user_repository.dart';
 import 'editar_viaje.dart';
+import 'entry_search.dart';
 import 'estadisticasScreen.dart';
 import 'map_screen.dart';
 //import 'select_location_screen.dart';
@@ -336,16 +337,11 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
 
               List<Entry> entries = snapshot.data!;
 
-              if (_searchQuery.isNotEmpty) {
-                entries = entries.where((e) {
-                  if (e.type == EntryType.note && e.text != null) {
-                    return e.text!
-                        .toLowerCase()
-                        .contains(_searchQuery.toLowerCase());
-                  }
-                  return false; // fotos y vídeos no se filtran
-                }).toList();
-              }
+              entries = filterEntriesByText(
+                entries: entries,
+                query: _searchQuery,
+              );
+
 
               return Column(children: [
                 if (_searchQuery.isNotEmpty)

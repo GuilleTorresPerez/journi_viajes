@@ -949,6 +949,12 @@ class _TimelineListState extends State<TimelineList>
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
