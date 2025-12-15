@@ -573,12 +573,14 @@ class MapaDetalleScreen extends StatefulWidget {
   final Trip viaje;
   final EntryService entryService;
   final EntryRepository entryRepo;
+  final LatLng? testUserPosition; // 👈 SOLO PARA TEST
 
   const MapaDetalleScreen({
     Key? key,
     required this.viaje,
     required this.entryService,
     required this.entryRepo,
+    this.testUserPosition,
   }) : super(key: key);
 
   @override
@@ -594,8 +596,13 @@ class _MapaDetalleScreenState extends State<MapaDetalleScreen> {
   @override
   void initState() {
     super.initState();
-    _obtenerUbicacion();
-    _cargarEntradas();
+    if (widget.testUserPosition != null) {
+      _posicionUsuario = widget.testUserPosition;
+      _cargarEntradas();
+    } else {
+      _obtenerUbicacion();
+      _cargarEntradas();
+    }
   }
 
   Future<void> _cargarEntradas() async {
