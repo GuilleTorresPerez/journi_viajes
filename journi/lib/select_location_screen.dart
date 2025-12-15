@@ -110,7 +110,9 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
           });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(key: Key('ubicacionNoExiste'), content: Text('No se encontró esa ubicación')),
+            const SnackBar(
+                key: Key('ubicacionNoExiste'),
+                content: Text('No se encontró esa ubicación')),
           );
         }
       } else {

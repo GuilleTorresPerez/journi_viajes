@@ -12,7 +12,8 @@ class FakeGeocodingRepository implements GeocodingRepository {
   FakeGeocodingRepository({this.response = 'País de Prueba'});
 
   @override
-  Future<Result<String?>> getCountryFromCoordinates(double lat, double lon) async {
+  Future<Result<String?>> getCountryFromCoordinates(
+      double lat, double lon) async {
     return Ok(response);
   }
 

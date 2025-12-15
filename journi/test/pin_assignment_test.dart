@@ -8,7 +8,7 @@ import 'package:journi/data/memory/in_memory_entry_repository.dart';
 import 'package:journi/domain/entry.dart';
 import 'package:journi/select_location_screen.dart';
 
-void main(){
+void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('Trip.create - validaciones y normalización', () {
     late AppDatabase db;
@@ -21,7 +21,6 @@ void main(){
     });
 
     testWidgets('✅ Ubicacion existente', (WidgetTester tester) async {
-
       final entryId = UniqueKey().toString();
       final cmd = CreateEntryCommand(
         id: entryId,
@@ -53,7 +52,6 @@ void main(){
     });
 
     testWidgets('❌ Ubicacion inexistente', (WidgetTester tester) async {
-
       final entryId = UniqueKey().toString();
       final cmd = CreateEntryCommand(
         id: entryId,
@@ -66,7 +64,8 @@ void main(){
       final entry = await entryRepo.findById(entryId);
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold( // ⚠️ IMPORTANTE
+          home: Scaffold(
+            // ⚠️ IMPORTANTE
             body: SelectLocationScreen(
               entry: entry.valueOrNull!,
               entryRepo: entryRepo,
@@ -78,7 +77,8 @@ void main(){
 
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byKey(Key('nombreUbicacion')), 'jsfbadlbafywelfavke');
+      await tester.enterText(
+          find.byKey(Key('nombreUbicacion')), 'jsfbadlbafywelfavke');
 
       await tester.tap(find.byKey(Key('buscaUbicacion')));
       await tester.pump();

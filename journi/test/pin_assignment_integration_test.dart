@@ -121,7 +121,8 @@ void main() {
       await tester.tap(find.byKey(Key('buscaUbicacion')));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byKey(Key('tituloUbicacion')), 'Londres 2025');
+      await tester.enterText(
+          find.byKey(Key('tituloUbicacion')), 'Londres 2025');
       await tester.tap(find.byKey(Key('guardarUbicacion')));
       await tester.pumpAndSettle();
 
@@ -129,63 +130,63 @@ void main() {
     });
 
     testWidgets('❌ Error: El usuario introduce una localización inexistente',
-            (WidgetTester tester) async {
-          final viajes = [
-            Trip(
-              id: '1',
-              title: 'Viaje Test',
-              description: 'Test',
-              startDate: DateTime(2025, 1, 1),
-              endDate: DateTime(2025, 1, 5),
-              ownerId: testUserId,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            )
-          ];
+        (WidgetTester tester) async {
+      final viajes = [
+        Trip(
+          id: '1',
+          title: 'Viaje Test',
+          description: 'Test',
+          startDate: DateTime(2025, 1, 1),
+          endDate: DateTime(2025, 1, 5),
+          ownerId: testUserId,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        )
+      ];
 
-          await tester.pumpWidget(
-            MaterialApp(
-              home: Pantalla_Viaje(
-                selectedIndex: 0,
-                sesionIniciada: true,
-                viajes: viajes,
-                num_viaje: 0,
-                repo: tripRepo,
-                entryRepo: entryRepo,
-                tripService: tripService,
-                entryService: entryService,
-                userRepo: userRepo,
-                userService: userService,
-                currentUser: result.valueOrNull,
-              ),
-            ),
-          );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Pantalla_Viaje(
+            selectedIndex: 0,
+            sesionIniciada: true,
+            viajes: viajes,
+            num_viaje: 0,
+            repo: tripRepo,
+            entryRepo: entryRepo,
+            tripService: tripService,
+            entryService: entryService,
+            userRepo: userRepo,
+            userService: userService,
+            currentUser: result.valueOrNull,
+          ),
+        ),
+      );
 
-          await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.byIcon(Icons.text_fields));
-          await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.text_fields));
+      await tester.pumpAndSettle();
 
-          await tester.enterText(find.byType(TextField), 'Mi primera nota');
-          await tester.tap(find.text('Aceptar'));
-          await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Mi primera nota');
+      await tester.tap(find.text('Aceptar'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Texto añadido'), findsOneWidget);
-          await tester.pumpAndSettle();
+      expect(find.text('Texto añadido'), findsOneWidget);
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.byKey(Key('ubicacionButton')));
-          await tester.pumpAndSettle();
+      await tester.tap(find.byKey(Key('ubicacionButton')));
+      await tester.pumpAndSettle();
 
-          // Buscar ubicación inexistente
-          await tester.enterText(find.byKey(Key('nombreUbicacion')), 'fbdisboahovsofqvewyvfief');
-          await tester.tap(find.byKey(Key('buscaUbicacion')));
+      // Buscar ubicación inexistente
+      await tester.enterText(
+          find.byKey(Key('nombreUbicacion')), 'fbdisboahovsofqvewyvfief');
+      await tester.tap(find.byKey(Key('buscaUbicacion')));
 
-          await tester.pump();
+      await tester.pump();
 
-          await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 500));
 
-          expect(find.byType(SnackBar), findsOneWidget);
-
-        });
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
   });
 }
