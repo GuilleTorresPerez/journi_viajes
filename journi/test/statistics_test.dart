@@ -20,7 +20,7 @@ Widget wrap(Widget widget) {
   return MaterialApp(home: widget);
 }
 
-void main(){
+void main() {
   testWidgets('Muestra tarjeta de estadísticas con título', (tester) async {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     final userRepo = DriftUserRepository(db);
@@ -35,7 +35,8 @@ void main(){
       viajes: [],
       tripRepo: tripRepo,
       entryRepo: entryRepo,
-      tripService: makeTripService(tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
+      tripService: makeTripService(
+          tripRepo, userRepo, entryRepo, FakeGeocodingRepository()),
       entryService: makeEntryService(entryRepo),
       userRepo: userRepo,
       userService: userService,
@@ -73,8 +74,8 @@ void main(){
       viajes: viajes,
       tripRepo: InMemoryTripRepository(),
       entryRepo: InMemoryEntryRepository(),
-      tripService: makeTripService(
-          InMemoryTripRepository(), userRepo, InMemoryEntryRepository(), FakeGeocodingRepository()),
+      tripService: makeTripService(InMemoryTripRepository(), userRepo,
+          InMemoryEntryRepository(), FakeGeocodingRepository()),
       entryService: makeEntryService(InMemoryEntryRepository()),
       userRepo: userRepo,
       userService: makeUserService(userRepo),
@@ -110,8 +111,8 @@ void main(){
       viajes: viajes,
       tripRepo: InMemoryTripRepository(),
       entryRepo: InMemoryEntryRepository(),
-      tripService: makeTripService(
-          InMemoryTripRepository(), userRepo, InMemoryEntryRepository(), FakeGeocodingRepository()),
+      tripService: makeTripService(InMemoryTripRepository(), userRepo,
+          InMemoryEntryRepository(), FakeGeocodingRepository()),
       entryService: makeEntryService(InMemoryEntryRepository()),
       userRepo: userRepo,
       userService: makeUserService(userRepo),
@@ -123,5 +124,4 @@ void main(){
     // PieChart existe
     expect(find.byType(PieChart), findsOneWidget);
   });
-
 }
