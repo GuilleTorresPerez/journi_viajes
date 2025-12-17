@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:journi/application/entry_service.dart';
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/user_service.dart';
-import 'package:journi/application/shared/result.dart'; // Importar Result para asOk
 import 'package:journi/domain/user.dart'; // 👈 Importar User
 import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';

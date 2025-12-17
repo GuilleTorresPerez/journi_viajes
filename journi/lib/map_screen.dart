@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:journi/data/local/drift/app_database.dart';
-import 'package:journi/data/local/drift/drift_trip_repository.dart';
 import 'package:journi/domain/ports/entry_repository.dart';
 import 'package:journi/domain/trip.dart';
 
@@ -13,7 +11,6 @@ import 'application/entry_service.dart';
 import 'application/trip_service.dart';
 import 'application/user_service.dart';
 import 'crear_viaje.dart';
-import 'data/local/drift/drift_user_repository.dart';
 import 'domain/entry.dart';
 import 'domain/ports/trip_repository.dart';
 import 'domain/ports/user_repository.dart';

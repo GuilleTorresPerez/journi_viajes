@@ -12,8 +12,6 @@ import 'package:journi/application/use_cases/user_use_cases.dart';
 import 'package:journi/application/shared/result.dart';
 import 'package:journi/domain/user.dart';
 
-import 'main.dart';
-
 // ignore: must_be_immutable
 class RegisterScreen extends StatefulWidget {
   final bool sesionIniciada;
