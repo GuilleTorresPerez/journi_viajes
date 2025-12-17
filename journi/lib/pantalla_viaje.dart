@@ -655,7 +655,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       );
                     }
 
-
                     return const SizedBox.shrink();
                   },
                 ))
@@ -751,8 +750,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Adjuntar foto'),
                           ),
-
-
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
@@ -772,7 +769,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Hacer foto'),
                           ),
-
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
@@ -791,7 +787,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Adjuntar video'),
                           ),
-
                         ],
                       ),
                     );
