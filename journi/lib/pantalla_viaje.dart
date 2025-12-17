@@ -816,56 +816,77 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],
-        onTap: (int inIndex) {
-          setState(() async {
+        onTap: (int inIndex) async {
+          setState(() {
             _selectedIndex = inIndex;
-            if (_selectedIndex == 0) {
-              // ✅ Volver a la home existente
-              Navigator.pop(context);
-            } else if (_selectedIndex == 1) {
-              // Ir al mapa
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MapaPaisScreen(
-                    selectedIndex: _selectedIndex,
-                    viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
-                    tripRepo: widget.repo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: widget.userService,
-                    currentUser: widget.currentUser,
-                  ),
+          });
+          if (_selectedIndex == 0) {
+            // ✅ Volver a la home existente
+            Navigator.pop(context);
+          } else if (_selectedIndex == 1) {
+            // Ir al mapa
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MapaPaisScreen(
+                  selectedIndex: _selectedIndex,
+                  viajes: widget.viajes,
+                  sesionIniciada: widget.sesionIniciada,
+                  tripRepo: widget.repo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
-              );
-            } else if (_selectedIndex == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Crear_Viaje(
-                    selectedIndex: _selectedIndex,
-                    viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
-                    num_viaje: -1,
-                    repo: widget.repo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: widget.userService,
-                    currentUser: widget.currentUser,
-                  ),
+              ),
+            );
+          } else if (_selectedIndex == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Crear_Viaje(
+                  selectedIndex: _selectedIndex,
+                  viajes: widget.viajes,
+                  sesionIniciada: widget.sesionIniciada,
+                  num_viaje: -1,
+                  repo: widget.repo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser,
                 ),
-              );
-            } else if (_selectedIndex == 3) {
-              // Estadisticas
+              ),
+            );
+          } else if (_selectedIndex == 3) {
+            // Estadisticas
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EstadisticasScreen(
+                  selectedIndex: _selectedIndex,
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.repo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser!,
+                ),
+              ),
+            );
+          } else if (_selectedIndex == 4) {
+            // Perfil
+            if (widget.sesionIniciada && widget.currentUser != null) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EstadisticasScreen(
+                  builder: (context) => MiPerfil(
                     selectedIndex: _selectedIndex,
                     sesionIniciada: widget.sesionIniciada,
                     viajes: widget.viajes,
@@ -879,15 +900,36 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                   ),
                 ),
               );
-            } else if (_selectedIndex == 4) {
-              // Perfil
-              if (widget.sesionIniciada && widget.currentUser != null) {
+            } else {
+              final loggedUser = await Navigator.push<User?>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginScreen(
+                    selectedIndex: _selectedIndex,
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.repo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                  ),
+                ),
+              );
+
+              bool _sesionIniciada = false;
+              if (loggedUser != null && mounted) {
+                setState(() {
+                  _sesionIniciada = true;
+                });
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => MiPerfil(
                       selectedIndex: _selectedIndex,
-                      sesionIniciada: widget.sesionIniciada,
+                      sesionIniciada: _sesionIniciada,
                       viajes: widget.viajes,
                       tripRepo: widget.repo,
                       entryRepo: widget.entryRepo,
@@ -895,55 +937,13 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
-                      currentUser: widget.currentUser!,
+                      currentUser: loggedUser,
                     ),
                   ),
                 );
-              } else {
-                final loggedUser = await Navigator.push<User?>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      selectedIndex: _selectedIndex,
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.repo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
-                    ),
-                  ),
-                );
-
-                bool _sesionIniciada = false;
-                if (loggedUser != null && mounted) {
-                  setState(() {
-                    _sesionIniciada = true;
-                  });
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MiPerfil(
-                        selectedIndex: _selectedIndex,
-                        sesionIniciada: _sesionIniciada,
-                        viajes: widget.viajes,
-                        tripRepo: widget.repo,
-                        entryRepo: widget.entryRepo,
-                        tripService: widget.tripService,
-                        entryService: widget.entryService,
-                        userRepo: widget.userRepo,
-                        userService: widget.userService,
-                        currentUser: loggedUser,
-                      ),
-                    ),
-                  );
-                }
               }
             }
-          });
+          }
         },
       ),
     );
