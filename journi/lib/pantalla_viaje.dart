@@ -578,7 +578,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     }
 
                     // ---- VIDEO ----
-                    // coverage:ignore-start
+
                     if (e.type == EntryType.video && e.mediaUri != null) {
                       return Card(
                         color: Colors.white,
@@ -654,7 +654,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         ),
                       );
                     }
-                    // coverage:ignore-end
 
                     return const SizedBox.shrink();
                   },
@@ -751,8 +750,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Adjuntar foto'),
                           ),
-
-                          // coverage:ignore-start
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
@@ -772,7 +769,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Hacer foto'),
                           ),
-
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
@@ -791,7 +787,6 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Adjuntar video'),
                           ),
-                          // coverage:ignore-end
                         ],
                       ),
                     );
