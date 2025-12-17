@@ -5,14 +5,11 @@ import 'package:journi/application/entry_service.dart';
 import 'package:journi/application/trip_service.dart';
 import 'package:journi/application/user_service.dart';
 import 'package:journi/application/use_cases/user_use_cases.dart';
-import 'package:journi/application/shared/result.dart';
-import 'package:journi/domain/user.dart';
 
 import 'package:journi/data/local/drift/app_database.dart';
 import 'package:journi/data/local/drift/drift_user_repository.dart';
 
 import 'package:journi/login_screen.dart';
-import 'package:journi/main.dart';
 
 import 'package:journi/data/memory/in_memory_trip_repository.dart';
 import 'package:journi/data/memory/in_memory_entry_repository.dart';

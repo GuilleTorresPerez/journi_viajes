@@ -50,13 +50,6 @@ class EstadisticasScreen extends StatefulWidget {
 class _EstadisticasState extends State<EstadisticasScreen> {
   @override
   Widget build(BuildContext context) {
-    final paisesVisitados = widget.viajes
-        .map((trip) => trip.title) // o trip.pais según tu modelo
-        .toSet()
-        .length;
-
-    final bool noHayViajes = widget.viajes.isEmpty;
-
     return Scaffold(
       backgroundColor: Colors.teal[200],
       appBar: AppBar(

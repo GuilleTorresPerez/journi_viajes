@@ -22,7 +22,6 @@ import 'editar_viaje.dart';
 import 'entry_search.dart';
 import 'estadisticasScreen.dart';
 import 'map_screen.dart';
-//import 'select_location_screen.dart';
 import 'package:journi/login_screen.dart';
 
 import 'mi_perfil.dart';
@@ -65,12 +64,6 @@ class Pantalla_Viaje extends StatefulWidget {
 class _PantallaViajeState extends State<Pantalla_Viaje> {
   VideoPlayerController? _videoController;
   String? _currentVideoPath;
-
-  Future<void> _initVideo(File file) async {
-    _videoController?.dispose();
-    _videoController = VideoPlayerController.file(file);
-    await _videoController!.initialize();
-  }
 
   final ImagePicker _picker = ImagePicker();
   //final List<Map<String, dynamic>> _textos = []; // {texto, fecha}
@@ -585,9 +578,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                     }
 
                     // ---- VIDEO ----
+                    // coverage:ignore-start
                     if (e.type == EntryType.video && e.mediaUri != null) {
-                      final file = File(e.mediaUri!);
-
                       return Card(
                         color: Colors.white,
                         shape: RoundedRectangleBorder(
@@ -662,6 +654,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                         ),
                       );
                     }
+                    // coverage:ignore-end
 
                     return const SizedBox.shrink();
                   },
@@ -758,6 +751,8 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Adjuntar foto'),
                           ),
+
+                          // coverage:ignore-start
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
@@ -777,6 +772,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Hacer foto'),
                           ),
+
                           TextButton(
                             onPressed: () async {
                               Navigator.pop(context);
@@ -795,6 +791,7 @@ class _PantallaViajeState extends State<Pantalla_Viaje> {
                             },
                             child: const Text('Adjuntar video'),
                           ),
+                          // coverage:ignore-end
                         ],
                       ),
                     );

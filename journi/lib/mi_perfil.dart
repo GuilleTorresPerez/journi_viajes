@@ -10,7 +10,6 @@ import 'domain/ports/user_repository.dart';
 import 'domain/trip.dart';
 import 'domain/user.dart';
 import 'estadisticasScreen.dart';
-import 'login_screen.dart';
 import 'main.dart';
 import 'map_screen.dart';
 
