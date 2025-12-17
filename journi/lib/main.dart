@@ -402,7 +402,12 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Mis viajes',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.add,
+                key: Key('addButton'),
+              ),
+              label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],

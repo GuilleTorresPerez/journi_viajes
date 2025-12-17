@@ -325,55 +325,61 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
             icon: Icon(Icons.folder),
             label: 'Mis viajes',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.map,
+                key: Key('button1'),
+              ),
+              label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
         ],
-        onTap: (int index) {
-          setState(() async {
+        onTap: (int index) async {
+          setState(() {
             _selectedIndex = index;
-            if (_selectedIndex == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
-                  builder: (context) => MyHomePage(
-                    title: 'JOURNI',
-                    sesionIniciada: widget.sesionIniciada,
-                    viajes: widget.viajes,
-                    skipLogin: false,
-                    tripRepo: widget.tripRepo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: userService,
-                    currentUser: widget.currentUser,
-                  ),
+          });
+          if (_selectedIndex == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                // cuando este con sesion iniciada habra que cambiarlo para que vaya directamente a la pantalla del perfil
+                builder: (context) => MyHomePage(
+                  title: 'JOURNI',
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  skipLogin: false,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: userService,
+                  currentUser: widget.currentUser,
                 ),
-              );
-            } else if (_selectedIndex == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Crear_Viaje(
-                    selectedIndex: _selectedIndex,
-                    viajes: widget.viajes,
-                    sesionIniciada: widget.sesionIniciada,
-                    num_viaje: -1,
-                    repo: widget.tripRepo,
-                    entryRepo: widget.entryRepo,
-                    tripService: widget.tripService,
-                    entryService: widget.entryService,
-                    userRepo: widget.userRepo,
-                    userService: userService,
-                    currentUser: widget.currentUser,
-                  ),
+              ),
+            );
+          } else if (_selectedIndex == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Crear_Viaje(
+                  selectedIndex: _selectedIndex,
+                  viajes: widget.viajes,
+                  sesionIniciada: widget.sesionIniciada,
+                  num_viaje: -1,
+                  repo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: userService,
+                  currentUser: widget.currentUser,
                 ),
-              );
-            }
-            /* DESCOMENTAR SI FUERA NECESARIO
+              ),
+            );
+          }
+          /* DESCOMENTAR SI FUERA NECESARIO
             else if (index == 1) {
               // Ir al mapa
               Navigator.push(
@@ -391,12 +397,32 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
               );
             }
             */
-            else if (index == 3) {
-              // Estadisticas
+          else if (index == 3) {
+            // Estadisticas
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EstadisticasScreen(
+                  selectedIndex: index,
+                  sesionIniciada: widget.sesionIniciada,
+                  viajes: widget.viajes,
+                  tripRepo: widget.tripRepo,
+                  entryRepo: widget.entryRepo,
+                  tripService: widget.tripService,
+                  entryService: widget.entryService,
+                  userRepo: widget.userRepo,
+                  userService: widget.userService,
+                  currentUser: widget.currentUser!,
+                ),
+              ),
+            );
+          } else if (index == 4) {
+            // Perfil
+            if (widget.sesionIniciada && widget.currentUser != null) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EstadisticasScreen(
+                  builder: (context) => MiPerfil(
                     selectedIndex: index,
                     sesionIniciada: widget.sesionIniciada,
                     viajes: widget.viajes,
@@ -410,15 +436,36 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                   ),
                 ),
               );
-            } else if (index == 4) {
-              // Perfil
-              if (widget.sesionIniciada && widget.currentUser != null) {
+            } else {
+              final loggedUser = await Navigator.push<User?>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginScreen(
+                    selectedIndex: index,
+                    sesionIniciada: widget.sesionIniciada,
+                    viajes: widget.viajes,
+                    tripRepo: widget.tripRepo,
+                    entryRepo: widget.entryRepo,
+                    tripService: widget.tripService,
+                    entryService: widget.entryService,
+                    userRepo: widget.userRepo,
+                    userService: widget.userService,
+                  ),
+                ),
+              );
+
+              bool _sesionIniciada = false;
+              if (loggedUser != null && mounted) {
+                setState(() {
+                  _sesionIniciada = true;
+                });
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => MiPerfil(
                       selectedIndex: index,
-                      sesionIniciada: widget.sesionIniciada,
+                      sesionIniciada: _sesionIniciada,
                       viajes: widget.viajes,
                       tripRepo: widget.tripRepo,
                       entryRepo: widget.entryRepo,
@@ -426,55 +473,13 @@ class _MapaPaisScreenState extends State<MapaPaisScreen> {
                       entryService: widget.entryService,
                       userRepo: widget.userRepo,
                       userService: widget.userService,
-                      currentUser: widget.currentUser!,
+                      currentUser: loggedUser,
                     ),
                   ),
                 );
-              } else {
-                final loggedUser = await Navigator.push<User?>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      selectedIndex: index,
-                      sesionIniciada: widget.sesionIniciada,
-                      viajes: widget.viajes,
-                      tripRepo: widget.tripRepo,
-                      entryRepo: widget.entryRepo,
-                      tripService: widget.tripService,
-                      entryService: widget.entryService,
-                      userRepo: widget.userRepo,
-                      userService: widget.userService,
-                    ),
-                  ),
-                );
-
-                bool _sesionIniciada = false;
-                if (loggedUser != null && mounted) {
-                  setState(() {
-                    _sesionIniciada = true;
-                  });
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MiPerfil(
-                        selectedIndex: index,
-                        sesionIniciada: _sesionIniciada,
-                        viajes: widget.viajes,
-                        tripRepo: widget.tripRepo,
-                        entryRepo: widget.entryRepo,
-                        tripService: widget.tripService,
-                        entryService: widget.entryService,
-                        userRepo: widget.userRepo,
-                        userService: widget.userService,
-                        currentUser: loggedUser,
-                      ),
-                    ),
-                  );
-                }
               }
             }
-          });
+          }
         },
       ),
     );

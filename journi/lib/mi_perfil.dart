@@ -179,7 +179,12 @@ class _MiPerfilState extends State<MiPerfil> {
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Nuevo viaje'),
           BottomNavigationBarItem(icon: Icon(Icons.equalizer), label: 'Datos'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Mi perfil'),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.person,
+                key: Key('button4'),
+              ),
+              label: 'Mi perfil'),
         ],
         onTap: (int index) {
           setState(() => widget.selectedIndex = index);
