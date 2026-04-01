@@ -49,6 +49,10 @@ class AppDatabase extends _$AppDatabase {
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );
+  @override
+  Future<void> beforeClose() async {
+    await streamQueries.close(); // 👈 cierra los streams y elimina timers
+  }
 }
 
 LazyDatabase _openLazy() {
